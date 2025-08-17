@@ -1,0 +1,15 @@
+/* frontend/src/App.css */
+
+/* This targets the root div where our React app is mounted */
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* This is our main content wrapper */
+.app-content-wrapper {
+  flex-grow: 1; /* This is the key property that pushes the footer down */
+  display: flex;
+  flex-direction: column;
+}

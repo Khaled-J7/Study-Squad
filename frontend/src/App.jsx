@@ -1,6 +1,8 @@
 // frontend/src/App.jsx
+
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import HomePage from "./pages/HomePage";
 import ExplorePage from "./pages/ExplorePage";
 import SquadHubPage from "./pages/SquadHubPage";
@@ -10,11 +12,11 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import "./App.css";
 
-function App() {
+const App = () => {
   return (
     <>
       <Navbar />
-      <div className="container"> {/* <-- BOOTSTRAP CONTAINER WRAPPER */}
+      <div className="app-content-wrapper">
         <main>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -24,12 +26,12 @@ function App() {
             <Route path="/my-studio" element={<MyStudioPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
-            {/* We will add more routes for profiles, studio details, etc., later */}
           </Routes>
         </main>
       </div>
+      <Footer />
     </>
   );
-}
+};
 
 export default App;
