@@ -1,7 +1,8 @@
 # backend/users/urls.py
 from django.urls import path
-from .views import studio_list_view
+from .views import explore_view
 
 urlpatterns = [
-    path("studios/", studio_list_view, name="studio-list"),
+    # This one URL will now handle all our explore page requests
+    path("explore/", explore_view, name="explore"),
 ]
