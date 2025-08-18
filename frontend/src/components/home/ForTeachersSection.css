@@ -51,7 +51,7 @@
 }
 
 .feature-icon {
-  color: var(--color-primary);
+  color: var(--color-primary) !important;
   font-size: 1.5rem;
   margin-right: 1rem;
   flex-shrink: 0; /* Prevents icon from shrinking */

@@ -7,7 +7,7 @@ import {
   HiOutlineVideoCamera,
   HiCollection,
 } from "react-icons/hi";
-import teacherVisual from "../../assets/teacherVisual.jpg"; // Import the image
+import teacherVisual from "../../assets/teacherVisual.jpg";
 import "./ForTeachersSection.css";
 
 const ForTeachersSection = () => {
