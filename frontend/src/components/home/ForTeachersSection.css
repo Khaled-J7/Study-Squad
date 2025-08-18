@@ -1,0 +1,105 @@
+/* frontend/src/components/home/ForTeachersSection.css */
+
+.teachers-section {
+  padding: 6rem 0;
+  background: linear-gradient(
+    135deg,
+    var(--color-bg-start),
+    var(--color-bg-mid),
+    var(--color-bg-end)
+  );
+}
+
+.teachers-container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 4rem;
+}
+
+.section-headline {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+}
+
+.section-subheadline {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2.5rem 0;
+}
+
+.features-list li {
+  display: flex;
+  align-items: center;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.feature-icon {
+  color: var(--color-primary);
+  font-size: 1.5rem;
+  margin-right: 1rem;
+  flex-shrink: 0; /* Prevents icon from shrinking */
+}
+
+.btn.btn-cta-primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverted);
+  border-radius: 2rem;
+  padding: 0.8rem 2rem;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.2s ease-out, background-color 0.2s ease-out;
+  display: inline-flex; /* Use inline-flex for content alignment */
+  align-items: center;
+  justify-content: center;
+}
+
+.btn.btn-cta-primary:hover {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-2px);
+}
+
+.teachers-visual {
+  width: 100%;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.teachers-visual img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Responsive Styles */
+@media (max-width: 992px) {
+  .teachers-container {
+    grid-template-columns: 1fr;
+  }
+  .teachers-visual {
+    order: -1; /* Move image to the top on mobile */
+    margin-bottom: 2rem;
+  }
+  .teachers-section {
+    padding: 4rem 0;
+  }
+}
