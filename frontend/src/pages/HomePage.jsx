@@ -1,14 +1,17 @@
 // frontend/src/pages/HomePage.jsx
+import HeroSection from "../components/home/HeroSection";
+import ForTeachersSection from "../components/home/ForTeachersSection";
+import ForLearnersSection from "../components/home/ForLearnersSection";
+import CommunitySection from "./../components/home/CommunitySection";
 
 const HomePage = () => {
   return (
-    <div style={{ paddingTop: "150px", height: "200vh" }}>
-      {" "}
-      {/* Added padding and height */}
-      <h1>Home Page</h1>
-      <p>Scroll down to see the navbar background effect...</p>
-      <p>This is just temporary garbage content for testing the scroll.</p>
-    </div>
+    <>
+      <HeroSection />
+      <ForTeachersSection />
+      <ForLearnersSection />
+      <CommunitySection />
+    </>
   );
 };
 
