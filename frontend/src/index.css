@@ -2,31 +2,67 @@
 @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=Inter:wght@400;500;700&family=Source+Sans+3:wght@600;700&display=swap");
 
 :root {
-  /* Fonts */
+  /* ------------------------- */
+  /* FONT PALETTE              */
+  /* ------------------------- */
   --font-display: "Bricolage Grotesque", sans-serif;
   --font-body: "Inter", sans-serif;
-  --font-nav: "Source Sans 3", sans-serif; /* Font for Nav Items & Buttons */
+  --font-sans: "Source Sans 3", sans-serif;
 
-  /* Color Palette */
+  /* ------------------------- */
+  /* COLOR PALETTE             */
+  /* ------------------------- */
+
+  /* -- Background Colors -- */
+  --color-bg-start: #f7f3e9;
+  --color-bg-mid: #e8dcc6;
+  --color-bg-end: #d4c5a0;
+
+  /* -- Text Colors -- */
   --color-text-primary: #1e293b; /* Deep Navy */
-  --color-text-secondary: #374151; /* Charcoal Gray */
-  --color-primary: #d97706; /* Warm Gold */
-  --color-primary-hover: #f59e0b; /* Lighter Gold */
-  --color-surface: #ffffff;
+  --color-text-secondary: #374151; /* Charcoal */
+  --color-text-inverted: #ffffff; /* Pure White */
+
+  /* -- Surface Colors (for cards, menus, etc.) -- */
+  --color-surface-soft: #f8f5f0;
+  --color-surface-deep: #f1ebe3;
+  --color-border: #e5e0d8;
+  --color-overlay-dark: rgba(
+    30,
+    27,
+    24,
+    0.7
+  ); /* Dark overlay with transparency */
+
+  /* -- Primary Action Colors (Gold) -- */
+  --color-primary: #d97706;
+  --color-primary-hover: #f59e0b;
+  --color-primary-active: #c2410c;
+
+  /* -- Accent Colors -- */
   --color-accent-green: #65a30d;
   --color-accent-teal: #0e7490;
-  --color-accent-gold: #ffd300;
-  --color-accent-skyblue: #00aff0;
+  --color-accent-rose: #be185d;
+  --color-accent-purple: #7e22ce;
 
   color-scheme: light;
 }
 
+/* ------------------------- */
+/* GLOBAL STYLES             */
+/* ------------------------- */
 body {
   margin: 0;
   font-family: var(--font-body);
-  background: linear-gradient(135deg, #f7f3e9, #e8dcc6, #d4c5a0);
+  background: linear-gradient(
+    135deg,
+    var(--color-bg-start),
+    var(--color-bg-mid),
+    var(--color-bg-end)
+  );
   color: var(--color-text-primary);
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 h1,
