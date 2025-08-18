@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 
 # Model 1: The Unified Profile for all users
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     bio = models.TextField(blank=True)
     profile_picture = models.ImageField(
         upload_to="profile_pics/", default="profile_pics/default.jpg"
@@ -58,6 +58,7 @@ class Studio(models.Model):
 class Lesson(models.Model):
     studio = models.ForeignKey(Studio, on_delete=models.CASCADE, related_name="lessons")
     title = models.CharField(max_length=200)
+    tags = models.ManyToManyField(Tag, blank=True)
     content = models.TextField(help_text="Use Markdown for formatting.")
     video_upload = models.FileField(
         upload_to="lesson_videos/", blank=True, null=True
