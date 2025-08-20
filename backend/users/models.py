@@ -59,6 +59,13 @@ class Lesson(models.Model):
     studio = models.ForeignKey(Studio, on_delete=models.CASCADE, related_name="lessons")
     title = models.CharField(max_length=200)
     tags = models.ManyToManyField(Tag, blank=True)
+    # -- New --
+    cover_image = models.ImageField(
+        upload_to="lesson_covers/",
+        blank=True,
+        null=True,
+        help_text="Upload a cover image for this course.",
+    )
     content = models.TextField(help_text="Use Markdown for formatting.")
     video_upload = models.FileField(
         upload_to="lesson_videos/", blank=True, null=True
