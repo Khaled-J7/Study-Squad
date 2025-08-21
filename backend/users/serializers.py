@@ -49,6 +49,7 @@ class StudioCardSerializer(serializers.ModelSerializer):
             "cover_image",
             "owner",
             "tags",
+            "social_links",
             # "subscribers_count",
         ]
 

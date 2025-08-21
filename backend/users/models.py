@@ -51,7 +51,12 @@ class Studio(models.Model):
 
     tags = models.ManyToManyField(Tag, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    # -- NEW --
+    social_links = models.JSONField(
+        blank=True,
+        null=True,
+        help_text="e.g., {'email': 'teacher@example.com', 'linkedin': '...'}",
+    )
     # We will use studio.subscribers.count() to get the number of subscribers
     # We will define 'subscribers' using the Subscription model later if needed, or a simple ManyToManyField on Profile.
 
