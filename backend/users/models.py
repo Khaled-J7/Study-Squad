@@ -28,35 +28,31 @@ class Tag(models.Model):
 class Studio(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
-    # -- NEW --
     job_title = models.CharField(
         max_length=200, blank=True, help_text="e.g., Professor of Computer Science"
-    )
-    experience = models.TextField(
-        blank=True, help_text="Describe your work experience."
     )
     cover_image = models.ImageField(
         upload_to="studio_covers/", default="studio_covers/default.jpg"
     )
     description = models.TextField()
-    degrees_text = models.TextField(
-        blank=True, help_text="Describe your qualifications."
-    )
-    cv_file = models.FileField(
-        upload_to="cv_files/",
+
+    # --- UPDATED FIELDS ---
+    degrees = models.JSONField(
+        default=list,
         blank=True,
-        null=True,
-        help_text="Upload your CV or diplomas.",
+        help_text='List of degrees, e.g., ["B.Sc. Computer Science", "M.Sc. AI"]',
+    )
+    experience = models.JSONField(
+        default=list,
+        blank=True,
+        help_text='List of experiences, e.g., [{"title": "Software Engineer", "company": "Google"}]',
     )
 
+    cv_file = models.FileField(upload_to="cv_files/", blank=True, null=True)
     tags = models.ManyToManyField(Tag, blank=True)
+    social_links = models.JSONField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    # -- NEW --
-    social_links = models.JSONField(
-        blank=True,
-        null=True,
-        help_text="e.g., {'email': 'teacher@example.com', 'linkedin': '...'}",
-    )
+
     # We will use studio.subscribers.count() to get the number of subscribers
     # We will define 'subscribers' using the Subscription model later if needed, or a simple ManyToManyField on Profile.
 
