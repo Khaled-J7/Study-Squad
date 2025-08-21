@@ -44,6 +44,7 @@ class StudioCardSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
+            "job_title",
             "description",
             "cover_image",
             "owner",

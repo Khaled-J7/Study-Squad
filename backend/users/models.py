@@ -28,6 +28,10 @@ class Tag(models.Model):
 class Studio(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
+    # -- NEW --
+    job_title = models.CharField(
+        max_length=200, blank=True, help_text="e.g., Professor of Computer Science"
+    )
     cover_image = models.ImageField(
         upload_to="studio_covers/", default="studio_covers/default.jpg"
     )
