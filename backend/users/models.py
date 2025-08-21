@@ -32,6 +32,9 @@ class Studio(models.Model):
     job_title = models.CharField(
         max_length=200, blank=True, help_text="e.g., Professor of Computer Science"
     )
+    experience = models.TextField(
+        blank=True, help_text="Describe your work experience."
+    )
     cover_image = models.ImageField(
         upload_to="studio_covers/", default="studio_covers/default.jpg"
     )
@@ -45,9 +48,7 @@ class Studio(models.Model):
         null=True,
         help_text="Upload your CV or diplomas.",
     )
-    experience = models.TextField(
-        blank=True, help_text="Describe your work experience."
-    )
+
     tags = models.ManyToManyField(Tag, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
