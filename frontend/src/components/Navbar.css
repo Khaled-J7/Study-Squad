@@ -57,7 +57,7 @@
 }
 
 .nav-link {
-  font-family: var(--font-nav);
+  font-family: var(--font-nav); /* Will now use Lato */
   font-weight: 700;
   font-size: 1.3rem;
   color: var(--color-text-primary);
@@ -94,7 +94,7 @@
   border: none;
   display: flex;
   align-items: center;
-  font-family: var(--font-nav);
+  font-family: var(--font-nav); /* Will now use Lato */
   text-decoration: none;
   cursor: pointer;
   transition: transform 0.2s ease-out, background-color 0.2s ease-in-out;
