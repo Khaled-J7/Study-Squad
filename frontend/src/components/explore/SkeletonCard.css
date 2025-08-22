@@ -1,0 +1,44 @@
+/* frontend/src/components/explore/SkeletonCard.css */
+.skeleton-card {
+  background-color: var(--color-surface-deep);
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+.skeleton-image {
+  height: 190px;
+  background-color: #e0e0e0;
+}
+.skeleton-content {
+  padding: 1.5rem;
+}
+.skeleton-line {
+  height: 1rem;
+  border-radius: 0.5rem;
+  background-color: #e0e0e0;
+  margin-bottom: 0.75rem;
+}
+.skeleton-line.short {
+  width: 40%;
+}
+.skeleton-line.medium {
+  width: 80%;
+}
+.skeleton-line.long {
+  width: 100%;
+}
+
+/* Shimmer Animation */
+.skeleton-card > * {
+  background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+}
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
