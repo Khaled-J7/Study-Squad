@@ -50,6 +50,7 @@ class StudioCardSerializer(serializers.ModelSerializer):
             "owner",
             "tags",
             "social_links",
+            "created_at",
             # "subscribers_count",
         ]
 
@@ -60,13 +61,54 @@ class LessonCardSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Lesson
-        fields = ["id", "title", "studio", "tags", "cover_image"]
+        fields = [
+            "id",
+            "title",
+            "studio",
+            "tags",
+            "cover_image",
+            "description",
+            "created_at",
+        ]
 
 
 class TeacherCardSerializer(serializers.ModelSerializer):
-    profile = ProfileSerializer(read_only=True)  # Updated to use the ProfileSerializer
-    studio_name = serializers.CharField(source="studio.name", read_only=True)
+    """
+    A serializer for the "Teacher Card" on the Explore page.
+    """
+
+    profile = ProfileSerializer(read_only=True)
+    # --- NEW: Use SerializerMethodFields to get data from the related Studio ---
+    job_title = serializers.SerializerMethodField()
+    experience = serializers.SerializerMethodField()
+    degrees = serializers.SerializerMethodField()
+    social_links = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ["id", "username", "profile", "studio_name"]
+        fields = [
+            "id",
+            "username",
+            "profile",
+            "job_title",
+            "experience",
+            "degrees",
+            "social_links",
+        ]
+
+    def get_job_title(self, obj):
+        # 'obj' is the User instance. We find their studio and get the job title.
+        studio = Studio.objects.filter(owner=obj).first()
+        return studio.job_title if studio else ""
+
+    def get_experience(self, obj):
+        studio = Studio.objects.filter(owner=obj).first()
+        return studio.experience if studio else []
+
+    def get_degrees(self, obj):
+        studio = Studio.objects.filter(owner=obj).first()
+        return studio.degrees if studio else []
+
+    def get_social_links(self, obj):
+        studio = Studio.objects.filter(owner=obj).first()
+        return studio.social_links if studio else {}

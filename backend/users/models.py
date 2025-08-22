@@ -65,7 +65,7 @@ class Lesson(models.Model):
     studio = models.ForeignKey(Studio, on_delete=models.CASCADE, related_name="lessons")
     title = models.CharField(max_length=200)
     tags = models.ManyToManyField(Tag, blank=True)
-    # -- New --
+    description = models.TextField(blank=True, help_text="A short description of the course.")
     cover_image = models.ImageField(
         upload_to="lesson_covers/",
         blank=True,
