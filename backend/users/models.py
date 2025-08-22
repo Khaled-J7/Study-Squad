@@ -65,7 +65,9 @@ class Lesson(models.Model):
     studio = models.ForeignKey(Studio, on_delete=models.CASCADE, related_name="lessons")
     title = models.CharField(max_length=200)
     tags = models.ManyToManyField(Tag, blank=True)
-    description = models.TextField(blank=True, help_text="A short description of the course.")
+    description = models.TextField(
+        blank=True, help_text="A short description of the course."
+    )
     cover_image = models.ImageField(
         upload_to="lesson_covers/",
         blank=True,
@@ -85,6 +87,7 @@ class Lesson(models.Model):
     order = models.PositiveIntegerField(
         default=0, help_text="Order of the lesson in the course."
     )
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
         return self.title
