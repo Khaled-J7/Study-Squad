@@ -33,6 +33,16 @@ class UserSerializer(serializers.ModelSerializer):
 # --- Serializers for Search Results (Our Custom Cards) ---
 
 
+# --- NEW SERIALIZER ---
+# A simple serializer to nest studio info inside the CourseCard
+class CourseStudioSerializer(serializers.ModelSerializer):
+    owner = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Studio
+        fields = ["id", "name", "owner"]
+
+
 class StudioCardSerializer(serializers.ModelSerializer):
     # This now has access to the user's profile through the updated UserSerializer
     owner = UserSerializer(read_only=True)
@@ -56,7 +66,7 @@ class StudioCardSerializer(serializers.ModelSerializer):
 
 
 class LessonCardSerializer(serializers.ModelSerializer):
-    studio = serializers.StringRelatedField(read_only=True)
+    studio = CourseStudioSerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
 
     class Meta:
