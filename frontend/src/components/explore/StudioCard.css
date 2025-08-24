@@ -89,20 +89,22 @@
   font-size: 0.9rem;
   margin: 0 0 16px 0;
 }
-.card-teacher-name span {
+/* --- FIX for link color --- */
+.card-teacher-name a {
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
   transition: color 0.2s ease-in-out;
   border-bottom: 2px solid transparent;
   padding-bottom: 2px;
+  color: var(--color-text-secondary); /* Set base color */
+  text-decoration: none;
 }
-.card-teacher-name span:hover {
+.card-teacher-name a:hover {
   color: var(--color-accent-rose);
   border-bottom-color: var(--color-accent-rose);
 }
 
-/* --- NEW DESCRIPTION STYLES --- */
 .card-description {
   font-family: var(--font-body);
   font-size: 0.9rem;
@@ -113,7 +115,7 @@
 .studio-card-read-more {
   background: none;
   border: none;
-  color: rgba(190, 24, 93, 1);
+  color: var(--color-accent-rose);
   font-weight: 700;
   cursor: pointer;
   padding: 0 0 0 0.5rem;
@@ -125,7 +127,8 @@
   gap: 8px;
   flex-wrap: wrap;
 }
-.card-tag {
+/* --- FIX for tag style bleeding --- */
+.card-wrapper .card-tag {
   background: var(--color-surface-deep);
   color: var(--color-text-secondary);
   padding: 6px 12px;
@@ -138,8 +141,9 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  text-decoration: none;
 }
-.card-tag:hover {
+.card-wrapper .card-tag:hover {
   background: var(--color-accent-rose);
   color: white;
   transform: translateY(-1px);
@@ -185,7 +189,6 @@
 }
 .card-button {
   background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: white;
   text-decoration: none;
