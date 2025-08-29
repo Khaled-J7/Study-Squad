@@ -1,16 +1,20 @@
 # backend/users/views.py
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework import status
 from django.contrib.auth.models import User
 from .models import Studio, Lesson
 from .serializers import (
     StudioCardSerializer,
     LessonCardSerializer,
     TeacherCardSerializer,
+    UserRegisterSerializer,
+    CurrentUserSerializer,
 )
 
 
-# 🧠 This view is the "brain" of our search feature in the Explore Page
+# 🧠 This view is the "brain" of our Search&Filter features in the Explore Page
 @api_view(["GET"])
 def explore_view(request):
     """
@@ -58,4 +62,46 @@ def explore_view(request):
     else:
         return Response({"error": "Invalid Search Type"}, status=400)
 
+    return Response(serializer.data)
+
+
+# --- Authentication Views ---
+
+
+@api_view(["POST"])
+def register_view(request):
+    """
+    Handles new user registration.
+    """
+
+    # Pass the incoming request data to our registration serializer.
+    serializer = UserRegisterSerializer(data=request.data)
+    # Check if the data is valid (e.g., passwords match, username isn't taken).
+    if serializer.is_valid():
+        user = (
+            serializer.save()
+        )  # The .save() method calls our custom .create() method.
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def logout_view(request):
+    """
+    A placeholder endpoint for logging out.
+    With JWT, logout is handled on the frontend by deleting the token.
+    This endpoint is a good practice to have for future blacklist features.
+    """
+    return Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def current_user_view(request):
+    """
+    Gets the details of the currently logged-in user.
+    """
+    # The fix is to pass request.user, not request.data
+    serializer = CurrentUserSerializer(request.user)
     return Response(serializer.data)
