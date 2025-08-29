@@ -1,19 +1,15 @@
 /* frontend/src/index.css */
-@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=Inter:wght@400;500;700&family=Lato:wght@700&family=Source+Sans+3:wght@600;700&display=swap");
+
+/* --- GLOBAL FONT IMPORTS --- */
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=Source+Sans+3:wght@600;700&family=Farro:wght@300;400;500;700&display=swap");
 
 :root {
-  /* ------------------------- */
-  /* FONT PALETTE              */
-  /* ------------------------- */
+  /* FONT PALETTE */
   --font-display: "Bricolage Grotesque", sans-serif;
-  --font-body: "Inter", sans-serif;
-  --font-nav: "Lato", sans-serif;
-  --font-sans: "Source Sans 3", sans-serif;
+  --font-body: "Source Sans 3", sans-serif;
+  --font-nav: "Farro", sans-serif;
 
-  /* ------------------------- */
-  /* COLOR PALETTE             */
-  /* ------------------------- */
-  
+  /* COLOR PALETTE */
   /* Main Background */
   --color-bg-start: #f7f3e9;
   --color-bg-mid: #e8dcc6;
@@ -43,9 +39,7 @@
   --color-accent-purple: #7e22ce;
 }
 
-/* ------------------------- */
-/* GLOBAL STYLES             */
-/* ------------------------- */
+/* GLOBAL STYLES */
 body {
   margin: 0;
   font-family: var(--font-body);
