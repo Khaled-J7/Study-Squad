@@ -1,5 +1,4 @@
 # backend/users/serializers.py
-
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Profile, Tag, Studio, Lesson, Post, Comment
@@ -28,6 +27,13 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         # UPDATE: Added 'profile' to the fields list
         fields = ["id", "username", "first_name", "last_name", "profile"]
+
+
+# A simple serializer to include basic studio info with the user
+class UserStudioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Studio
+        fields = ["id", "name", "job_title", "experience", "degrees"]
 
 
 # --- Serializers for Search Results (Our Custom Cards) ---
@@ -122,3 +128,53 @@ class TeacherCardSerializer(serializers.ModelSerializer):
     def get_social_links(self, obj):
         studio = Studio.objects.filter(owner=obj).first()
         return studio.social_links if studio else {}
+
+
+class UserRegisterSerializer(serializers.ModelSerializer):
+    """
+    Serializer for user registration.
+    Includes a second password field for validation and creates a Profile on success.
+    """
+
+    # An extra field for password confirmation that is only used for writing (input).
+    password2 = serializers.CharField(style={"input_type": "password"}, write_only=True)
+
+    class Meta:
+        model = User
+        fields = ["username", "email", "password", "password2"]
+        extra_kwargs = {
+            # Ensure the password is not sent back in the API response.
+            "password": {"write_only": True}
+        }
+
+    def validate(self, attrs):
+        """
+        Check that the two password fields match.
+        """
+        # attrs (short for attributes) means the data coming in
+        if attrs["password"] != attrs["password2"]:
+            raise serializers.ValidationError({"password": "Passwords must match."})
+        return attrs
+
+    def create(self, validated_data):
+        """
+        Create a new user with a hashed password and a corresponding profile.
+        """
+        user = User.objects.create_user(
+            username=validated_data["username"],
+            email=validated_data["email"],
+            password=validated_data["password"],
+        )
+        # Automatically create a blank Profile when a new User is created.
+        Profile.objects.create(user=user)
+        return user
+
+
+class CurrentUserSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer(read_only=True)
+    # Finds the first studio owned by the user, if any
+    studio = UserStudioSerializer(read_only=True, source="studio_set.first")
+
+    class Meta:
+        model = User
+        fields = ["id", "username", "email", "profile", "studio"]
