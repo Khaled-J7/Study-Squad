@@ -3,6 +3,7 @@ import { createContext, useState, useEffect, useContext } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import authService from "../api/authService";
+import axiosInstance from "../api/axiosInstance";
 
 // This creates the "box" that will hold the global authentication data.
 const AuthContext = createContext();
@@ -22,35 +23,28 @@ export const AuthProvider = ({ children }) => {
       : null
   );
 
-  // State to hold the decoded user information from the access token.
-  // Also initializes from localStorage.
-  const [user, setUser] = useState(() =>
-    localStorage.getItem("authTokens")
-      ? jwtDecode(localStorage.getItem("authTokens"))
-      : null
-  );
+  // State to hold the FULL user object with profile details.
+  const [user, setUser] = useState(null);
 
-  // State to manage loading, prevents parts of the app from rendering before auth state is checked.
+  // State to manage loading, prevents parts of the app from rendering before the initial auth check is complete.
   const [loading, setLoading] = useState(true);
 
   /**
    * Handles the user login process.
-   * @param {string} username - The user's username.
-   * @param {string} password - The user's password.
    */
-  const loginUser = async (username, password) => {
+  const login = async (username, password) => {
     // Call the API service to get tokens.
     const response = await authService.login(username, password);
 
-    // Decode the new access token to get user data.
-    const decodedUser = jwtDecode(response.data.access);
-
-    // Update the state with the new tokens and user info.
+    // Update the state with the new tokens.
     setTokens(response.data);
-    setUser(decodedUser);
 
     // Store the new tokens in localStorage to persist the session.
     localStorage.setItem("authTokens", JSON.stringify(response.data));
+
+    // After getting tokens, fetch the full user profile from our secure endpoint.
+    const userResponse = await axiosInstance.get("/auth/user/");
+    setUser(userResponse.data);
 
     // Redirect the user to the homepage after a successful login.
     navigate("/");
@@ -59,7 +53,7 @@ export const AuthProvider = ({ children }) => {
   /**
    * Handles the user logout process.
    */
-  const logoutUser = () => {
+  const logout = () => {
     // Clear the state.
     setTokens(null);
     setUser(null);
@@ -73,19 +67,37 @@ export const AuthProvider = ({ children }) => {
   const contextData = {
     user,
     tokens,
-    loginUser, // Renamed for clarity
-    logoutUser, // Renamed for clarity
+    login,
+    logout,
   };
 
-  // This effect runs once on initial load to ensure we are not showing a logged-out state
-  // while we check for tokens in localStorage.
+  // This effect runs ONCE when the app starts up. It's the key to a stable login.
   useEffect(() => {
-    setLoading(false);
-  }, []);
+    const checkUserLoggedIn = async () => {
+      if (tokens) {
+        try {
+          // If we have tokens in localStorage, verify them by fetching the user's data.
+          const userResponse = await axiosInstance.get("/auth/user/");
+          setUser(userResponse.data);
+        } catch (error) {
+          // If the tokens are invalid (e.g., expired), log the user out.
+          console.error(
+            "Token is invalid on initial load, logging out.",
+            error
+          );
+          logout();
+        }
+      }
+      // This is crucial: we set loading to false only AFTER we have checked for a user.
+      setLoading(false);
+    };
+
+    checkUserLoggedIn();
+  }, []); // The empty array [] ensures this runs only once.
 
   return (
     <AuthContext.Provider value={contextData}>
-      {/* Don't render the rest of the app until the initial auth check is done */}
+      {/* We don't render the rest of the app until the initial loading check is complete. This prevents the "flash" of a logged-out state. */}
       {loading ? null : children}
     </AuthContext.Provider>
   );
