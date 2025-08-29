@@ -3,66 +3,117 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import dayjs from "dayjs";
 
-// Define the base URL for all API requests to the backend.
+// Our backend API's base URL.
 const baseURL = "http://127.0.0.1:8000/api";
 
-// Create a custom instance of axios. This allows us to have a pre-configured
-// version of axios that we can use throughout our application.
+// This is our special, pre-configured axios instance for authenticated requests.
 const axiosInstance = axios.create({
   baseURL,
 });
 
+// --- PRO-LEVEL TOKEN REFRESH LOGIC ---
+
+// This flag prevents multiple token refresh requests from firing at the same time.
+let isRefreshing = false;
+// This is a queue to hold any requests that came in while we were refreshing the token.
+let failedQueue = [];
+
+// A helper function to process all the requests in the queue.
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      // If the refresh failed, we reject all queued promises.
+      prom.reject(error);
+    } else {
+      // If the refresh succeeded, we resolve them with the new token.
+      prom.resolve(token);
+    }
+  });
+  failedQueue = []; // Clear the queue.
+};
+
 /**
  * Axios Request Interceptor
- * This is a powerful feature that acts as a "gatekeeper" for every single API call
- * made with this axiosInstance. Before a request is sent, this function runs.
+ * This is the gatekeeper for every single API call.
  */
-axiosInstance.interceptors.request.use(async (req) => {
-  // Always get the latest tokens from localStorage before each request.
-  // This ensures we're not using stale data.
-  const authTokens = localStorage.getItem("authTokens")
-    ? JSON.parse(localStorage.getItem("authTokens"))
-    : null;
+axiosInstance.interceptors.request.use(
+  async (req) => {
+    const authTokens = localStorage.getItem("authTokens")
+      ? JSON.parse(localStorage.getItem("authTokens"))
+      : null;
 
-  // If there are no tokens, the user is not logged in.
-  // We let the request proceed without an Authorization header.
-  if (!authTokens) {
-    return req;
-  }
+    // If there's no token, just let the request go through.
+    if (!authTokens) {
+      return req;
+    }
 
-  // If tokens exist, decode the access token to check its expiration date.
-  const user = jwtDecode(authTokens.access);
+    // Decode the token to check when it expires.
+    const user = jwtDecode(authTokens.access);
 
-  // Use dayjs to compare the token's expiration time (user.exp) with the current time.
-  // We check if the token has less than a minute of validity left.
-  const isExpired = dayjs.unix(user.exp).diff(dayjs()) < 60; // Check if expired or close to expiring
+    // Check if the token is expired. We'll use a 5-minute buffer, so we refresh it
+    // before it actually expires, which is better for user experience.
+    const isExpired = dayjs.unix(user.exp).diff(dayjs()) < 300; // 300 seconds = 5 minutes
 
-  // If the token is not expired, add the Authorization header and let the request proceed.
-  if (!isExpired) {
-    req.headers.Authorization = `Bearer ${authTokens.access}`;
-    return req;
-  }
+    if (!isExpired) {
+      // If the token is still good, just add the Authorization header and send the request.
+      req.headers.Authorization = `Bearer ${authTokens.access}`;
+      return req;
+    }
 
-  // --- TOKEN REFRESH LOGIC ---
-  // If the access token is expired, we need to get a new one using the refresh token.
-  try {
-    const response = await axios.post(`${baseURL}/token/refresh/`, {
-      refresh: authTokens.refresh,
-    });
+    // --- TOKEN REFRESH HANDLING ---
 
-    // If the refresh is successful, update localStorage with the new tokens.
-    localStorage.setItem("authTokens", JSON.stringify(response.data));
+    // If a refresh is already in progress, we'll pause this request and add it to the queue.
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        failedQueue.push({ resolve, reject });
+      })
+        .then((token) => {
+          // Once the refresh is done, the promise will resolve with the new token.
+          req.headers.Authorization = `Bearer ${token}`;
+          return req;
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    }
 
-    // Update the Authorization header of the original, paused request with the new access token.
-    req.headers.Authorization = `Bearer ${response.data.access}`;
+    // If we are the first request to find an expired token, we'll start the refresh.
+    req._retry = true;
+    isRefreshing = true;
 
-    return req; // Let the original request proceed with the new token.
-  } catch (error) {
-    console.error("Token refresh failed", error);
-    // If the refresh token is also expired or invalid, this will fail.
-    // The AuthContext will handle logging the user out in this case.
+    try {
+      // Make the API call to get a new token.
+      const response = await axios.post(`${baseURL}/token/refresh/`, {
+        refresh: authTokens.refresh,
+      });
+
+      // Update the tokens in localStorage with the new access token.
+      localStorage.setItem("authTokens", JSON.stringify(response.data));
+
+      // Update the header of our current request.
+      req.headers.Authorization = `Bearer ${response.data.access}`;
+
+      // Process any requests that were queued while we were refreshing.
+      processQueue(null, response.data.access);
+
+      return req; // Finally, send the original request.
+    } catch (err) {
+      // If the refresh token is also bad, the refresh will fail.
+      processQueue(err, null);
+
+      // We'll fire off a custom event. Our AuthContext will be listening for this
+      // and will know to log the user out completely.
+      window.dispatchEvent(new Event("forceLogout"));
+
+      return Promise.reject(err);
+    } finally {
+      // No matter what, we reset the refreshing flag.
+      isRefreshing = false;
+    }
+  },
+  (error) => {
     return Promise.reject(error);
   }
-});
+);
 
 export default axiosInstance;
