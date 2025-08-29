@@ -1,86 +1,102 @@
 // frontend/src/context/AuthContext.jsx
-import { createContext, useState, useEffect, useContext } from "react";
-import { jwtDecode } from "jwt-decode";
+import {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import authService from "../api/authService";
 import axiosInstance from "../api/axiosInstance";
 
-// This creates the "box" that will hold the global authentication data.
+// This is the "box" that will hold all our global auth data.
 const AuthContext = createContext();
 
 /**
- * This component is the provider. Its job is to manage all the authentication state
- * and provide it to any child component that needs it.
+ * This component is the "brain" of our app's authentication.
+ * It provides the user's data and auth functions to any component that needs it.
  */
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
-  // State to hold the authentication tokens (access & refresh).
-  // It initializes its state from localStorage to keep the user logged in on page refresh.
+  // State to hold the tokens from localStorage.
   const [tokens, setTokens] = useState(() =>
     localStorage.getItem("authTokens")
       ? JSON.parse(localStorage.getItem("authTokens"))
       : null
   );
 
-  // State to hold the FULL user object with profile details.
+  // State for the full user object.
   const [user, setUser] = useState(null);
 
-  // State to manage loading, prevents parts of the app from rendering before the initial auth check is complete.
+  // 'loading' is for the initial check when the app first loads.
   const [loading, setLoading] = useState(true);
+
+  // 'authLoading' is for when a user is actively logging in or out.
+  const [authLoading, setAuthLoading] = useState(false);
+
+  // This is a generic error state for auth-related issues.
+  const [error, setError] = useState(null);
 
   /**
    * Handles the user login process.
    */
-  const login = async (username, password) => {
-    // Call the API service to get tokens.
-    const response = await authService.login(username, password);
+  const login = useCallback(
+    async (username, password) => {
+      setAuthLoading(true);
+      setError(null);
+      try {
+        // First, get the tokens.
+        const response = await authService.login(username, password);
+        const newTokens = response.data;
+        setTokens(newTokens);
+        localStorage.setItem("authTokens", JSON.stringify(newTokens));
 
-    // Update the state with the new tokens.
-    setTokens(response.data);
+        // Then, use the new token to fetch the user's full profile.
+        const userResponse = await axiosInstance.get("/auth/user/");
+        setUser(userResponse.data);
 
-    // Store the new tokens in localStorage to persist the session.
-    localStorage.setItem("authTokens", JSON.stringify(response.data));
-
-    // After getting tokens, fetch the full user profile from our secure endpoint.
-    const userResponse = await axiosInstance.get("/auth/user/");
-    setUser(userResponse.data);
-
-    // Redirect the user to the homepage after a successful login.
-    navigate("/");
-  };
+        // Finally, send them to the homepage.
+        navigate("/");
+      } catch (err) {
+        // This allows the LoginPage to catch it and handle its own UI.
+        console.error("Login failed:", err);
+        const errorMessage =
+          err.response?.data?.detail ||
+          "Invalid credentials. Please try again.";
+        setError(errorMessage);
+        throw err;
+      } finally {
+        setAuthLoading(false);
+      }
+    },
+    [navigate]
+  );
 
   /**
    * Handles the user logout process.
    */
-  const logout = () => {
-    // Clear the state.
+  const logout = useCallback(() => {
+    // Clear our state and remove the tokens from storage.
     setTokens(null);
     setUser(null);
-    // Remove the tokens from localStorage.
     localStorage.removeItem("authTokens");
-    // Redirect the user to the login page.
+    // Send the user back to the login page.
     navigate("/login");
-  };
+  }, [navigate]);
 
-  // The data and functions that will be provided to the whole app.
-  const contextData = {
-    user,
-    tokens,
-    login,
-    logout,
-  };
-
-  // This effect runs ONCE when the app starts up. It's the key to a stable login.
+  // This effect runs only ONCE when the app starts.
   useEffect(() => {
     const checkUserLoggedIn = async () => {
       if (tokens) {
         try {
-          // If we have tokens in localStorage, verify them by fetching the user's data.
+          // If we have tokens, we'll verify them by fetching the user's data.
           const userResponse = await axiosInstance.get("/auth/user/");
           setUser(userResponse.data);
         } catch (error) {
-          // If the tokens are invalid (e.g., expired), log the user out.
+          // If the tokens are invalid (e.g., expired refresh token), this will fail.
+          // In this case, we just log them out.
           console.error(
             "Token is invalid on initial load, logging out.",
             error
@@ -88,17 +104,73 @@ export const AuthProvider = ({ children }) => {
           logout();
         }
       }
-      // This is crucial: we set loading to false only AFTER we have checked for a user.
+      // This is crucial: we set loading to false only AFTER we've checked for a user.
       setLoading(false);
     };
 
     checkUserLoggedIn();
-  }, []); // The empty array [] ensures this runs only once.
+  }, []); // The empty array [] means this runs only once.
+
+  // This effect sets up our event listeners.
+  useEffect(() => {
+    // This is where we listen for the "flare signal" from our axiosInstance.
+    // If the refresh token fails, axiosInstance will fire this event.
+    const handleForceLogout = () => {
+      console.log("forceLogout event received. Logging out.");
+      logout();
+    };
+
+    // This listener helps us sync auth state across multiple browser tabs.
+    // If the user logs out in one tab, this will log them out in all other tabs.
+    const handleStorageChange = (e) => {
+      if (e.key === "authTokens" && e.newValue === null) {
+        console.log("authTokens removed from another tab. Logging out.");
+        setUser(null);
+        setTokens(null);
+      }
+    };
+
+    window.addEventListener("forceLogout", handleForceLogout);
+    window.addEventListener("storage", handleStorageChange);
+
+    // We need to clean up the listeners when the component unmounts.
+    return () => {
+      window.removeEventListener("forceLogout", handleForceLogout);
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, [logout]);
+
+  // This is the data and functions that we provide to the whole app.
+  const contextData = {
+    user,
+    tokens,
+    loading,
+    authLoading,
+    error,
+    login,
+    logout,
+  };
 
   return (
     <AuthContext.Provider value={contextData}>
-      {/* We don't render the rest of the app until the initial loading check is complete. This prevents the "flash" of a logged-out state. */}
-      {loading ? null : children}
+      {/* While the initial check is running, we show a loading screen. */}
+      {loading ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100vh",
+            fontFamily: "var(--font-display)",
+            fontSize: "1.5rem",
+            color: "var(--color-text-primary)",
+          }}
+        >
+          Checking authentication...
+        </div>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 };
@@ -109,3 +181,4 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   return useContext(AuthContext);
 };
+
