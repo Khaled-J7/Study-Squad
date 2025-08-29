@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { HiOutlineUser, HiOutlineLockClosed } from "react-icons/hi";
-import { useAuth } from "../context/authContext";
+import { useAuth } from "../context/AuthContext";
 import "./LoginPage.css";
 
 const LoginPage = () => {
@@ -32,7 +32,15 @@ const LoginPage = () => {
       await login(formData.username, formData.password);
       navigate("/"); // Redirect to homepage on successful login
     } catch (err) {
-      setError("Failed to log in. Please check your credentials.");
+      // --- DEBUG ---
+      // Check for a specific response from the backend
+      if (err.response && err.response.data) {
+        // Simple JWT sends an error under the "detail" key
+        setError(err.response.data.detail || "Invalid credentials provided.");
+      } else {
+        // Handle network errors or other issues
+        setError("Failed to log in. Please check your connection.");
+      }
     } finally {
       setLoading(false);
     }
