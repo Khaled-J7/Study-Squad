@@ -1,3 +1,4 @@
+# backend/config/settings.py
 """
 Django settings for config project.
 
@@ -108,3 +109,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # CORS Configuration
 CORS_ALLOW_ALL_ORIGINS = True
+
+# Django REST Framework Configuration
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    )
+}
