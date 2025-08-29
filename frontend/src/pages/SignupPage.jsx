@@ -10,10 +10,10 @@ import authService from "../api/authService";
 import "./SignupPage.css";
 
 const SignupPage = () => {
-  // This helps us redirect the user after they sign up
+  // This helps us redirect the user after they sign up.
   const navigate = useNavigate();
 
-  // State to hold the form data
+  // State to hold the form data.
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -21,41 +21,45 @@ const SignupPage = () => {
     password2: "",
   });
 
-  // State for loading and any errors from the backend
+  // State for loading and any errors from the backend.
   const [loading, setLoading] = useState(false);
+  // NOTE: 'errors' is now an object to hold field-specific messages.
   const [errors, setErrors] = useState({});
 
-  // Updates the state when a user types in a field
+  // Updates the state when a user types in a field.
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    // Also, clear the specific error for this field when the user starts typing again.
+    if (errors[e.target.name]) {
+      setErrors({ ...errors, [e.target.name]: null });
+    }
   };
 
-  // This function runs when the form is submitted
+  // This function runs when the form is submitted.
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevents the page from reloading
+    e.preventDefault(); // Prevents the page from reloading.
     setLoading(true);
-    setErrors({}); // Clear old errors
+    setErrors({}); // Clear old errors before a new submission.
 
-    try {
-      await authService.register(
-        formData.username,
-        formData.email,
-        formData.password,
-        formData.password2
-      );
-      // If successful, navigate to login
+    // Call our updated authService.
+    const response = await authService.register(
+      formData.username,
+      formData.email,
+      formData.password,
+      formData.password2
+    );
+
+    // Check the 'success' flag from our service's structured response.
+    if (response.success) {
+      // If successful, we can navigate the user to the login page.
       navigate("/login");
-    } catch (error) {
-      if (error.response && error.response.data) {
-        setErrors(error.response.data);
-      } else {
-        setErrors({
-          general: "An unexpected error occurred. Please try again.",
-        });
-      }
-    } finally {
-      setLoading(false);
+    } else {
+      // If it fails, the service gives us a 'fieldErrors' object.
+      // We'll set this object in our state to display the errors in the form.
+      setErrors(response.fieldErrors);
     }
+
+    setLoading(false); // Stop the loading indicator.
   };
 
   return (
@@ -112,6 +116,7 @@ const SignupPage = () => {
                   required
                 />
               </div>
+              {/* Here's the magic: only show the error if it exists for this field. */}
               {errors.username && (
                 <p className="error-text">{errors.username}</p>
               )}
@@ -169,8 +174,9 @@ const SignupPage = () => {
               )}
             </div>
 
-            {errors.general && (
-              <p className="error-text general-error">{errors.general}</p>
+            {/* A general error for non-field specific issues. */}
+            {errors.detail && (
+              <p className="error-text general-error">{errors.detail}</p>
             )}
 
             <button type="submit" className="auth-button" disabled={loading}>
