@@ -1,11 +1,15 @@
-// frontend/src/components/home/WhatMakesUsDifferent.jsx
+// frontend/src/components/home/CommunitySection.jsx
 
 import { Link } from "react-router-dom";
 import { HiChatAlt2, HiBookOpen, HiUsers, HiArrowRight } from "react-icons/hi";
 import SquadHubLogo from "../../assets/SquadHUB_logo.png";
+import { useAuth } from "../../context/AuthContext"; // We need our auth hook.
 import "./CommunitySection.css";
 
 const CommunitySection = () => {
+  // Get the isTeacher function from our context.
+  const { isTeacher } = useAuth();
+
   const features = [
     {
       icon: HiChatAlt2,
@@ -39,14 +43,32 @@ const CommunitySection = () => {
             />
           </div>
           <div className="community-intro">
-            <h2 className="community-headline">
-              Discover <span className="highlight-text">SquadHUB</span>
-            </h2>
-            <p className="community-description">
-              SquadHUB is our integrated blog and community space where learners
-              can share experiences, discuss topics, and connect with others on
-              their educational journey.
-            </p>
+            {/* --- DYNAMIC TEXT --- */}
+            {isTeacher() ? (
+              <>
+                {/* This is the view for logged-in teachers. */}
+                <h2 className="community-headline">
+                  Engage with Your{" "}
+                  <span className="highlight-text">Community</span>
+                </h2>
+                <p className="community-description">
+                  See what students are discussing, answer their questions, and
+                  build your reputation as an expert in the SquadHUB.
+                </p>
+              </>
+            ) : (
+              <>
+                {/* This is the default view for guests and learners. */}
+                <h2 className="community-headline">
+                  Discover <span className="highlight-text">SquadHUB</span>
+                </h2>
+                <p className="community-description">
+                  SquadHUB is our integrated blog and community space where
+                  learners can share experiences, discuss topics, and connect
+                  with others.
+                </p>
+              </>
+            )}
           </div>
         </div>
         <div className="community-features-section">

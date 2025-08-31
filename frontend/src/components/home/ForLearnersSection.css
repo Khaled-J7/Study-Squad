@@ -52,7 +52,7 @@
 }
 
 .section-subtitle {
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   font-size: 1.2rem;
   color: var(--color-text-secondary);
   max-width: 600px;

@@ -60,11 +60,12 @@
 }
 
 .community-description {
-  font-family: var(--font-sans);
+  font-family: var(--font-nav);
   font-size: 1.1rem;
   color: var(--color-text-secondary);
-  line-height: 1.7;
+  line-height: 1.9;
   max-width: 500px;
+  
 }
 
 /* Features Section */
@@ -157,7 +158,7 @@
 }
 
 .cta-subtitle {
-  font-family: var(--font-sans);
+  font-family: var(--font-nav);
   font-size: 1.1rem;
   color: var(--color-text-secondary);
   line-height: 1.6;

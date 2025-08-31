@@ -44,7 +44,7 @@
 .features-list li {
   display: flex;
   align-items: center;
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   font-weight: 600;
   font-size: 1.1rem;
   margin-bottom: 1rem;
@@ -62,7 +62,7 @@
   color: var(--color-text-inverted);
   border-radius: 2rem;
   padding: 0.8rem 2rem;
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   font-weight: 700;
   text-decoration: none;
   transition: transform 0.2s ease-out, background-color 0.2s ease-out;
@@ -74,6 +74,11 @@
 .btn.btn-cta-primary:hover {
   background-color: var(--color-primary-hover);
   transform: translateY(-2px);
+}
+
+.btn-cta-primary .btn-icon {
+  margin-left: 8px;
+  font-size: 1.2rem;
 }
 
 .teachers-visual {

@@ -82,7 +82,7 @@
 
 /*  Better contrast for description text */
 .hero-description {
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   font-size: 1.25rem;
   max-width: 650px;
   margin-bottom: 2.5rem;
@@ -102,7 +102,7 @@
   color: var(--color-text-inverted);
   padding: 0.8rem 2.5rem;
   border-radius: 2rem;
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   font-weight: 700;
   text-decoration: none;
   border: 2px solid transparent;
