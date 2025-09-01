@@ -5,6 +5,7 @@ import {
   HiOutlineUser,
   HiOutlineMail,
   HiOutlineLockClosed,
+  HiOutlineIdentification,
 } from "react-icons/hi";
 import authService from "../api/authService";
 import "./SignupPage.css";
@@ -17,6 +18,8 @@ const SignupPage = () => {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
+    firstName: "",
+    lastName: "",
     password: "",
     password2: "",
   });
@@ -38,13 +41,15 @@ const SignupPage = () => {
   // This function runs when the form is submitted.
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevents the page from reloading.
-    setLoading(true);
+    setLoading(true); // Indicate that the submission is in progress
     setErrors({}); // Clear old errors before a new submission.
 
-    // Call our updated authService.
+    // NOTE: We're now passing all the fields from our state to the register service.
     const response = await authService.register(
       formData.username,
       formData.email,
+      formData.firstName,
+      formData.lastName,
       formData.password,
       formData.password2
     );
@@ -103,6 +108,48 @@ const SignupPage = () => {
             <h2 className="auth-form-title">Sign Up</h2>
           </div>
           <form onSubmit={handleSubmit}>
+            {/* --- NEW: First Name and Last Name fields --- */}
+            <div className="name-fields-group">
+              <div className="input-group">
+                <label htmlFor="firstName">First Name</label>
+                <div className="input-wrapper">
+                  <HiOutlineIdentification className="input-icon" />
+                  <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    placeholder="e.g., Khaled"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                {errors.first_name && (
+                  <p className="error-text">{errors.first_name}</p>
+                )}
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="lastName">Last Name</label>
+                <div className="input-wrapper">
+                  <HiOutlineIdentification className="input-icon" />
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    placeholder="e.g., Jallouli"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                {errors.last_name && (
+                  <p className="error-text">{errors.last_name}</p>
+                )}
+              </div>
+            </div>
+            {/* --- End of new fields --- */}
+
             <div className="input-group">
               <label htmlFor="username">Username</label>
               <div className="input-wrapper">
@@ -111,12 +158,12 @@ const SignupPage = () => {
                   type="text"
                   id="username"
                   name="username"
-                  placeholder="e.g., johnsmith"
+                  placeholder="khaledjallouli (no spaces)"
+                  value={formData.username}
                   onChange={handleChange}
                   required
                 />
               </div>
-              {/* Here's the magic: only show the error if it exists for this field. */}
               {errors.username && (
                 <p className="error-text">{errors.username}</p>
               )}
@@ -131,6 +178,7 @@ const SignupPage = () => {
                   id="email"
                   name="email"
                   placeholder="you@example.com"
+                  value={formData.email}
                   onChange={handleChange}
                   required
                 />
@@ -147,6 +195,7 @@ const SignupPage = () => {
                   id="password"
                   name="password"
                   placeholder="••••••••"
+                  value={formData.password}
                   onChange={handleChange}
                   required
                 />
@@ -165,6 +214,7 @@ const SignupPage = () => {
                   id="password2"
                   name="password2"
                   placeholder="••••••••"
+                  value={formData.password2}
                   onChange={handleChange}
                   required
                 />
@@ -174,7 +224,6 @@ const SignupPage = () => {
               )}
             </div>
 
-            {/* A general error for non-field specific issues. */}
             {errors.detail && (
               <p className="error-text general-error">{errors.detail}</p>
             )}
