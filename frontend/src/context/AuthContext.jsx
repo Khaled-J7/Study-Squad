@@ -41,6 +41,7 @@ export const AuthProvider = ({ children }) => {
 
   /**
    * Handles the user login process.
+   * NOTE: We've updated this to throw errors so the calling component can catch them.
    */
   const login = useCallback(
     async (username, password) => {
@@ -66,7 +67,7 @@ export const AuthProvider = ({ children }) => {
           err.response?.data?.detail ||
           "Invalid credentials. Please try again.";
         setError(errorMessage);
-        throw err;
+        throw err; // This is the key change to report the failure.
       } finally {
         setAuthLoading(false);
       }
@@ -85,6 +86,15 @@ export const AuthProvider = ({ children }) => {
     // Send the user back to the login page.
     navigate("/login");
   }, [navigate]);
+
+  /**
+   * A utility function to check if the current user is a teacher.
+   * We know a user is a teacher if their user object has a 'studio' property.
+   */
+  const isTeacher = useCallback(() => {
+    // The '!!' converts the result to a true boolean (true if studio exists, false otherwise).
+    return !!user?.studio;
+  }, [user]);
 
   // This effect runs only ONCE when the app starts.
   useEffect(() => {
@@ -109,7 +119,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     checkUserLoggedIn();
-  }, []); // The empty array [] means this runs only once.
+  }, [logout, tokens]);
 
   // This effect sets up our event listeners.
   useEffect(() => {
@@ -149,6 +159,7 @@ export const AuthProvider = ({ children }) => {
     error,
     login,
     logout,
+    isTeacher,
   };
 
   return (
@@ -181,4 +192,3 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   return useContext(AuthContext);
 };
-
