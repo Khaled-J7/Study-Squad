@@ -11,6 +11,11 @@ class Profile(models.Model):
     profile_picture = models.ImageField(
         upload_to="profile_pics/", default="profile_pics/default.jpg"
     )
+    # --- NEW FIELDS FOR THE PROFILE PAGE ---
+    # A short, one-line description the user can write about themselves.
+    about_me = models.CharField(max_length=250, blank=True)
+    # A dedicated field for a contact email, separate from their account email.
+    contact_email = models.EmailField(max_length=255, blank=True)
 
     def __str__(self):
         return f"{self.user.username} Profile"

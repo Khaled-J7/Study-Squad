@@ -10,7 +10,7 @@ from .models import Profile, Tag, Studio, Lesson, Post, Comment
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ["bio", "profile_picture"]
+        fields = ["bio", "profile_picture", "about_me", "contact_email"]
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -130,6 +130,9 @@ class TeacherCardSerializer(serializers.ModelSerializer):
         return studio.social_links if studio else {}
 
 
+# --- Authentication and User Management Serializers ---
+
+
 class UserRegisterSerializer(serializers.ModelSerializer):
     """
     Serializer for user registration.
@@ -141,10 +144,21 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["username", "email", "password", "password2"]
+        #  NOTE: We've added first_name and last_name to the fields list.
+        fields = [
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "password",
+            "password2",
+        ]
         extra_kwargs = {
             # Ensure the password is not sent back in the API response.
-            "password": {"write_only": True}
+            "password": {"write_only": True},
+            # Make first_name & last_name required for our registration form
+            "first_name": {"required": True},
+            "last_name": {"required": True},
         }
 
     def validate(self, attrs):
@@ -160,9 +174,12 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         """
         Create a new user with a hashed password and a corresponding profile.
         """
+        # NOTE: We now create the user with their first and last names.
         user = User.objects.create_user(
             username=validated_data["username"],
             email=validated_data["email"],
+            first_name=validated_data["first_name"],
+            last_name=validated_data["last_name"],
             password=validated_data["password"],
         )
         # Automatically create a blank Profile when a new User is created.
@@ -177,4 +194,56 @@ class CurrentUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "username", "email", "profile", "studio"]
+        # NOTE: We've added first_name and last_name here so the frontend
+        # receives this data when it asks for the current user.
+        fields = [
+            "id",
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "profile",
+            "studio",
+        ]
+
+
+# --- NEW SERIALIZER FOR THE "EDIT PROFILE" FORM ---
+class ProfileUpdateSerializer(serializers.ModelSerializer):
+    # We also want to update fields on the User model, so we define them here.
+    # The 'source' argument tells Django REST Framework to get the data from the related 'user' object.
+    first_name = serializers.CharField(source="user.first_name", required=False)
+    last_name = serializers.CharField(source="user.last_name", required=False)
+
+    class Meta:
+        model = Profile
+        # These are the fields the frontend form will be able to update.
+        fields = [
+            "first_name",
+            "last_name",
+            "about_me",
+            "contact_email",
+            "profile_picture",
+        ]
+
+    def update(self, instance, validated_data):
+        """
+        * 'instance' is the Profile object we are updating.
+        * 'validated_data' is the clean data from the form.
+        """
+        # This update method is the key. It handles saving data to both the User and Profile models.
+
+        # Step 1: We handle the User model data if it exists.
+        # We get the nested 'user' data that we defined in the serializer.
+        user_data = validated_data.pop("user", {})
+        user = instance.user  # Get the actual User object from the profile.
+
+        # Update the user's fields and save them.
+        user.first_name = user_data.get("first_name", user.first_name)
+        user.last_name = user_data.get("last_name", user.last_name)
+        user.save()
+
+        # Step 2: Handle the Profile data.
+        # Then, we let the parent class handle updating the Profile model fields.
+        # This will automatically update about_me, contact_email, and profile_picture.
+        super().update(instance, validated_data)
+        return instance

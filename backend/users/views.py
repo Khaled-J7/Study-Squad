@@ -4,8 +4,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import User
-from .models import Studio, Lesson
+from .models import Studio, Lesson, Profile
 from .serializers import (
+    ProfileUpdateSerializer,
     StudioCardSerializer,
     LessonCardSerializer,
     TeacherCardSerializer,
@@ -105,3 +106,34 @@ def current_user_view(request):
     # The fix is to pass request.user, not request.data
     serializer = CurrentUserSerializer(request.user)
     return Response(serializer.data)
+
+
+# --- NEW: Profile and Security Views ---
+@api_view(["PUT"])
+@permission_classes([IsAuthenticated])
+def profile_update_view(request):
+    """
+    Handles updating the user's profile information.
+    This includes their name, "About Me", contact email, and profile picture.
+    """
+    try:
+        # We get the user's profile based on the authenticated user making the request.
+        profile = request.user.profile
+    except Profile.DoesNotExist:
+        return Response(
+            {"error": "Profile not found."}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    # We pass the existing profile instance and the new data to our serializer.
+    # The 'partial=True' allows for partial updates (e.g., only updating the 'about_me' field).
+    serializer = ProfileUpdateSerializer(
+        instance=profile, data=request.data, partial=True
+    )
+
+    if serializer.is_valid():
+        # If the data is valid, the serializer's .update() method will handle saving everything.
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # If the data is not valid, we return the errors.
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
