@@ -1,19 +1,29 @@
 // frontend/src/api/authService.js
 import axios from "axios";
+import axiosInstance from "./axiosInstance";
 
-// NOTE: We are using the standard axios here for public requests (like login/register)
-// because our special 'axiosInstance' is for authenticated requests.
 const API_BASE_URL = "http://127.0.0.1:8000/api";
 
 /**
  * Handles the user registration process.
- * Sends user data to the backend and returns a structured response.
+ * Sends user data, now including first and last name, to the backend.
  */
-const register = async (username, email, password, password2) => {
+const register = async (
+  username,
+  email,
+  firstName,
+  lastName,
+  password,
+  password2
+) => {
   try {
+    // NOTE: We've added firstName and lastName to the data we're sending.
+    // The keys 'first_name' and 'last_name' must match what our Django serializer expects.
     const response = await axios.post(`${API_BASE_URL}/auth/register/`, {
       username,
       email,
+      first_name: firstName,
+      last_name: lastName,
       password,
       password2,
     });
@@ -37,12 +47,11 @@ const register = async (username, email, password, password2) => {
 
 /**
  * Handles the user login process.
- * We'll keep using our axiosInstance for this one since it kicks off
- * our authentication flow.
+ * This function uses the standard axios for the public /token/ endpoint.
  */
 const login = (username, password) => {
-  // This is a wrapper around the original call, which will be handled
-  // by our AuthContext. We're keeping it here to centralize all auth functions.
+  // The actual logic of setting state is handled in AuthContext,
+  // this service just makes the API call.
   return axios.post(`${API_BASE_URL}/token/`, {
     username,
     password,
