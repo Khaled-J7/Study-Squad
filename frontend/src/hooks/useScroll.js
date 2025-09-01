@@ -1,5 +1,5 @@
 // frontend/src/hooks/useScroll.js
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export const useScroll = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -8,8 +8,8 @@ export const useScroll = () => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 15);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return scrolled;

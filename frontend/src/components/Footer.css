@@ -3,7 +3,7 @@
   background-color: var(--color-text-secondary); /* Charcoal Gray */
   color: #a0a0b0; /* Lighter gray text for contrast */
   padding: 4rem 0 0;
-  font-family: var(--font-body);
+  font-family: var(--font-nav);
 }
 
 .footer-container {

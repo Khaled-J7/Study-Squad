@@ -16,11 +16,17 @@ const LoginPage = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
 
   const [loading, setLoading] = useState(false);
+
+  // This will hold our error message from the backend
   const [error, setError] = useState("");
 
   // Updates the state when a user types in a field
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    // Clear the error message when the user starts typing again.
+    if (error) {
+      setError("");
+    }
   };
 
   // This function runs when the form is submitted
@@ -28,20 +34,18 @@ const LoginPage = () => {
     e.preventDefault(); // Prevents the page from reloading
     setLoading(true);
     setError(""); // Clear old errors
+
     try {
       await login(formData.username, formData.password);
-      navigate("/"); // Redirect to homepage on successful login
+      // The navigate("/") call is now handled inside the login function itself(AuthContext)
     } catch (err) {
-      // --- DEBUG ---
-      // Check for a specific response from the backend
-      if (err.response && err.response.data) {
-        // Simple JWT sends an error under the "detail" key
-        setError(err.response.data.detail || "Invalid credentials provided.");
-      } else {
-        // Handle network errors or other issues
-        setError("Failed to log in. Please check your connection.");
-      }
+      // If login throws an error, we'll catch it here.
+      const errorMessage =
+        err.response?.data?.detail || "Invalid credentials. Please try again.";
+      // We set the error message to be displayed on the login page.
+      setError(errorMessage);
     } finally {
+      // This will run whether the login succeeded or failed.
       setLoading(false);
     }
   };
@@ -98,7 +102,6 @@ const LoginPage = () => {
                   required
                 />
               </div>
-              {error && <p className="error-text">{error}</p>}
             </div>
 
             <div className="input-group">
@@ -115,8 +118,10 @@ const LoginPage = () => {
                   required
                 />
               </div>
-              {error && <p className="error-text">{error}</p>}
             </div>
+
+            {/* We'll display our error message here, right above the button */}
+            {error && <p className="error-text general-error">{error}</p>}
 
             <button type="submit" className="auth-button" disabled={loading}>
               {loading ? "Logging In..." : "Log In"}

@@ -1,16 +1,21 @@
 # backend/users/views.py
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework import status
 from django.contrib.auth.models import User
-from .models import Studio, Lesson
+from .models import Studio, Lesson, Profile
 from .serializers import (
+    ProfileUpdateSerializer,
     StudioCardSerializer,
     LessonCardSerializer,
     TeacherCardSerializer,
+    UserRegisterSerializer,
+    CurrentUserSerializer,
 )
 
 
-# 🧠 This view is the "brain" of our search feature in the Explore Page
+# 🧠 This view is the "brain" of our Search&Filter features in the Explore Page
 @api_view(["GET"])
 def explore_view(request):
     """
@@ -59,3 +64,76 @@ def explore_view(request):
         return Response({"error": "Invalid Search Type"}, status=400)
 
     return Response(serializer.data)
+
+
+# --- Authentication Views ---
+
+
+@api_view(["POST"])
+def register_view(request):
+    """
+    Handles new user registration.
+    """
+
+    # Pass the incoming request data to our registration serializer.
+    serializer = UserRegisterSerializer(data=request.data)
+    # Check if the data is valid (e.g., passwords match, username isn't taken).
+    if serializer.is_valid():
+        user = (
+            serializer.save()
+        )  # The .save() method calls our custom .create() method.
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def logout_view(request):
+    """
+    A placeholder endpoint for logging out.
+    With JWT, logout is handled on the frontend by deleting the token.
+    This endpoint is a good practice to have for future blacklist features.
+    """
+    return Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def current_user_view(request):
+    """
+    Gets the details of the currently logged-in user.
+    """
+    # The fix is to pass request.user, not request.data
+    serializer = CurrentUserSerializer(request.user)
+    return Response(serializer.data)
+
+
+# --- NEW: Profile and Security Views ---
+@api_view(["PUT"])
+@permission_classes([IsAuthenticated])
+def profile_update_view(request):
+    """
+    Handles updating the user's profile information.
+    This includes their name, "About Me", contact email, and profile picture.
+    """
+    try:
+        # We get the user's profile based on the authenticated user making the request.
+        profile = request.user.profile
+    except Profile.DoesNotExist:
+        return Response(
+            {"error": "Profile not found."}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    # We pass the existing profile instance and the new data to our serializer.
+    # The 'partial=True' allows for partial updates (e.g., only updating the 'about_me' field).
+    serializer = ProfileUpdateSerializer(
+        instance=profile, data=request.data, partial=True
+    )
+
+    if serializer.is_valid():
+        # If the data is valid, the serializer's .update() method will handle saving everything.
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # If the data is not valid, we return the errors.
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

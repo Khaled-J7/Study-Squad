@@ -177,6 +177,18 @@
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(249, 168, 38, 0.3);
 }
+
+/* This will make our new name fields sit side-by-side */
+.name-fields-group {
+  display: flex;
+  gap: 1rem; /* Adjust the space between the fields */
+  width: 100%;
+}
+
+.name-fields-group .input-group {
+  flex: 1; /* This makes each field take up half the space */
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
