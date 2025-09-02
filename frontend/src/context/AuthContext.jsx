@@ -96,6 +96,25 @@ export const AuthProvider = ({ children }) => {
     return !!user?.studio;
   }, [user]);
 
+  /**
+   * Refreshes the user data from the backend.
+   * This is useful after a profile update to ensure the UI has the latest info.
+   */
+  const refreshUser = useCallback(async () => {
+    // We only try to refresh if there's a token (meaning the user is logged in).
+    if (tokens) {
+      try {
+        const userResponse = await axiosInstance.get("/auth/user/");
+        // We update our global user state with the new data from the API.
+        setUser(userResponse.data);
+      } catch (error) {
+        console.error("Failed to refresh user data:", error);
+        // If the refresh fails (e.g., token expired), we log the user out.
+        logout();
+      }
+    }
+  }, [tokens, logout]); // We list dependencies here.
+
   // This effect runs only ONCE when the app starts.
   useEffect(() => {
     const checkUserLoggedIn = async () => {
@@ -160,6 +179,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     isTeacher,
+    refreshUser,
   };
 
   return (
