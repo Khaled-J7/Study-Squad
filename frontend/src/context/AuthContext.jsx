@@ -9,6 +9,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import authService from "../api/authService";
 import axiosInstance from "../api/axiosInstance";
+import Spinner from "../components/common/Spinner"; 
 
 // This is the "box" that will hold all our global auth data.
 const AuthContext = createContext();
@@ -184,24 +185,8 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={contextData}>
-      {/* While the initial check is running, we show a loading screen. */}
-      {loading ? (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100vh",
-            fontFamily: "var(--font-display)",
-            fontSize: "1.5rem",
-            color: "var(--color-text-primary)",
-          }}
-        >
-          Checking authentication...
-        </div>
-      ) : (
-        children
-      )}
+      {/* While the initial check is running, we show a loading Spinner. */}
+      {loading ? <Spinner /> : children}
     </AuthContext.Provider>
   );
 };
