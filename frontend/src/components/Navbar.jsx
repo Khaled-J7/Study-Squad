@@ -23,6 +23,7 @@ import { useClickOutside } from "../hooks/useClickOutside";
 import { useAuth } from "../context/AuthContext";
 import SquadHubLogo from "../assets/SquadHUB_logo.png";
 import "./Navbar.css";
+import { getAvatarUrl } from "../utils/helpers";
 
 /**
  * Navbar Component
@@ -47,15 +48,8 @@ const Navbar = () => {
     setIsLanguageMenuOpen(false);
   });
 
-  // --- NEW: Robust Avatar URL Logic ---
-
-  const API_BASE_URL = "http://127.0.0.1:8000";
-  // Define the path to our local default image as a safety net.
-  const localDefaultAvatar = "/default.jpg";
-  // Determines the correct avatar URL to display.
-  const navAvatarUrl = user?.profile?.profile_picture
-    ? `${API_BASE_URL}${user.profile.profile_picture}` // If the backend provides a URL, we use it.
-    : localDefaultAvatar; // Otherwise, we use our local fallback image.
+  // NOTE: All the old avatar logic is now replaced by this one clean function call.
+  const navAvatarUrl = getAvatarUrl(user);
 
   const closeAllMenus = () => {
     setIsMenuOpen(false);
