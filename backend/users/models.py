@@ -7,7 +7,6 @@ from django.contrib.auth.models import User
 # Model 1: The Unified Profile for all users
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
-    bio = models.TextField(blank=True)
     profile_picture = models.ImageField(
         upload_to="profile_pics/", default="profile_pics/default.jpg"
     )
@@ -16,6 +15,11 @@ class Profile(models.Model):
     about_me = models.CharField(max_length=250, blank=True)
     # A dedicated field for a contact email, separate from their account email.
     contact_email = models.EmailField(max_length=255, blank=True)
+    
+    # --- NEW FIELD ---
+    # This will store the date and time of the last username change.
+    # It's nullable because new users won't have a value for it yet.
+    username_last_changed = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username} Profile"
