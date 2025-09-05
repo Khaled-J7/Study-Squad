@@ -12,7 +12,7 @@ import axiosInstance from "../api/axiosInstance";
 import Spinner from "../components/common/Spinner"; 
 
 // This is the "box" that will hold all our global auth data.
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 /**
  * This component is the "brain" of our app's authentication.
