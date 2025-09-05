@@ -279,3 +279,47 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         # This will automatically update about_me, contact_email, and profile_picture.
         super().update(instance, validated_data)
         return instance
+
+
+# --- NEW SERIALIZER FOR THE "CREATE STUDIO" FORM ---
+class StudioCreateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for creating a new Studio.
+    Handles all the fields from the multi-step form.
+    """
+
+    # We will accept tags as a list of strings from the frontend.
+    tags = serializers.ListField(
+        child=serializers.CharField(max_length=50), write_only=True, required=False
+    )
+
+    class Meta:
+        model = Studio
+        # These are all the fields the user will fill out in the form.
+        fields = [
+            "name",
+            "job_title",
+            "description",
+            "cover_image",
+            "degrees",
+            "experience",
+            "tags",
+            "social_links",
+        ]
+
+    def create(self, validated_data):
+        # We pop the list of tag names from the validated data.
+        tag_names = validated_data.pop("tags", [])
+
+        # We create the Studio instance with the rest of the data.
+        studio = Studio.objects.create(**validated_data)
+
+        # Now, we loop through the tag names.
+        for tag_name in tag_names:
+            # For each name, we either get the existing Tag object from the database
+            # or create a new one if it doesn't exist.
+            tag, created = Tag.objects.get_or_create(name=tag_name.strip())
+            # Then, we add this tag to our new studio.
+            studio.tags.add(tag)
+
+        return studio
