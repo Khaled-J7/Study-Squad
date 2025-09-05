@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from .models import Studio, Lesson, Profile
 from .serializers import (
     ProfileUpdateSerializer,
@@ -12,6 +12,7 @@ from .serializers import (
     TeacherCardSerializer,
     UserRegisterSerializer,
     CurrentUserSerializer,
+    StudioCreateSerializer,
 )
 
 
@@ -127,12 +128,52 @@ def profile_update_view(request):
     # We pass the existing profile instance and the new data to our serializer.
     # The 'partial=True' allows for partial updates (e.g., only updating the 'about_me' field).
     # We are passing the 'request' context to the serializer so it can access the user for validation.
-    serializer = ProfileUpdateSerializer(instance=profile, data=request.data, partial=True, context={'request': request})
+    serializer = ProfileUpdateSerializer(
+        instance=profile, data=request.data, partial=True, context={"request": request}
+    )
 
     if serializer.is_valid():
         # If the data is valid, the serializer's .update() method will handle saving everything.
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # If the data is not valid, we return the errors.
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# --- NEW VIEW FOR CREATING A STUDIO ---
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def studio_create_view(request):
+    """
+    Handles the creation of a new Studio for an authenticated user.
+    """
+    user = request.user
+
+    # First, we check if the user already owns a studio.
+    # A user should only be able to create one studio.
+    if Studio.objects.filter(owner=user).exists():
+        return Response(
+            {"error": "You have already created a studio."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # We pass the incoming form data to our new serializer.
+    serializer = StudioCreateSerializer(data=request.data)
+
+    if serializer.is_valid():
+        # If the data is valid, we call .save() but we also pass the owner,
+        # which the serializer needs to create the studio instance correctly.
+        studio = serializer.save(owner=user)
+
+        # After the form completion in CreateStudioPage, We add the user to the Teacher
+        teachers_group = Group.objects.get(name='Teachers')
+        user.groups.add(teachers_group)
+
+        # We return a success response with the data of the newly created studio.
+        return Response(
+            StudioCardSerializer(studio).data, status=status.HTTP_201_CREATED
+        )
 
     # If the data is not valid, we return the errors.
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
