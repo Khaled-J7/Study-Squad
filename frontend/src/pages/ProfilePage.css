@@ -255,7 +255,7 @@
   font-family: var(--font-display);
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--color-text-primary);
+  color: var(--color-accent-teal);
   margin-bottom: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -301,7 +301,6 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  position: relative;
 }
 
 .detail-textarea {
@@ -311,8 +310,8 @@
   padding-top: 1.4rem;
 }
 
-.detail-textarea .detail-input-icon {
-  top: 2rem;
+.detail-textarea + .detail-input-icon {
+  top: 1.4rem;
   transform: none;
 }
 
@@ -403,48 +402,51 @@
   font-style: italic;
 }
 
-.detail-helper-text::before {
-  content: "ℹ️";
-  font-style: normal;
-  opacity: 0.8;
+.detail-helper-text .icon {
+  font-size: 1.1rem;
+  color: var(--color-accent-teal);
+}
+
+.detail-guidance-text {
+  font-size: 0.9rem;
+  color: #64748b; /* A soft, secondary text color */
+  margin-top: -0.5rem; /* Pull it a bit closer to the label */
+  margin-bottom: 0.8rem;
+  font-style: italic;
 }
 
 /* === RESPONSIVE DESIGN === */
+@media (max-width: 992px) {
+  .profile-card-header {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+}
+
 @media (max-width: 768px) {
   .profile-page-container {
     margin: 1rem;
     border-radius: 16px;
   }
-
-  .profile-card-header {
-    grid-template-columns: 1fr;
-    min-height: 0;
-  }
-
   .profile-left-column,
   .profile-right-column {
     padding: 2rem 1.5rem;
   }
-
   .profile-avatar {
     width: 120px;
     height: 120px;
   }
-
   .profile-full-name {
     font-size: 1.8rem;
   }
-
   .profile-details-grid {
     gap: 2rem;
   }
-
   .detail-input,
   .detail-textarea,
   .detail-value {
     padding: 1.2rem 1.4rem 1.2rem 3.5rem;
   }
-
   .detail-input-icon,
   .detail-value-icon {
     left: 1.2rem;
@@ -463,7 +465,6 @@
     transform: translateY(0);
   }
 }
-
 @keyframes slideInRight {
   from {
     opacity: 0;
