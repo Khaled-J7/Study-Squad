@@ -2,6 +2,8 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Profile, Tag, Studio, Lesson, Post, Comment
+from django.utils import timezone
+from datetime import timedelta
 
 # --- Serializers for Core Models ---
 
@@ -10,7 +12,11 @@ from .models import Profile, Tag, Studio, Lesson, Post, Comment
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ["bio", "profile_picture", "about_me", "contact_email"]
+        fields = [
+            "profile_picture",
+            "about_me",
+            "contact_email",
+        ]
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -209,21 +215,47 @@ class CurrentUserSerializer(serializers.ModelSerializer):
 
 # --- NEW SERIALIZER FOR THE "EDIT PROFILE" FORM ---
 class ProfileUpdateSerializer(serializers.ModelSerializer):
-    # We also want to update fields on the User model, so we define them here.
-    # The 'source' argument tells Django REST Framework to get the data from the related 'user' object.
-    first_name = serializers.CharField(source="user.first_name", required=False)
-    last_name = serializers.CharField(source="user.last_name", required=False)
+    # We define the 'username' field, getting its data from the related User model.
+    username = serializers.CharField(source="user.username", required=False)
 
     class Meta:
         model = Profile
         # These are the fields the frontend form will be able to update.
         fields = [
-            "first_name",
-            "last_name",
+            "username",
             "about_me",
             "contact_email",
             "profile_picture",
         ]
+
+    def validate_username(self, value):
+        """
+        This special method, 'validate_<field_name>', runs automatically
+        for the username field to enforce our custom rules.
+        """
+        # We get the user from the 'context' that our view will provide.
+        user = self.context["request"].user
+
+        # Rule 1: We only run these checks if the username is actually being changed.
+        if value == user.username:
+            return value  # If there's no change, we don't need to do anything else.
+
+        # Rule 2: Check if the new username is already taken by another user.
+        if User.objects.exclude(pk=user.pk).filter(username=value).exists():
+            raise serializers.ValidationError(
+                "This username is already taken by another user."
+            )
+
+        # Rule 3: Enforce the 30-day cooldown period.
+        if user.profile.username_last_changed:
+            # We check if the current time is still within the 30-day cooldown period.
+            if timezone.now() < user.profile.username_last_changed + timedelta(days=30):
+                raise serializers.ValidationError(
+                    "You can only change your username once every 30 days."
+                )
+
+        # If all checks pass, we return the new username.
+        return value
 
     def update(self, instance, validated_data):
         """

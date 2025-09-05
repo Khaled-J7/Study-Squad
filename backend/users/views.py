@@ -126,9 +126,8 @@ def profile_update_view(request):
 
     # We pass the existing profile instance and the new data to our serializer.
     # The 'partial=True' allows for partial updates (e.g., only updating the 'about_me' field).
-    serializer = ProfileUpdateSerializer(
-        instance=profile, data=request.data, partial=True
-    )
+    # We are passing the 'request' context to the serializer so it can access the user for validation.
+    serializer = ProfileUpdateSerializer(instance=profile, data=request.data, partial=True, context={'request': request})
 
     if serializer.is_valid():
         # If the data is valid, the serializer's .update() method will handle saving everything.
