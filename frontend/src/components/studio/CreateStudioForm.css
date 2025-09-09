@@ -1,0 +1,463 @@
+/* frontend/src/components/studio/CreateStudioForm.css */
+
+.form-step {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  animation: slideInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-text-primary);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.form-label svg {
+  color: var(--color-primary);
+  font-size: 1.3rem;
+}
+
+.form-input-wrapper {
+  position: relative;
+}
+
+.form-input-icon {
+  position: absolute;
+  top: 50%;
+  left: 1.2rem;
+  transform: translateY(-50%);
+  color: var(--color-primary);
+  font-size: 1.2rem;
+  z-index: 2;
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: 1rem 1.2rem 1rem 3rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  background: linear-gradient(145deg, #ffffff, #f8fafc);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.1),
+    0 8px 25px rgba(217, 119, 6, 0.15);
+  background: #ffffff;
+  transform: translateY(-2px);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 140px;
+  padding-left: 1.2rem;
+  line-height: 1.6;
+}
+
+/* Step 2: Upload Cover Image */
+.file-uploader {
+  border: 3px dashed #cbd5e1;
+  border-radius: 20px;
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(145deg, #f8fafc, #f1f5f9);
+  position: relative;
+  overflow: hidden;
+}
+
+.file-uploader::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    transparent 40%,
+    rgba(217, 119, 6, 0.05) 50%,
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.file-uploader:hover {
+  border-color: var(--color-primary);
+  background: linear-gradient(145deg, #fef3e7, #fed7aa);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(217, 119, 6, 0.2);
+}
+
+.file-uploader:hover::before {
+  opacity: 1;
+}
+
+.upload-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: #64748b;
+  position: relative;
+  z-index: 2;
+}
+
+.upload-icon {
+  font-size: 3rem;
+  color: var(--color-primary);
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.file-uploader:hover .upload-icon {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.upload-prompt span {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.upload-prompt small {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.file-preview {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* --- NEW STYLES FOR STEP 2 VISUALS --- */
+.preview-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.clear-image-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.2s ease;
+}
+
+.clear-image-btn:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+  transform: scale(1.1);
+}
+
+.upload-prompt.is-default {
+  color: var(--color-accent-teal);
+}
+
+.upload-prompt.is-default .file-preview {
+  opacity: 0.5;
+}
+
+.form-checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.form-checkbox-wrapper input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.form-checkbox-wrapper label {
+  font-family: var(--font-body);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+/* Step 3: Tags Input */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #ffffff, #f8fafc);
+  transition: all 0.3s ease;
+  min-height: 60px;
+}
+
+.tags-container:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.1);
+}
+
+.tag-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, var(--color-accent-teal), #0891b2);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(14, 116, 144, 0.3);
+  animation: slideInScale 0.3s ease;
+}
+
+.tag-remove-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.tag-remove-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+/* Dynamic List Items (Degrees/Experience) */
+.dynamic-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  padding: 1rem 1.25rem;
+  border-radius: 14px;
+  margin-top: 0.75rem;
+  border: 1px solid #cbd5e1;
+  transition: all 0.3s ease;
+  animation: slideInScale 0.4s ease;
+}
+
+.dynamic-list-item:hover {
+  background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.list-item-text-bold {
+  font-weight: 700;
+  color: var(--color-text-primary);
+  font-family: var(--font-display);
+}
+
+.list-item-text-secondary {
+  color: #64748b;
+  margin-left: 0.5rem;
+  font-weight: 500;
+}
+
+.list-remove-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 1.4rem;
+  padding: 0.25rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.list-remove-btn:hover {
+  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.1);
+  transform: scale(1.1);
+}
+
+.credentials-summary {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.credentials-summary h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-family: var(--font-display);
+  color: var(--color-text-primary);
+}
+
+.credentials-summary p {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.credentials-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.credentials-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.credentials-list .check-icon {
+  color: var(--color-accent-green);
+  font-size: 1.25rem;
+}
+
+.degree-input-group {
+  display: flex;
+  gap: 0.75rem; /* A bit tighter spacing */
+  margin-top: 1rem;
+}
+
+/* Base style for our new, smaller buttons */
+.btn-inline-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem; /* Smaller padding */
+  font-family: var(--font-body); /* Using body font for a softer look */
+  font-weight: 700;
+  font-size: 0.9rem; /* Slightly smaller font */
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0; /* Prevents buttons from shrinking */
+}
+
+/* Style for the "Attach File" button */
+.btn-attach {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.btn-attach.is-selected {
+  background-color: #f0fdf4; /* A light green */
+  color: #166534; /* A dark green */
+  border-color: #bbf7d0; /* A soft green border */
+}
+
+.btn-attach:hover {
+  background-color: #e2e8f0;
+  transform: translateY(-1px);
+}
+
+/* Style for the "Add" button */
+.btn-add {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.btn-add:hover {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(217, 119, 6, 0.2);
+}
+
+/* Animations */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .form-step {
+    gap: 1.5rem;
+  }
+
+  .form-input,
+  .form-textarea {
+    padding: 0.875rem 1rem 0.875rem 2.5rem;
+  }
+
+  .file-uploader {
+    padding: 2rem 1rem;
+  }
+
+  .upload-icon {
+    font-size: 2.5rem;
+  }
+
+  .dynamic-list-item {
+    padding: 0.875rem 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .list-remove-btn {
+    align-self: flex-end;
+  }
+}

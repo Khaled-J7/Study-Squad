@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import User, Group
-from .models import Studio, Lesson, Profile
+from .models import Studio, Lesson, Profile, Degree
 from .serializers import (
     ProfileUpdateSerializer,
     StudioCardSerializer,
@@ -165,9 +165,26 @@ def studio_create_view(request):
         # If the data is valid, we call .save() but we also pass the owner,
         # which the serializer needs to create the studio instance correctly.
         studio = serializer.save(owner=user)
+        profile = request.user.profile
+
+        # --- LOGIC FOR HANDLING CV & DEGREES ---
+
+        # Handle CV File
+        if "cv_file" in request.FILES:
+            profile.cv_file = request.FILES["cv_file"]
+            profile.save()
+
+        # Handle Degrees
+        degree_names = request.data.getlist("degrees[name]")
+        degree_files = request.FILES.getlist("degrees[file]")
+
+        # Attach each Degree name to its correspondant Degree file
+        for name, file in zip(degree_names, degree_files):
+            if name and file:
+                Degree.objects.create(profile=profile, name=name, file=file)
 
         # After the form completion in CreateStudioPage, We add the user to the Teacher
-        teachers_group = Group.objects.get(name='Teachers')
+        teachers_group = Group.objects.get(name="Teachers")
         user.groups.add(teachers_group)
 
         # We return a success response with the data of the newly created studio.

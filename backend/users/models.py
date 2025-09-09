@@ -10,16 +10,12 @@ class Profile(models.Model):
     profile_picture = models.ImageField(
         upload_to="profile_pics/", default="profile_pics/default.jpg"
     )
-    # --- NEW FIELDS FOR THE PROFILE PAGE ---
-    # A short, one-line description the user can write about themselves.
     about_me = models.CharField(max_length=250, blank=True)
-    # A dedicated field for a contact email, separate from their account email.
     contact_email = models.EmailField(max_length=255, blank=True)
-    
-    # --- NEW FIELD ---
-    # This will store the date and time of the last username change.
-    # It's nullable because new users won't have a value for it yet.
     username_last_changed = models.DateTimeField(null=True, blank=True)
+
+    # --- NEW FIELD (MOVED FROM STUDIO) ---
+    cv_file = models.FileField(upload_to="cv_files/", blank=True, null=True)
 
     def __str__(self):
         return f"{self.user.username} Profile"
@@ -33,6 +29,19 @@ class Tag(models.Model):
         return self.name
 
 
+# --- NEW MODEL ---
+# Represents a single degree or certification with an associated file.
+class Degree(models.Model):
+    profile = models.ForeignKey(
+        Profile, on_delete=models.CASCADE, related_name="degrees"
+    )
+    name = models.CharField(max_length=255)
+    file = models.FileField(upload_to="degree_files/")
+
+    def __str__(self):
+        return f"{self.name} for {self.profile.user.username}"
+
+
 # Model 3: The Studio model for teachers
 class Studio(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -41,23 +50,15 @@ class Studio(models.Model):
         max_length=200, blank=True, help_text="e.g., Professor of Computer Science"
     )
     cover_image = models.ImageField(
-        upload_to="studio_covers/", default="studio_covers/default.jpg"
+        upload_to="studio_covers/", default="studio_covers/default_cover.jpg"
     )
     description = models.TextField()
 
-    # --- UPDATED FIELDS ---
-    degrees = models.JSONField(
-        default=list,
-        blank=True,
-        help_text='List of degrees, e.g., ["B.Sc. Computer Science", "M.Sc. AI"]',
-    )
     experience = models.JSONField(
         default=list,
         blank=True,
         help_text='List of experiences, e.g., [{"title": "Software Engineer", "company": "Google"}]',
     )
-
-    cv_file = models.FileField(upload_to="cv_files/", blank=True, null=True)
     tags = models.ManyToManyField(Tag, blank=True)
     social_links = models.JSONField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

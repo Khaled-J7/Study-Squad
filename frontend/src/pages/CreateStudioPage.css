@@ -1,0 +1,307 @@
+/* frontend/src/pages/CreateStudioPage.css */
+
+.studio-creation-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+}
+
+/* --- NEW STYLES FOR THE HEADER --- */
+.studio-creation-header {
+  width: 100%;
+  text-align: center;
+  padding: 0 2rem 3rem 2rem; /* Add some padding at the bottom */
+  border-bottom: 2px solid var(--color-border);
+  margin-bottom: 3rem;
+}
+
+.studio-creation-header h1 {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+}
+
+.studio-creation-header p {
+  font-family: var(--font-nav);
+  font-size: 1.1rem;
+  color: var(--color-text-secondary);
+  max-width: 800px;
+  margin: 0 auto; /* Center the paragraph */
+  line-height: 1.6;
+}
+
+.studio-creation-main-content {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 4rem;
+}
+
+/* --- The vertical progress bar --- */
+.progress-bar-container {
+  position: sticky;
+  top: 200px;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.progress-step {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  position: relative;
+  padding: 1.5rem 0;
+  cursor: default;
+}
+
+/* The vertical connecting line */
+.progress-step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 29px; /* (60px / 2) - (2px / 2) = 29px */
+  /* Make the line span the full height of the step */
+  top: 0;
+  height: 100%;
+  width: 2px;
+  background-color: #e5e7eb;
+  /* Ensure the line is behind the circle */
+  z-index: 1;
+}
+
+.step-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: white;
+  color: #6b7280;
+  border: 2px solid #e5e7eb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.step-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #6b7280;
+  transition: color 0.3s ease;
+}
+
+/* Active step styling */
+.progress-step.step-active .step-circle {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+.progress-step.step-active .step-label {
+  color: var(--color-primary);
+}
+
+/* Completed step styling */
+.progress-step.step-completed .step-circle {
+  background-color: var(--color-accent-green);
+  border-color: var(--color-accent-green);
+  color: white;
+}
+.progress-step.step-completed + .progress-step::after {
+  background-color: var(--color-accent-green);
+}
+
+/* --- The "floating" form card --- */
+.form-step-container {
+  flex-grow: 1;
+  width: 100%;
+  background-color: white;
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.step-navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+.step-btn {
+  padding: 0.8rem 2rem;
+  border: none;
+  border-radius: 12px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.step-btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+}
+.step-btn-primary:hover {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-2px);
+}
+
+.step-btn-secondary {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+.step-btn-secondary:hover {
+  background-color: #d1d5db;
+}
+
+.step-btn:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Icons Styling */
+
+.step-btn svg {
+  vertical-align: middle;
+  margin: 0 0.2rem;
+}
+
+.step-btn.step-btn-secondary svg {
+  margin-right: 0.5rem;
+}
+
+.step-btn.step-btn-primary svg {
+  margin-left: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .studio-creation-container {
+    gap: 3rem;
+  }
+
+  .progress-bar-container {
+    width: 180px;
+    min-width: 180px;
+  }
+
+  .step-circle {
+    width: 45px;
+    height: 45px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .studio-creation-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .progress-bar-container {
+    position: static;
+    width: 100%;
+    max-width: 700px;
+    min-width: auto;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 2rem 0;
+  }
+
+  .progress-title {
+    display: none;
+  }
+
+  /* Horizontal connecting line for tablet/mobile */
+  .progress-bar-container::before {
+    left: 10%;
+    right: 10%;
+    top: 50%;
+    bottom: auto;
+    width: 80%;
+    height: 2px;
+    background: linear-gradient(90deg, #e2e8f0, #cbd5e1, #e2e8f0);
+    transform: translateY(-50%);
+  }
+
+  .progress-step {
+    margin-bottom: 0;
+    padding: 1rem 0;
+  }
+
+  .progress-step:hover {
+    transform: translateY(-5px);
+  }
+
+  .form-step-container {
+    width: 100%;
+    max-width: 800px;
+  }
+}
+
+@media (max-width: 768px) {
+  .studio-creation-container {
+    padding: 1.5rem 0.5rem 3rem;
+    gap: 2rem;
+  }
+
+  .progress-bar-container {
+    padding: 1.5rem 0;
+  }
+
+  .progress-bar-container::before {
+    left: 15%;
+    right: 15%;
+    width: 70%;
+  }
+
+  .step-circle {
+    width: 40px;
+    height: 40px;
+    font-size: 0.95rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .step-label {
+    font-size: 0.8rem;
+    max-width: 100px;
+  }
+
+  .form-step-container {
+    padding: 2rem 1.5rem;
+    border-radius: 20px;
+  }
+
+  .step-navigation {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .step-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .step-circle {
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+  }
+
+  .step-label {
+    font-size: 0.75rem;
+    max-width: 80px;
+  }
+
+  .form-step-container {
+    padding: 1.5rem 1rem;
+  }
+}

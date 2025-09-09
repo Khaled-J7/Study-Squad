@@ -1,21 +1,36 @@
 # backend/users/serializers.py
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Profile, Tag, Studio, Lesson, Post, Comment
+from .models import Profile, Tag, Studio, Lesson, Post, Comment, Degree
 from django.utils import timezone
 from datetime import timedelta
 
 # --- Serializers for Core Models ---
 
 
+# --- NEW SERIALIZER ---
+# This serializer will handle our new Degree model.
+class DegreeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Degree
+        fields = ["id", "name", "file"]
+
+
 # NEW serializer to handle profile-specific data
 class ProfileSerializer(serializers.ModelSerializer):
+    # We are nesting the new DegreeSerializer here.
+    # `many=True` because a profile can have multiple degrees.
+    # `read_only=True` because degrees will be created/managed separately.
+    degrees = DegreeSerializer(many=True, read_only=True)
+
     class Meta:
         model = Profile
         fields = [
             "profile_picture",
             "about_me",
             "contact_email",
+            "cv_file",
+            "degrees",
         ]
 
 
@@ -26,7 +41,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    # UPDATE: We are nesting the profile data within the user
+    # UPDATE: We are nesting the profile data within the user to get the updated ProfileSerializer data
     profile = ProfileSerializer(read_only=True)
 
     class Meta:
@@ -39,6 +54,7 @@ class UserSerializer(serializers.ModelSerializer):
 class UserStudioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Studio
+        # --- NOTE: The 'degrees' field here will now be empty. ---
         fields = ["id", "name", "job_title", "experience", "degrees"]
 
 
@@ -103,6 +119,7 @@ class TeacherCardSerializer(serializers.ModelSerializer):
     # --- NEW: Use SerializerMethodFields to get data from the related Studio ---
     job_title = serializers.SerializerMethodField()
     experience = serializers.SerializerMethodField()
+    # --- CHANGE: This field will now get data from the Profile ---
     degrees = serializers.SerializerMethodField()
     social_links = serializers.SerializerMethodField()
 
@@ -127,9 +144,13 @@ class TeacherCardSerializer(serializers.ModelSerializer):
         studio = Studio.objects.filter(owner=obj).first()
         return studio.experience if studio else []
 
+    # --- UPDATED METHOD ---
     def get_degrees(self, obj):
-        studio = Studio.objects.filter(owner=obj).first()
-        return studio.degrees if studio else []
+        # 'obj' is the User instance. We now get degrees from the user's profile.
+        # We'll just return a list of the names for the card.
+        if hasattr(obj, 'profile') and obj.profile.degrees.exists():
+            return [degree.name for degree in obj.profile.degrees.all()]
+        return []
 
     def get_social_links(self, obj):
         studio = Studio.objects.filter(owner=obj).first()
@@ -194,9 +215,11 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 
 class CurrentUserSerializer(serializers.ModelSerializer):
+    # This will automatically use our updated ProfileSerializer, so it will now
+    # include the 'cv_file' and the nested 'degrees' list.
     profile = ProfileSerializer(read_only=True)
     # Finds the first studio owned by the user, if any
-    studio = UserStudioSerializer(read_only=True, source="studio_set.first")
+    studio = UserStudioSerializer(read_only=True, source="studios.first")
 
     class Meta:
         model = User
@@ -301,7 +324,6 @@ class StudioCreateSerializer(serializers.ModelSerializer):
             "job_title",
             "description",
             "cover_image",
-            "degrees",
             "experience",
             "tags",
             "social_links",
@@ -318,7 +340,7 @@ class StudioCreateSerializer(serializers.ModelSerializer):
         for tag_name in tag_names:
             # For each name, we either get the existing Tag object from the database
             # or create a new one if it doesn't exist.
-            tag, created = Tag.objects.get_or_create(name=tag_name.strip())
+            tag, _ = Tag.objects.get_or_create(name=tag_name.strip())
             # Then, we add this tag to our new studio.
             studio.tags.add(tag)
 
