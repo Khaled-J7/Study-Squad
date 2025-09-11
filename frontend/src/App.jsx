@@ -11,7 +11,6 @@ import MyStudioPage from "./pages/MyStudioPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import ProfilePage from "./pages/ProfilePage";
-import CreateStudioPage from "./pages/CreateStudioPage";
 import "./App.css";
 
 const App = () => {
@@ -29,7 +28,6 @@ const App = () => {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/create-studio" element={<CreateStudioPage />} />
           </Routes>
         </main>
       </div>
