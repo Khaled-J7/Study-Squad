@@ -55,7 +55,7 @@ class UserStudioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Studio
         # --- NOTE: The 'degrees' field here will now be empty. ---
-        fields = ["id", "name", "job_title", "experience", "degrees"]
+        fields = ["id", "name", "job_title", "experience"]
 
 
 # --- Serializers for Search Results (Our Custom Cards) ---
@@ -148,7 +148,7 @@ class TeacherCardSerializer(serializers.ModelSerializer):
     def get_degrees(self, obj):
         # 'obj' is the User instance. We now get degrees from the user's profile.
         # We'll just return a list of the names for the card.
-        if hasattr(obj, 'profile') and obj.profile.degrees.exists():
+        if hasattr(obj, "profile") and obj.profile.degrees.exists():
             return [degree.name for degree in obj.profile.degrees.all()]
         return []
 
@@ -219,7 +219,7 @@ class CurrentUserSerializer(serializers.ModelSerializer):
     # include the 'cv_file' and the nested 'degrees' list.
     profile = ProfileSerializer(read_only=True)
     # Finds the first studio owned by the user, if any
-    studio = UserStudioSerializer(read_only=True, source="studios.first")
+    studio = UserStudioSerializer(read_only=True, source="studio_set.first")
 
     class Meta:
         model = User
@@ -307,7 +307,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
 # --- NEW SERIALIZER FOR THE "CREATE STUDIO" FORM ---
 class StudioCreateSerializer(serializers.ModelSerializer):
     """
-    Serializer for creating a new Studio.
+    Serializer for creating AND updating a Studio.
     Handles all the fields from the multi-step form.
     """
 
@@ -345,3 +345,29 @@ class StudioCreateSerializer(serializers.ModelSerializer):
             studio.tags.add(tag)
 
         return studio
+
+    # --- NEW METHOD: Update() -> Used in Edit Mode in the Studio Dashboard ---
+    def update(self, instance, validated_data):
+        """
+        Handles updating an existing studio instance.
+        """
+        # Update standard fields by iterating through the validated data.
+        instance.name = validated_data.get("name", instance.name)
+        instance.job_title = validated_data.get("job_title", instance.job_title)
+        instance.description = validated_data.get("description", instance.description)
+        instance.cover_image = validated_data.get("cover_image", instance.cover_image)
+        instance.experience = validated_data.get("experience", instance.experience)
+        instance.social_links = validated_data.get(
+            "social_links", instance.social_links
+        )
+
+        # Handle the ManyToMany 'tags' field.
+        if "tags" in validated_data:
+            tag_names = validated_data.pop("tags", [])
+            instance.tags.clear()  # Clear existing tags before adding new ones.
+            for tag_name in tag_names:
+                tag, _ = Tag.objects.get_or_create(name=tag_name.strip())
+                instance.tags.add(tag)
+
+        instance.save()
+        return instance

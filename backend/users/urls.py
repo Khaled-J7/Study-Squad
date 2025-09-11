@@ -6,7 +6,7 @@ from .views import (
     register_view,
     current_user_view,
     profile_update_view,
-    studio_create_view
+    studio_manage_view,
 )
 
 urlpatterns = [
@@ -17,6 +17,7 @@ urlpatterns = [
     path("auth/user/", current_user_view, name="current-user"),
     # The endpoint for updating the user's profile information.
     path("profile/update/", profile_update_view, name="profile-update"),
-    # --- NEW URL FOR CREATING A STUDIO ---
-    path("studios/create/", studio_create_view, name="studio-create"),
+    # --- UNIFIED STUDIO URL ---
+    # This single endpoint will handle GET, POST, and PUT for a user's studio.
+    path("studio/", studio_manage_view, name="studio-manage"),
 ]
