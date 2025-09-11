@@ -1,5 +1,5 @@
 // frontend/src/components/Navbar.jsx
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { NavLink, Link } from "react-router-dom";
 import {
   HiHome,
@@ -37,7 +37,22 @@ const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
 
-  // --- DERIVED STATE ---
+  // --- ⚠️ OUR DIAGNOSTIC TOOL ---
+  // This will run every single time the 'user' object from the context changes.
+  // useEffect(() => {
+  //   console.log("--- NAVBAR DIAGNOSTIC ---");
+  //   if (user) {
+  //     console.log("User object in Navbar has changed:", user);
+  //     console.log("Does the user have a studio? ->", user.studio);
+  //   } else {
+  //     console.log("User object in Navbar is now null.");
+  //   }
+  //   console.log("-------------------------");
+  // }, [user]); // The dependency array ensures this runs only when 'user' changes.
+  // --- END OF DIAGNOSTIC TOOL ⚠️  ---
+
+  // 2. We derive ALL state directly from the user object right here.
+  // This is the most direct and reliable way.
   const isLoggedIn = !!user;
   const isTeacher = !!user?.studio;
 
@@ -130,7 +145,7 @@ const Navbar = () => {
             <div className="logged-in-actions">
               {!isTeacher && (
                 <Link
-                  to="/become-teacher"
+                  to="/my-studio"
                   className="btn btn-cta-teal"
                   onClick={closeAllMenus}
                 >
