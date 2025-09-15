@@ -244,12 +244,6 @@
 .detail-group:nth-child(3) {
   animation-delay: 0.3s;
 }
-.detail-group:nth-child(4) {
-  animation-delay: 0.4s;
-}
-.detail-group:nth-child(5) {
-  animation-delay: 0.5s;
-}
 
 .detail-label {
   font-family: var(--font-display);
@@ -332,6 +326,12 @@
   transform: translateY(-1px);
 }
 
+.detail-input:disabled {
+  background-color: #f1f5f9;
+  cursor: not-allowed;
+  color: #64748b;
+}
+
 .detail-input-wrapper:focus-within .detail-input-icon {
   color: var(--color-accent-teal);
   opacity: 1;
@@ -355,20 +355,8 @@
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
   position: relative;
   transition: all 0.3s ease;
-}
-
-.detail-value:hover:not(.disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  border-color: var(--color-accent-teal);
-}
-
-.detail-value.disabled {
-  color: #64748b;
-  background: #f8fafc;
-  border-color: #e2e8f0;
-  cursor: not-allowed;
+  min-height: 65.6px; /* Match height of input */
+  box-sizing: border-box;
 }
 
 .detail-value-icon {
@@ -381,11 +369,7 @@
   opacity: 0.7;
 }
 
-.detail-value.disabled .detail-value-icon {
-  color: #94a3b8;
-}
-
-/* === ENHANCED HELPER TEXT === */
+/* === HELPER TEXT === */
 .detail-helper-text {
   font-family: var(--font-nav);
   font-size: 0.85rem;
@@ -398,7 +382,6 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  position: relative;
   font-style: italic;
 }
 
@@ -407,12 +390,203 @@
   color: var(--color-accent-teal);
 }
 
-.detail-guidance-text {
+/* === CREDENTIALS SECTION === */
+.credentials-section {
+  grid-column: 1 / -1;
+  border-top: 2px solid #e2e8f0;
+  margin-top: 2.5rem;
+  padding-top: 2.5rem;
+  animation: slideInRight 0.4s ease-out both;
+  animation-delay: 0.4s;
+}
+
+/* NEW: Style for the main "Credentials" header */
+.credentials-header {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-accent-teal);
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.credential-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: white;
+  padding: 1rem 1.6rem;
+  border-radius: 16px;
+  margin-bottom: 1rem;
+  border: 2px solid #e2e8f0;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06),
+    0 2px 4px -1px rgba(0, 0, 0, 0.04);
+}
+
+.credential-info {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+}
+
+.credential-info svg {
+  font-size: 1.3rem;
+  color: var(--color-accent-teal);
+  opacity: 0.7;
+}
+
+.credential-name {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 1.1rem;
+  color: var(--color-text-primary);
+}
+
+.credential-file-link {
+  font-family: var(--font-nav);
+  font-weight: 600;
   font-size: 0.9rem;
-  color: #64748b; /* A soft, secondary text color */
-  margin-top: -0.5rem; /* Pull it a bit closer to the label */
-  margin-bottom: 0.8rem;
-  font-style: italic;
+  color: var(--color-accent-teal);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.credential-file-link:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.credential-delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  font-size: 1.2rem;
+  transition: color 0.2s ease;
+}
+
+.credential-delete-btn:hover {
+  color: var(--color-accent-rose);
+}
+
+.btn-inline-action {
+  padding: 0.9rem 1.2rem;
+  border-radius: 12px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-attach {
+  background-color: white;
+  color: #334155;
+  border: 2px solid #cbd5e1;
+}
+
+.btn-attach.is-selected {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border-color: #6ee7b7;
+}
+
+.btn-add {
+  background-color: var(--color-accent-teal);
+  color: white;
+}
+
+.btn-add:hover {
+  opacity: 0.9;
+}
+
+/* NEW: Container for the list of editable degrees */
+.dynamic-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+/* NEW: A single degree item in edit mode */
+.dynamic-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 0.8rem 1.2rem;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  font-family: var(--font-body);
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.list-remove-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  font-size: 1.2rem;
+  transition: color 0.2s ease;
+}
+
+.list-remove-btn:hover {
+  color: var(--color-accent-rose);
+}
+
+/* NEW: The form for adding a new degree */
+.add-degree-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f8fafc;
+  border: 2px dashed #e2e8f0;
+  border-radius: 16px;
+}
+
+/* NEW: Unordered list for displaying degrees in view mode */
+.degree-list-view {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+/* Styling for the degree item in edit mode to accommodate the icon */
+.degree-item-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Styling for the degree icon itself */
+.degree-icon {
+  font-size: 1.2rem;
+  color: var(--color-accent-teal);
+  flex-shrink: 0;
+}
+
+.degree-list-view li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.25rem 0;
+  /* THE FONT CHANGE: Using the more distinguished display font */
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--color-text-primary);
 }
 
 /* === RESPONSIVE DESIGN === */
@@ -451,6 +625,9 @@
   .detail-value-icon {
     left: 1.2rem;
     font-size: 1.2rem;
+  }
+  .add-degree-form {
+    grid-template-columns: 1fr;
   }
 }
 

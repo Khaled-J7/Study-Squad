@@ -105,6 +105,7 @@ export const AuthProvider = ({ children }) => {
     // We only try to refresh if there's a token (meaning the user is logged in).
     if (tokens) {
       try {
+        // Makes an authenticated API call to get the latest user data.
         const userResponse = await axiosInstance.get("/auth/user/");
         // We update our global user state with the new data from the API.
         setUser(userResponse.data);
