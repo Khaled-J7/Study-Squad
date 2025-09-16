@@ -1,14 +1,8 @@
-// frontend/src/components/explore/CourseCard.jsx
+// In frontend/src/components/explore/CourseCard.jsx
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import {
-  HiTag,
-  HiArrowRight,
-  HiCalendar,
-  HiUserCircle,
-  HiViewGrid,
-} from "react-icons/hi";
+import AuthLink from "../common/AuthLink";
+import { HiTag, HiArrowRight, HiCalendar, HiViewGrid } from "react-icons/hi";
 import "./CourseCard.css";
 
 const CourseCard = ({ course }) => {
@@ -16,7 +10,6 @@ const CourseCard = ({ course }) => {
 
   const API_BASE_URL = "http://127.0.0.1:8000";
   const coverImageUrl = `${API_BASE_URL}${course.cover_image}`;
-  // Access the nested teacher avatar URL
   const teacherAvatarUrl = `${API_BASE_URL}${course.studio.owner.profile.profile_picture}`;
 
   const creationDate = course.created_at
@@ -55,7 +48,6 @@ const CourseCard = ({ course }) => {
           )}
         </p>
 
-        {/* --- NEW TEACHER & STUDIO INFO SECTION --- */}
         <div className="course-card-meta">
           <div className="meta-item">
             <img
@@ -72,22 +64,27 @@ const CourseCard = ({ course }) => {
             <HiViewGrid className="meta-icon" />
             <div className="meta-text">
               <span className="meta-label">Studio</span>
-              <Link to={`/studios/${course.studio.id}`} className="meta-link">
+              {/* ✅ Step 2.2: Replace Link with AuthLink */}
+              <AuthLink
+                to={`/studios/${course.studio.id}`}
+                className="meta-link"
+              >
                 {course.studio.name}
-              </Link>
+              </AuthLink>
             </div>
           </div>
         </div>
 
         <div className="card-tags">
           {course.tags?.map((tag) => (
-            <Link
+            // ✅ Replace Link with AuthLink
+            <AuthLink
               to={`/explore?tags=${tag.name}`}
               key={tag.id}
               className="card-tag"
             >
               <HiTag /> {tag.name}
-            </Link>
+            </AuthLink>
           ))}
         </div>
       </div>
@@ -100,10 +97,11 @@ const CourseCard = ({ course }) => {
             </>
           )}
         </div>
-        <Link to={`/courses/${course.id}`} className="card-button">
+        // ✅ Step 2.2: Replace Link with AuthLink
+        <AuthLink to={`/courses/${course.id}`} className="card-button">
           <span>Explore Course</span>
           <HiArrowRight />
-        </Link>
+        </AuthLink>
       </div>
     </div>
   );

@@ -96,6 +96,33 @@
   color: var(--color-accent-teal);
 }
 
+/* ✅ NEW: Style for the degree name to use the display font */
+.teacher-degree-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* ✅ NEW: Professional styling for the CV link */
+.cv-link {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-accent-teal);
+  text-decoration: none;
+  background-color: rgba(14, 116, 144, 0.1);
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.cv-link:hover {
+  background-color: var(--color-accent-teal);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(14, 116, 144, 0.2);
+}
+
 .teacher-card-socials {
   margin-bottom: 1rem;
 }

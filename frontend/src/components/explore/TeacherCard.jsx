@@ -1,24 +1,30 @@
-// frontend/src/components/explore/TeacherCard.jsx
+// In frontend/src/components/explore/TeacherCard.jsx
+
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import AuthLink from "../common/AuthLink";
 import {
   HiArrowRight,
   HiBriefcase,
   HiAcademicCap,
   HiOutlineVideoCamera,
+  HiDocumentText,
 } from "react-icons/hi";
 import { SiGmail } from "react-icons/si";
+import {
+  getAvatarUrl,
+  getCvFileUrl,
+  getDegrees,
+  getContactEmail,
+} from "../../utils/helpers";
 import "./TeacherCard.css";
 
-/**
- * Renders a profile preview of a teacher.
- * @param {object} teacher - The teacher (user) data object from the API.
- */
 const TeacherCard = ({ teacher }) => {
   const [isNameHovered, setIsNameHovered] = useState(false);
 
-  const API_BASE_URL = "http://127.0.0.1:8000";
-  const teacherAvatarUrl = `${API_BASE_URL}${teacher.profile.profile_picture}`;
+  const teacherAvatarUrl = getAvatarUrl(teacher);
+  const cvFileUrl = getCvFileUrl(teacher);
+  const degrees = getDegrees(teacher);
+  const contactEmail = getContactEmail(teacher);
 
   return (
     <div className="card-wrapper-teacher">
@@ -35,7 +41,7 @@ const TeacherCard = ({ teacher }) => {
           onMouseEnter={() => setIsNameHovered(true)}
           onMouseLeave={() => setIsNameHovered(false)}
         >
-          {teacher.username}
+          {`${teacher.first_name} ${teacher.last_name}`}
         </h3>
         <p className="teacher-card-job-title">{teacher.job_title}</p>
 
@@ -49,39 +55,60 @@ const TeacherCard = ({ teacher }) => {
               </div>
             </div>
           )}
-          {teacher.degrees?.length > 0 && (
+
+          {degrees.length > 0 && (
             <div className="teacher-detail-group">
               <h4 className="teacher-detail-heading">Degrees</h4>
+              {degrees.map((degree, index) => (
+                <div key={index} className="teacher-detail-item">
+                  <HiAcademicCap className="teacher-detail-icon" />
+                  <span className="teacher-degree-name">{degree}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {cvFileUrl && (
+            <div className="teacher-detail-group">
+              <h4 className="teacher-detail-heading">CV / Resume</h4>
               <div className="teacher-detail-item">
-                <HiAcademicCap className="teacher-detail-icon" />
-                <span>{teacher.degrees[0]}</span>
+                <HiDocumentText className="teacher-detail-icon" />
+                <a
+                  href={cvFileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="cv-link"
+                >
+                  View Credentials
+                </a>
               </div>
             </div>
           )}
         </div>
 
-        <div className="teacher-card-socials">
-          <p className="teacher-socials-heading">Contact Instructor</p>
-          <div className="teacher-social-icons">
-            {teacher.social_links?.email && (
-              <a href={teacher.social_links.email}>
+        {contactEmail && (
+          <div className="teacher-card-socials">
+            <p className="teacher-socials-heading">Contact Instructor</p>
+            <div className="teacher-social-icons">
+              <a href={`mailto:${contactEmail}`}>
                 <SiGmail />
               </a>
-            )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
       <div className="card-footer teacher">
-        <Link to="/meet" className="card-button-secondary">
+        {/* ✅ Using AuthLink for protected actions */}
+        <AuthLink to="/meet" className="card-button-secondary">
           <HiOutlineVideoCamera /> Meet Now
-        </Link>
-        <Link
+        </AuthLink>
+        <AuthLink
           to={`/studios/${teacher.studio_id}`}
           className="card-button-primary"
         >
           <span>View Studio</span>
           <HiArrowRight />
-        </Link>
+        </AuthLink>
       </div>
     </div>
   );

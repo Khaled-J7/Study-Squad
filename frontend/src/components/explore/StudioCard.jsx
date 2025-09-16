@@ -1,14 +1,10 @@
-// frontend/src/components/explore/StudioCard.jsx
+// In frontend/src/components/explore/StudioCard.jsx
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { HiUsers, HiArrowRight, HiTag, HiCalendar } from "react-icons/hi";
+import AuthLink from "../common/AuthLink";
+import { HiTag, HiArrowRight, HiCalendar } from "react-icons/hi";
 import "./StudioCard.css";
 
-/**
- * Renders a preview card for a teacher's studio.
- * @param {object} studio - The studio data object from the API.
- */
 const StudioCard = ({ studio }) => {
   const [isTeacherHovered, setIsTeacherHovered] = useState(false);
   const [isDescExpanded, setIsDescExpanded] = useState(false);
@@ -17,7 +13,6 @@ const StudioCard = ({ studio }) => {
   const coverImageUrl = `${API_BASE_URL}${studio.cover_image}`;
   const teacherAvatarUrl = `${API_BASE_URL}${studio.owner.profile.profile_picture}`;
 
-  // Formats the ISO date string from the backend into a readable format.
   const creationDate = studio.created_at
     ? new Date(studio.created_at).toLocaleDateString("en-US", {
         year: "numeric",
@@ -26,7 +21,6 @@ const StudioCard = ({ studio }) => {
       })
     : null;
 
-  // Truncates the description if it's longer than 100 characters.
   const shortDescription =
     studio.description?.length > 100
       ? `${studio.description.substring(0, 100)}...`
@@ -49,14 +43,14 @@ const StudioCard = ({ studio }) => {
       <div className="card-info">
         <h3 className="card-title">{studio.name}</h3>
         <p className="card-teacher-name">
-          by{" "}
-          <Link
+          by {/* ✅ Using AuthLink for the teacher's profile */}
+          <AuthLink
             to={`/teachers/${studio.owner.id}`}
             onMouseEnter={() => setIsTeacherHovered(true)}
             onMouseLeave={() => setIsTeacherHovered(false)}
           >
             {studio.owner.username}
-          </Link>
+          </AuthLink>
         </p>
         <p className="card-description">
           {isDescExpanded ? studio.description : shortDescription}
@@ -71,13 +65,14 @@ const StudioCard = ({ studio }) => {
         </p>
         <div className="card-tags">
           {studio.tags?.slice(0, 3).map((tag) => (
-            <Link
+            // ✅ Using AuthLink for the tags
+            <AuthLink
               to={`/explore?tags=${tag.name}`}
               key={tag.id}
               className="card-tag"
             >
               <HiTag /> {tag.name}
-            </Link>
+            </AuthLink>
           ))}
         </div>
       </div>
@@ -90,10 +85,11 @@ const StudioCard = ({ studio }) => {
             </>
           )}
         </div>
-        <Link to={`/studios/${studio.id}`} className="card-button">
+        {/* ✅ Using AuthLink for the main action button */}
+        <AuthLink to={`/studios/${studio.id}`} className="card-button">
           <span>View Studio</span>
           <HiArrowRight />
-        </Link>
+        </AuthLink>
       </div>
     </div>
   );
