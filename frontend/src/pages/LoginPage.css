@@ -218,6 +218,31 @@
   transform: none;
 }
 
+.password-wrapper {
+  position: relative;
+}
+
+/* Styles for the toggle button to place it inside the input field */
+.password-toggle-btn {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-primary);
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+}
+
+.password-toggle-btn:hover {
+  color: var(--color-accent-teal);
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

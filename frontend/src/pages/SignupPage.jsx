@@ -6,8 +6,12 @@ import {
   HiOutlineMail,
   HiOutlineLockClosed,
   HiOutlineIdentification,
+  HiEyeOff,
+  HiEye,
 } from "react-icons/hi";
 import authService from "../api/authService";
+// Reusable Error Component
+import InlineError from "../components/common/InlineError/InlineError";
 import "./SignupPage.css";
 
 const SignupPage = () => {
@@ -26,8 +30,42 @@ const SignupPage = () => {
 
   // State for loading and any errors from the backend.
   const [loading, setLoading] = useState(false);
-  // NOTE: 'errors' is now an object to hold field-specific messages.
+
+  // UPDATED: 'errors' state now handles both frontend and backend errors
   const [errors, setErrors] = useState({});
+
+  // NEW: A dedicated validation function for the frontend
+  const validate = () => {
+    const newErrors = {};
+    // Rule 1: Username length
+    if (formData.username.length < 5) {
+      newErrors.username = "Username must be at least 5 characters long.";
+    }
+    // Rule 2: Email format (simple regex check)
+    if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address.";
+    }
+    // Rule 3: Password complexity
+    if (!/(?=.*\d)(?=.*[a-zA-Z])/.test(formData.password)) {
+      newErrors.password =
+        "Password must contain at least one letter and one number.";
+    }
+    // Rule 4: Password length (mirrors our backend rule in settings.py)
+    if (formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters long.";
+    }
+    // Rule 5: Passwords must match
+    if (formData.password !== formData.password2) {
+      newErrors.password2 = "Passwords do not match.";
+    }
+    setErrors(newErrors);
+    // Return true if there are no errors, false otherwise
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // State to manage visibility for both password fields
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
 
   // Updates the state when a user types in a field.
   const handleChange = (e) => {
@@ -41,8 +79,13 @@ const SignupPage = () => {
   // This function runs when the form is submitted.
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevents the page from reloading.
+
+    // First, run frontend validation. If it fails, stop.
+    if (!validate()) {
+      return;
+    }
     setLoading(true); // Indicate that the submission is in progress
-    setErrors({}); // Clear old errors before a new submission.
+    // setErrors({}); // Clear old errors before a new submission.
 
     // NOTE: We're now passing all the fields from our state to the register service.
     const response = await authService.register(
@@ -66,6 +109,10 @@ const SignupPage = () => {
 
     setLoading(false); // Stop the loading indicator.
   };
+
+  // NEW: Toggle functions for each password field
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
+  const togglePassword2Visibility = () => setShowPassword2(!showPassword2);
 
   return (
     <div className="auth-container">
@@ -124,9 +171,7 @@ const SignupPage = () => {
                     required
                   />
                 </div>
-                {errors.first_name && (
-                  <p className="error-text">{errors.first_name}</p>
-                )}
+                <InlineError message={errors.first_name} />
               </div>
 
               <div className="input-group">
@@ -143,9 +188,7 @@ const SignupPage = () => {
                     required
                   />
                 </div>
-                {errors.last_name && (
-                  <p className="error-text">{errors.last_name}</p>
-                )}
+                <InlineError message={errors.last_name} />
               </div>
             </div>
             {/* --- End of new fields --- */}
@@ -164,9 +207,7 @@ const SignupPage = () => {
                   required
                 />
               </div>
-              {errors.username && (
-                <p className="error-text">{errors.username}</p>
-              )}
+              <InlineError message={errors.username} />
             </div>
 
             <div className="input-group">
@@ -183,15 +224,16 @@ const SignupPage = () => {
                   required
                 />
               </div>
-              {errors.email && <p className="error-text">{errors.email}</p>}
+              <InlineError message={errors.email} />
             </div>
 
             <div className="input-group">
               <label htmlFor="password">Password</label>
-              <div className="input-wrapper">
+              {/* UPDATED: The input is now wrapped for the icon */}
+              <div className="input-wrapper password-wrapper">
                 <HiOutlineLockClosed className="input-icon" />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   id="password"
                   name="password"
                   placeholder="••••••••"
@@ -199,18 +241,24 @@ const SignupPage = () => {
                   onChange={handleChange}
                   required
                 />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="password-toggle-btn"
+                >
+                  {showPassword ? <HiEyeOff /> : <HiEye />}
+                </button>
               </div>
-              {errors.password && (
-                <p className="error-text">{errors.password}</p>
-              )}
+              <InlineError message={errors.password} />
             </div>
 
             <div className="input-group">
               <label htmlFor="password2">Confirm Password</label>
-              <div className="input-wrapper">
+              {/* UPDATED: The input is now wrapped for the icon */}
+              <div className="input-wrapper password-wrapper">
                 <HiOutlineLockClosed className="input-icon" />
                 <input
-                  type="password"
+                  type={showPassword2 ? "text" : "password"}
                   id="password2"
                   name="password2"
                   placeholder="••••••••"
@@ -218,15 +266,19 @@ const SignupPage = () => {
                   onChange={handleChange}
                   required
                 />
+                <button
+                  type="button"
+                  onClick={togglePassword2Visibility}
+                  className="password-toggle-btn"
+                >
+                  {showPassword2 ? <HiEyeOff /> : <HiEye />}
+                </button>
               </div>
-              {errors.password2 && (
-                <p className="error-text">{errors.password2}</p>
-              )}
+              <InlineError message={errors.password2} />
             </div>
 
-            {errors.detail && (
-              <p className="error-text general-error">{errors.detail}</p>
-            )}
+            {/* General, non-field-specific errors */}
+            <InlineError message={errors.detail} />
 
             <button type="submit" className="auth-button" disabled={loading}>
               {loading ? "Creating Account..." : "Sign Up"}
