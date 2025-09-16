@@ -43,9 +43,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -78,15 +78,20 @@ DATABASES = {"default": env.db()}
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
+        # Checks if the password is too similar to the user's other information, like their username.
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
+        # NEW:  Enforces a minimum length for passwords. 8 is a good, standard minimum.
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_length": 8},
     },
     {
+        # Checks the password against a list of common, easily guessable passwords (e.g., "password", "12345678").
         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
+        # Ensures the password is not composed entirely of numbers.
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
