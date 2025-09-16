@@ -20,3 +20,33 @@ export const getAvatarUrl = (user) => {
   // If there's no user or no picture, we fall back to our local default avatar.
   return localDefaultAvatar;
 };
+
+/**
+ * ✅ NEW: Safely gets the full URL for a user's CV file.
+ * @param {object} user - The user object.
+ * @returns {string|null} The full URL for the CV or null if it doesn't exist.
+ */
+export const getCvFileUrl = (user) => {
+  if (user?.profile?.cv_file) {
+    return `${API_BASE_URL}${user.profile.cv_file}`;
+  }
+  return null;
+};
+
+/**
+ * ✅ NEW: Safely gets the list of degrees for a user.
+ * @param {object} user - The user object.
+ * @returns {Array} An array of degree strings, or an empty array.
+ */
+export const getDegrees = (user) => {
+  return user?.profile?.degrees || [];
+};
+
+/**
+ * ✅ NEW: Safely gets the contact email for a user.
+ * @param {object} user - The user object.
+ * @returns {string|null} The contact email or null if it doesn't exist.
+ */
+export const getContactEmail = (user) => {
+  return user?.profile?.contact_email || null;
+};
