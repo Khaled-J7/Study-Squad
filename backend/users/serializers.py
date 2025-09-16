@@ -79,12 +79,17 @@ class LessonCardSerializer(serializers.ModelSerializer):
 
 
 class TeacherCardSerializer(serializers.ModelSerializer):
+    """
+    A serializer for the "Teacher Card" on the Explore page.
+    """
+
+    # This correctly nests the full profile data, including cv_file and contact_email.
     profile = ProfileSerializer(read_only=True)
+
+    # These fields are correctly sourced from the related Studio model.
     job_title = serializers.SerializerMethodField()
     experience = serializers.SerializerMethodField()
-    degrees = serializers.JSONField(source="profile.degrees", read_only=True)
     social_links = serializers.SerializerMethodField()
-    # NEW: Add a field for the studio's ID to fix the frontend link.
     studio_id = serializers.SerializerMethodField()
 
     class Meta:
@@ -92,25 +97,17 @@ class TeacherCardSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "username",
-            "first_name",
-            "last_name",
-            "profile",
+            "first_name",  # Pass the first_name directly
+            "last_name",  # Pass the last_name directly
+            "profile",  # Pass the entire nested profile object
             "job_title",
             "experience",
-            "degrees",
             "social_links",
-            "studio_id",
+            "studio_id",  # Pass the studio ID for linking
         ]
 
-    def get_studio_id(self, obj):
-        """
-        Safely gets the ID of the teacher's first studio.
-        Returns the ID if a studio exists, otherwise returns None.
-        """
-        studio = Studio.objects.filter(owner=obj).first()
-        return studio.id if studio else None # type: ignore
-
     def get_job_title(self, obj):
+        # 'obj' is the User instance. We find their studio and get the job title.
         studio = Studio.objects.filter(owner=obj).first()
         return studio.job_title if studio else ""
 
@@ -121,6 +118,10 @@ class TeacherCardSerializer(serializers.ModelSerializer):
     def get_social_links(self, obj):
         studio = Studio.objects.filter(owner=obj).first()
         return studio.social_links if studio else {}
+
+    def get_studio_id(self, obj):
+        studio = Studio.objects.filter(owner=obj).first()
+        return studio.id if studio else None # type: ignore
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
