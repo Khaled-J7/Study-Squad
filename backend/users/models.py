@@ -3,6 +3,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+# NEW: We import the validator to check file extensions
+from django.core.validators import FileExtensionValidator
+
 
 # Model 1: The Unified Profile for all users
 class Profile(models.Model):
@@ -14,8 +17,20 @@ class Profile(models.Model):
     contact_email = models.EmailField(max_length=255, blank=True)
     username_last_changed = models.DateTimeField(null=True, blank=True)
 
-    # --- NEW FIELD (MOVED FROM STUDIO) ---
-    cv_file = models.FileField(upload_to="cv_files/", blank=True, null=True)
+    # UPDATED: We've added the validator to restrict file types
+    cv_file = models.FileField(
+        upload_to="cv_files/",
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(allowed_extensions=["pdf", "txt"])],
+    )
+
+    # NEW: The 'degrees' field is now a JSONField, storing a list of strings.
+    degrees = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="List of degrees or certifications as a JSON list.",
+    )
 
     def __str__(self):
         return f"{self.user.username} Profile"
@@ -29,17 +44,8 @@ class Tag(models.Model):
         return self.name
 
 
-# --- NEW MODEL ---
-# Represents a single degree or certification with an associated file.
-class Degree(models.Model):
-    profile = models.ForeignKey(
-        Profile, on_delete=models.CASCADE, related_name="degrees"
-    )
-    name = models.CharField(max_length=255)
-    file = models.FileField(upload_to="degree_files/")
-
-    def __str__(self):
-        return f"{self.name} for {self.profile.user.username}"
+# --- REMOVED ---
+# The Degree model has been completely removed as per our new plan.
 
 
 # Model 3: The Studio model for teachers
@@ -63,9 +69,6 @@ class Studio(models.Model):
     social_links = models.JSONField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    # We will use studio.subscribers.count() to get the number of subscribers
-    # We will define 'subscribers' using the Subscription model later if needed, or a simple ManyToManyField on Profile.
-
     def __str__(self):
         return self.name
 
@@ -85,15 +88,9 @@ class Lesson(models.Model):
         help_text="Upload a cover image for this course.",
     )
     content = models.TextField(help_text="Use Markdown for formatting.")
-    video_upload = models.FileField(
-        upload_to="lesson_videos/", blank=True, null=True
-    )  # For direct video upload
-    video_url = models.URLField(
-        blank=True, help_text="Or provide a YouTube/Vimeo URL."
-    )  # For video embedding
-    file_upload = models.FileField(
-        upload_to="lesson_files/", blank=True, null=True
-    )  # For attachments like PDFs
+    video_upload = models.FileField(upload_to="lesson_videos/", blank=True, null=True)
+    video_url = models.URLField(blank=True, help_text="Or provide a YouTube/Vimeo URL.")
+    file_upload = models.FileField(upload_to="lesson_files/", blank=True, null=True)
     order = models.PositiveIntegerField(
         default=0, help_text="Order of the lesson in the course."
     )

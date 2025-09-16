@@ -1,12 +1,15 @@
 # backend/users/views.py
+import json
+import traceback
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth.models import User, Group
-from .models import Studio, Lesson, Profile, Degree
+from .models import Studio, Lesson, Profile
 from .serializers import (
+    ProfileSerializer,
     ProfileUpdateSerializer,
     StudioCardSerializer,
     LessonCardSerializer,
@@ -110,138 +113,204 @@ def current_user_view(request):
     return Response(serializer.data)
 
 
-# --- NEW: Profile and Security Views ---
+# --- NEW, DEDICATED CV UPLOAD AND DELETE VIEW ---
+@api_view(["POST", "DELETE"])
+@permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])
+def cv_upload_view(request):
+    """
+    A dedicated view to handle uploading or deleting the CV file for a user's profile.
+    """
+    try:
+        # Accessing request.data first ensures the multipart parser runs correctly.
+        _ = request.data
+        profile = request.user.profile
+
+        if request.method == "POST":
+            cv_file = request.FILES.get("cv_file")
+            if not cv_file:
+                return Response(
+                    {"error": "No CV file was provided."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            profile.cv_file = cv_file
+            profile.save()
+
+        elif request.method == "DELETE":
+            if profile.cv_file:
+                # Set save=True here to ensure the change is committed.
+                profile.cv_file.delete(save=True)
+            else:
+                # If no file exists, the operation is still a success.
+                pass
+
+        return Response(
+            {"message": "CV operation successful."}, status=status.HTTP_200_OK
+        )
+
+    except Exception as e:
+        return Response(
+            {
+                "error": "A server error occurred during the CV operation.",
+                "detail": str(e),
+            },
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
+# Handles updates for all text-based and image-based profile information.
 @api_view(["PUT"])
 @permission_classes([IsAuthenticated])
+@parser_classes(
+    [MultiPartParser, FormParser]
+)  # We still need this for the profile picture
 def profile_update_view(request):
     """
     Handles updating the user's profile information.
-    This includes their name, "About Me", contact email, and profile picture.
+    This version now handles the 'degrees' field manually for maximum robustness.
     """
     try:
-        # We get the user's profile based on the authenticated user making the request.
         profile = request.user.profile
-    except Profile.DoesNotExist:
-        return Response(
-            {"error": "Profile not found."}, status=status.HTTP_404_NOT_FOUND
+
+        serializer = ProfileUpdateSerializer(
+            instance=profile,
+            data=request.data,
+            partial=True,
+            context={"request": request},
         )
 
-    # We pass the existing profile instance and the new data to our serializer.
-    # The 'partial=True' allows for partial updates (e.g., only updating the 'about_me' field).
-    # We are passing the 'request' context to the serializer so it can access the user for validation.
-    serializer = ProfileUpdateSerializer(
-        instance=profile, data=request.data, partial=True, context={"request": request}
-    )
-
-    if serializer.is_valid():
-        # If the data is valid, the serializer's .update() method will handle saving everything.
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    # If the data is not valid, we return the errors.
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(["GET", "POST", "PUT"])
-@permission_classes([IsAuthenticated])
-@parser_classes([MultiPartParser, FormParser])
-def studio_manage_view(request):
-    """
-    A single, unified view to handle all studio-related actions
-    for the authenticated user. (DEBUG VERSION)
-    """
-    user = request.user
-
-    # --- GET Request (No changes) ---
-    if request.method == "GET":
-        try:
-            studio = Studio.objects.get(owner=user)
-            serializer = StudioCardSerializer(studio)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Studio.DoesNotExist:
-            return Response(
-                {"error": "Studio not found for this user."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-    # --- POST Request (Correction is here) ---
-    elif request.method == "POST":
-        if Studio.objects.filter(owner=user).exists():
-            return Response(
-                {"error": "You have already created a studio."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        serializer = StudioCreateSerializer(data=request.data)
-        if serializer.is_valid():
-            try:
-                # All database operations are now inside a try block
-                studio = serializer.save(owner=user)
-                profile = request.user.profile
-                if "cv_file" in request.FILES:
-                    profile.cv_file = request.FILES["cv_file"]
-                    profile.save()
-
-                degree_names = request.data.getlist("degrees[name]")
-                degree_files = request.FILES.getlist("degrees[file]")
-                for name, file in zip(degree_names, degree_files):
-                    if name and file:
-                        Degree.objects.create(profile=profile, name=name, file=file)
-
-                teachers_group, _ = Group.objects.get_or_create(name="Teachers")
-                user.groups.add(teachers_group)
-
-                fresh_studio_instance = Studio.objects.get(pk=studio.pk) # type: ignore
-                response_serializer = StudioCardSerializer(fresh_studio_instance)
-
-                return Response(
-                    response_serializer.data, status=status.HTTP_201_CREATED
-                )
-
-            except Exception as e:
-                # If ANY error occurs during creation or serialization, we catch it
-                print(f"---! SEVERE ERROR DURING STUDIO CREATION: {e} !---")
-                # And return a proper 500 error that includes CORS headers
-                return Response(
-                    {
-                        "error": "Studio created, but a server error occurred preparing the response.",
-                        "detail": str(e),
-                    },
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                )
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    # --- PUT Request (No changes) ---
-    elif request.method == "PUT":
-        # ... (The PUT logic remains the same as before) ...
-        try:
-            studio = Studio.objects.get(owner=user)
-        except Studio.DoesNotExist:
-            return Response(
-                {"error": "Studio not found. Cannot update."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        serializer = StudioCreateSerializer(
-            instance=studio, data=request.data, partial=True
-        )
         if serializer.is_valid():
             serializer.save()
-            profile = request.user.profile
 
-            if "cv_file" in request.FILES:
-                profile.cv_file = request.FILES["cv_file"]
-                profile.save()
-
-            new_degree_names = request.data.getlist("degrees[name]")
-            new_degree_files = request.FILES.getlist("degrees[file]")
-            for name, file in zip(new_degree_names, new_degree_files):
-                if name and file:
-                    Degree.objects.get_or_create(
-                        profile=profile, name=name, defaults={"file": file}
+            # --- Handle degrees manually after other data is saved ---
+            if "degrees" in request.data:
+                degrees_json_string = request.data.get("degrees")
+                try:
+                    # We parse the string from the frontend back into a Python list
+                    degrees_list = json.loads(degrees_json_string)
+                    profile.degrees = degrees_list
+                    profile.save()  # Save the updated degrees list
+                except json.JSONDecodeError:
+                    # This is a fallback in case of malformed data
+                    return Response(
+                        {"error": "Invalid format for degrees."},
+                        status=status.HTTP_400_BAD_REQUEST,
                     )
+            # After a successful save, we refetch the user to send the latest data back.
+            request.user.refresh_from_db()
+            updated_user_serializer = CurrentUserSerializer(request.user)
+            return Response(updated_user_serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-            studio_serializer = StudioCardSerializer(studio)
-            return Response(studio_serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response(
+            {"error": "A server error occurred during the profile update.", "detail": str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
+# @api_view(["GET", "POST", "PUT"])
+# @permission_classes([IsAuthenticated])
+# @parser_classes([MultiPartParser, FormParser])
+# def studio_manage_view(request):
+#     """
+#     A single, unified view to handle all studio-related actions
+#     for the authenticated user.
+#     """
+#     user = request.user
+
+#     # --- GET Request (No changes) ---
+#     if request.method == "GET":
+#         try:
+#             studio = Studio.objects.get(owner=user)
+#             serializer = StudioCardSerializer(studio)
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         except Studio.DoesNotExist:
+#             return Response(
+#                 {"error": "Studio not found for this user."},
+#                 status=status.HTTP_404_NOT_FOUND,
+#             )
+
+#     # --- POST Request (Correction is here) ---
+#     elif request.method == "POST":
+#         if Studio.objects.filter(owner=user).exists():
+#             return Response(
+#                 {"error": "You have already created a studio."},
+#                 status=status.HTTP_400_BAD_REQUEST,
+#             )
+
+#         serializer = StudioCreateSerializer(data=request.data)
+#         if serializer.is_valid():
+#             try:
+#                 # All database operations are now inside a try block
+#                 studio = serializer.save(owner=user)
+#                 profile = request.user.profile
+#                 if "cv_file" in request.FILES:
+#                     profile.cv_file = request.FILES["cv_file"]
+#                     profile.save()
+
+#                 degree_names = request.data.getlist("degrees[name]")
+#                 degree_files = request.FILES.getlist("degrees[file]")
+#                 for name, file in zip(degree_names, degree_files):
+#                     if name and file:
+#                         Degree.objects.create(profile=profile, name=name, file=file)
+
+#                 teachers_group, _ = Group.objects.get_or_create(name="Teachers")
+#                 user.groups.add(teachers_group)
+
+#                 fresh_studio_instance = Studio.objects.get(pk=studio.pk)  # type: ignore
+#                 response_serializer = StudioCardSerializer(fresh_studio_instance)
+
+#                 return Response(
+#                     response_serializer.data, status=status.HTTP_201_CREATED
+#                 )
+
+#             except Exception as e:
+#                 # If ANY error occurs during creation or serialization, we catch it
+#                 print(f"---! SEVERE ERROR DURING STUDIO CREATION: {e} !---")
+#                 # And return a proper 500 error that includes CORS headers
+#                 return Response(
+#                     {
+#                         "error": "Studio created, but a server error occurred preparing the response.",
+#                         "detail": str(e),
+#                     },
+#                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#                 )
+
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#     # --- PUT Request (No changes) ---
+#     elif request.method == "PUT":
+#         # ... (The PUT logic remains the same as before) ...
+#         try:
+#             studio = Studio.objects.get(owner=user)
+#         except Studio.DoesNotExist:
+#             return Response(
+#                 {"error": "Studio not found. Cannot update."},
+#                 status=status.HTTP_404_NOT_FOUND,
+#             )
+
+#         serializer = StudioCreateSerializer(
+#             instance=studio, data=request.data, partial=True
+#         )
+#         if serializer.is_valid():
+#             serializer.save()
+#             profile = request.user.profile
+
+#             if "cv_file" in request.FILES:
+#                 profile.cv_file = request.FILES["cv_file"]
+#                 profile.save()
+
+#             new_degree_names = request.data.getlist("degrees[name]")
+#             new_degree_files = request.FILES.getlist("degrees[file]")
+#             for name, file in zip(new_degree_names, new_degree_files):
+#                 if name and file:
+#                     Degree.objects.get_or_create(
+#                         profile=profile, name=name, defaults={"file": file}
+#                     )
+
+#             studio_serializer = StudioCardSerializer(studio)
+#             return Response(studio_serializer.data, status=status.HTTP_200_OK)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
