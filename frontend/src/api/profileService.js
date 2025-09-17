@@ -13,7 +13,7 @@ const updateProfileDetails = async (detailsData) => {
   const formData = new FormData();
 
   formData.append("username", detailsData.username);
-  formData.append("about_me", detailsData.about_me);
+  formData.append("headline", detailsData.headline);
   formData.append("contact_email", detailsData.contact_email);
   formData.append("degrees", JSON.stringify(detailsData.degrees));
 
