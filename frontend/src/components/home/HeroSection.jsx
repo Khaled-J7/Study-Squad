@@ -1,5 +1,5 @@
 // frontend/src/components/home/HeroSection.jsx
-import { Link } from "react-router-dom";
+import AuthLink from "../common/AuthLink"; 
 import { HiOutlineArrowRight, HiViewGrid } from "react-icons/hi";
 import { useAuth } from "../../context/AuthContext"; // We need our auth hook to know who the user is.
 import "./HeroSection.css";
@@ -45,25 +45,26 @@ const HeroSection = () => {
 
         {/* --- DYNAMIC ACTIONS --- */}
         <div className="hero-actions">
-          <Link to="/explore" className="btn-hero btn-hero-primary">
+          {/* ✅ : Replace Link with AuthLink */}
+          <AuthLink to="/explore" className="btn-hero btn-hero-primary">
             <HiOutlineArrowRight /> Explore Courses
-          </Link>
+          </AuthLink>
 
           {!user ? (
             // 1. If the user is a GUEST, we invite them to sign up.
-            <Link to="/signup" className="btn-hero btn-hero-secondary">
+            <AuthLink to="/signup" className="btn-hero btn-hero-secondary">
               <HiViewGrid /> Create Your Studio
-            </Link>
+            </AuthLink>
           ) : isTeacher() ? (
             // 2. If the user IS a TEACHER, we link them to their studio management page.
-            <Link to="/my-studio" className="btn-hero btn-hero-secondary">
+            <AuthLink to="/my-studio" className="btn-hero btn-hero-secondary">
               <HiViewGrid /> Manage Your Studio
-            </Link>
+            </AuthLink>
           ) : (
             // 3. If the user is a logged-in LEARNER, we guide them to the hub.
-            <Link to="/squadhub" className="btn-hero btn-hero-secondary">
+            <AuthLink to="/squadhub" className="btn-hero btn-hero-secondary">
               <HiViewGrid /> Visit the SquadHUB
-            </Link>
+            </AuthLink>
           )}
         </div>
       </div>

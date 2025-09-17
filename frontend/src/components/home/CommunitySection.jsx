@@ -1,6 +1,6 @@
 // frontend/src/components/home/CommunitySection.jsx
 
-import { Link } from "react-router-dom";
+import AuthLink from "../common/AuthLink";
 import { HiChatAlt2, HiBookOpen, HiUsers, HiArrowRight } from "react-icons/hi";
 import SquadHubLogo from "../../assets/SquadHUB_logo.png";
 import { useAuth } from "../../context/AuthContext"; // We need our auth hook.
@@ -93,10 +93,10 @@ const CommunitySection = () => {
               Join the conversation and discover what the community is
               discussing.
             </p>
-            <Link to="/squadhub" className="btn btn-primary-cta">
+            <AuthLink to="/squadhub" className="btn btn-primary-cta">
               <span>Visit SquadHUB</span>
               <HiArrowRight className="btn-icon" />
-            </Link>
+            </AuthLink>
           </div>
         </div>
       </div>

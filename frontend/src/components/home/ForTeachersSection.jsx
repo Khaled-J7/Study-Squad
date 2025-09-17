@@ -1,6 +1,6 @@
 // frontend/src/components/home/ForTeachersSection.jsx
 
-import { Link } from "react-router-dom";
+import AuthLink from "../common/AuthLink";
 import {
   HiOutlinePencilAlt,
   HiOutlineUsers,
@@ -50,14 +50,14 @@ const ForTeachersSection = () => {
           {/* We check if the user is a teacher. */}
           {isTeacher() ? (
             // If they are a teacher, the button invites them to create content for their studio.
-            <Link to="/my-studio" className="btn btn-cta-primary">
+            <AuthLink to="/my-studio" className="btn btn-cta-primary">
               Craft a New Lesson <HiPlusCircle className="btn-icon" />
-            </Link>
+            </AuthLink>
           ) : (
             // Otherwise, the button invites them to sign up and become a teacher.
-            <Link to="/signup" className="btn btn-cta-primary">
+            <AuthLink to="/signup" className="btn btn-cta-primary">
               Start Teaching Today
-            </Link>
+            </AuthLink>
           )}
         </div>
         <div className="teachers-visual">
