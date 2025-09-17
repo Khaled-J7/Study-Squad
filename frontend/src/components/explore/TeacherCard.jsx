@@ -43,7 +43,7 @@ const TeacherCard = ({ teacher }) => {
         >
           {`${teacher.first_name} ${teacher.last_name}`}
         </h3>
-        <p className="teacher-card-job-title">{teacher.job_title}</p>
+        <p className="teacher-card-headline">{teacher.profile.headline}</p>
 
         <div className="teacher-card-details">
           {teacher.experience?.length > 0 && (

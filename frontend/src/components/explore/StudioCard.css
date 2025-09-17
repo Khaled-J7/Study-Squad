@@ -157,7 +157,7 @@
   padding: 18px 24px;
   margin-top: auto;
   position: relative;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 .card-footer.studio::before {
   content: "";
@@ -174,19 +174,80 @@
   );
   z-index: 1;
 }
+/* ✅ UPDATED: Changed to a flex container to handle multiple stats */
 .card-stats {
-  font-size: 0.9rem;
-  font-weight: 700;
-  display: flex;
+  display: flex; /* This will align the stat items in a row */
   align-items: center;
-  gap: 8px;
-  color: rgba(255, 255, 255, 0.95);
+  gap: 1rem; /* This adds space between the items */
   position: relative;
   z-index: 3;
+  color: rgba(255, 255, 255, 0.95);
 }
+
+/* ✅ NEW: Styling for an individual stat item (icon + text) */
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.stat-item svg {
+  font-size: 1.1rem;
+}
+/* ✅ NEW: Styling for the tooltip functionality */
+.tooltip-trigger {
+  position: relative; /* This is the anchor for the tooltip */
+  cursor: help;
+}
+
+.tooltip-text {
+  position: absolute;
+  bottom: 150%;
+  left: 50%;
+  transform: translateX(-40%);
+  background-color: var(--color-text-secondary);
+  color: white;
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  /* ✅ UPDATED: CSS for handling longer text */
+  white-space: normal; /* Allow text to wrap */
+  width: max-content; /* The box will be as wide as its content */
+  max-width: 150px; /* But it won't get wider than 150px */
+  text-align: center; /* Center the text if it wraps to a new line */
+
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  z-index: 10;
+}
+
+/* Show the tooltip on hover or focus */
+.tooltip-trigger:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Optional: Adds a small triangle below the tooltip */
+.tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #334155 transparent transparent transparent;
+}
+
 .card-stats svg {
   font-size: 1.1rem;
 }
+
 .card-button {
   background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.2);

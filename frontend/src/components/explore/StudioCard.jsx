@@ -2,16 +2,23 @@
 
 import { useState } from "react";
 import AuthLink from "../common/AuthLink";
-import { HiTag, HiArrowRight, HiCalendar } from "react-icons/hi";
+import {
+  HiUsers,
+  HiStar,
+  HiTag,
+  HiArrowRight,
+  HiInformationCircle,
+} from "react-icons/hi";
+import { getAvatarUrl } from "../../utils/helpers";
 import "./StudioCard.css";
 
 const StudioCard = ({ studio }) => {
   const [isTeacherHovered, setIsTeacherHovered] = useState(false);
   const [isDescExpanded, setIsDescExpanded] = useState(false);
 
-  const API_BASE_URL = "http://127.0.0.1:8000";
+  const API_BASE_URL = "http://1227.0.0.1:8000";
   const coverImageUrl = `${API_BASE_URL}${studio.cover_image}`;
-  const teacherAvatarUrl = `${API_BASE_URL}${studio.owner.profile.profile_picture}`;
+  const teacherAvatarUrl = getAvatarUrl(studio.owner);
 
   const creationDate = studio.created_at
     ? new Date(studio.created_at).toLocaleDateString("en-US", {
@@ -25,6 +32,9 @@ const StudioCard = ({ studio }) => {
     studio.description?.length > 100
       ? `${studio.description.substring(0, 100)}...`
       : studio.description;
+
+  const formattedRating =
+    studio.average_rating > 0 ? studio.average_rating.toFixed(1) : null;
 
   return (
     <div className="card-wrapper">
@@ -43,13 +53,13 @@ const StudioCard = ({ studio }) => {
       <div className="card-info">
         <h3 className="card-title">{studio.name}</h3>
         <p className="card-teacher-name">
-          by {/* ✅ Using AuthLink for the teacher's profile */}
+          by{" "}
           <AuthLink
             to={`/teachers/${studio.owner.id}`}
             onMouseEnter={() => setIsTeacherHovered(true)}
             onMouseLeave={() => setIsTeacherHovered(false)}
           >
-            {studio.owner.username}
+            {`${studio.owner.first_name} ${studio.owner.last_name}`}
           </AuthLink>
         </p>
         <p className="card-description">
@@ -65,7 +75,6 @@ const StudioCard = ({ studio }) => {
         </p>
         <div className="card-tags">
           {studio.tags?.slice(0, 3).map((tag) => (
-            // ✅ Using AuthLink for the tags
             <AuthLink
               to={`/explore?tags=${tag.name}`}
               key={tag.id}
@@ -78,14 +87,24 @@ const StudioCard = ({ studio }) => {
       </div>
       <div className="card-footer studio">
         <div className="card-stats">
+          <div className="stat-item">
+            <HiUsers />
+            <span>{studio.subscribers_count}</span>
+          </div>
+          {formattedRating && (
+            <div className="stat-item">
+              <HiStar />
+              <span>{formattedRating}</span>
+            </div>
+          )}
+          {/* ✅ UPDATED: The creation date is now a tooltip */}
           {creationDate && (
-            <>
-              <HiCalendar />
-              <span>{creationDate}</span>
-            </>
+            <div className="stat-item tooltip-trigger">
+              <HiInformationCircle />
+              <span className="tooltip-text">Created: {creationDate}</span>
+            </div>
           )}
         </div>
-        {/* ✅ Using AuthLink for the main action button */}
         <AuthLink to={`/studios/${studio.id}`} className="card-button">
           <span>View Studio</span>
           <HiArrowRight />

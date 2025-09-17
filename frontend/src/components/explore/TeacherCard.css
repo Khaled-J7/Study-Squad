@@ -53,13 +53,14 @@
   color: var(--color-accent-teal);
 }
 
-.teacher-card-job-title {
+.teacher-card-headline {
   font-family: var(--font-sans);
   color: var(--color-accent-teal);
   font-weight: 600;
   font-size: 1rem;
   margin: 0.25rem 0 1.5rem 0;
 }
+
 .teacher-card-details {
   text-align: left;
   margin-bottom: 1.5rem;
