@@ -2,16 +2,17 @@
 import json
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Profile, Tag, Studio, Lesson, Post, Comment
+from .models import Profile, Tag, Studio, Lesson, Post, Comment, StudioRating
 from django.utils import timezone
 from datetime import timedelta
+from django.db.models import Avg
 
 
 # --- (ProfileSerializer, TagSerializer, UserSerializer, etc. are unchanged) ---
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ["profile_picture", "about_me", "contact_email", "cv_file", "degrees"]
+        fields = ["profile_picture", "headline", "contact_email", "cv_file", "degrees"]
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -28,10 +29,54 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["id", "username", "first_name", "last_name", "profile"]
 
 
+# --- ✅ REFACTORED: The Main Studio Serializer ---
+class StudioSerializer(serializers.ModelSerializer):
+    """
+    The primary serializer for the Studio model.
+    It now includes calculated fields for subscribers and average rating.
+    """
+
+    owner = UserSerializer(read_only=True)
+    tags = TagSerializer(many=True, read_only=True)
+
+    # --- NEW: Calculated Fields ---
+    subscribers_count = serializers.SerializerMethodField()
+    average_rating = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Studio
+        fields = [
+            "id",
+            "name",
+            "description",
+            "cover_image",
+            "owner",
+            "tags",
+            "created_at",
+            "subscribers_count",
+            "average_rating",
+        ]
+
+    def get_subscribers_count(self, obj):
+        """
+        Calculates the total number of subscribers for the studio.
+        'obj' here is the Studio instance.
+        """
+        return obj.subscribers.count()
+
+    def get_average_rating(self, obj):
+        """
+        Calculates the average rating for the studio from all StudioRating entries.
+        """
+        # We use Django's aggregation function to get the average of the 'rating' field.
+        # The '.get('rating__avg', 0) or 0' part ensures we return 0 if there are no ratings yet.
+        return obj.ratings.aggregate(Avg("rating")).get("rating__avg", 0) or 0
+
+
 class UserStudioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Studio
-        fields = ["id", "name", "job_title", "experience"]
+        fields = ["id", "name"]
 
 
 class CourseStudioSerializer(serializers.ModelSerializer):
@@ -40,25 +85,6 @@ class CourseStudioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Studio
         fields = ["id", "name", "owner"]
-
-
-class StudioCardSerializer(serializers.ModelSerializer):
-    owner = UserSerializer(read_only=True)
-    tags = TagSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Studio
-        fields = [
-            "id",
-            "name",
-            "job_title",
-            "description",
-            "cover_image",
-            "owner",
-            "tags",
-            "social_links",
-            "created_at",
-        ]
 
 
 class LessonCardSerializer(serializers.ModelSerializer):
@@ -85,11 +111,7 @@ class TeacherCardSerializer(serializers.ModelSerializer):
 
     # This correctly nests the full profile data, including cv_file and contact_email.
     profile = ProfileSerializer(read_only=True)
-
-    # These fields are correctly sourced from the related Studio model.
-    job_title = serializers.SerializerMethodField()
-    experience = serializers.SerializerMethodField()
-    social_links = serializers.SerializerMethodField()
+    # studio_id to link to the studio page.
     studio_id = serializers.SerializerMethodField()
 
     class Meta:
@@ -99,29 +121,17 @@ class TeacherCardSerializer(serializers.ModelSerializer):
             "username",
             "first_name",  # Pass the first_name directly
             "last_name",  # Pass the last_name directly
-            "profile",  # Pass the entire nested profile object
-            "job_title",
-            "experience",
-            "social_links",
+            "profile",  # Pass the entire nested profile object: Contains picture, degrees, cv_file
             "studio_id",  # Pass the studio ID for linking
         ]
 
-    def get_job_title(self, obj):
-        # 'obj' is the User instance. We find their studio and get the job title.
-        studio = Studio.objects.filter(owner=obj).first()
-        return studio.job_title if studio else ""
-
-    def get_experience(self, obj):
-        studio = Studio.objects.filter(owner=obj).first()
-        return studio.experience if studio else []
-
-    def get_social_links(self, obj):
-        studio = Studio.objects.filter(owner=obj).first()
-        return studio.social_links if studio else {}
-
     def get_studio_id(self, obj):
+        """
+        Safely gets the ID of the teacher's studio for linking purposes.
+        'obj' is the User instance.
+        """
         studio = Studio.objects.filter(owner=obj).first()
-        return studio.id if studio else None # type: ignore
+        return studio.id if studio else None  # type: ignore
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -177,6 +187,17 @@ class CurrentUserSerializer(serializers.ModelSerializer):
         ]
 
 
+# --- ✅ NEW: StudioRating Serializer ---
+class StudioRatingSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the StudioRating model.
+    """
+
+    class Meta:
+        model = StudioRating
+        fields = ["id", "user", "rating", "created_at"]
+
+
 # --- THE SIMPLIFIED ProfileUpdateSerializer ---
 class ProfileUpdateSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source="user.username", required=False)
@@ -186,7 +207,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         # NOTE: 'cv_file' is now removed from this list.
         fields = [
             "username",
-            "about_me",
+            "headline",
             "contact_email",
             "profile_picture",
             "degrees",
@@ -213,48 +234,4 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
             instance.username_last_changed = timezone.now()
 
         super().update(instance, validated_data)
-        return instance
-
-
-class StudioCreateSerializer(serializers.ModelSerializer):
-    tags = serializers.ListField(
-        child=serializers.CharField(max_length=50), write_only=True, required=False
-    )
-
-    class Meta:
-        model = Studio
-        fields = [
-            "name",
-            "job_title",
-            "description",
-            "cover_image",
-            "experience",
-            "tags",
-            "social_links",
-        ]
-
-    def create(self, validated_data):
-        tag_names = validated_data.pop("tags", [])
-        studio = Studio.objects.create(**validated_data)
-        for tag_name in tag_names:
-            tag, _ = Tag.objects.get_or_create(name=tag_name.strip())
-            studio.tags.add(tag)
-        return studio
-
-    def update(self, instance, validated_data):
-        instance.name = validated_data.get("name", instance.name)
-        instance.job_title = validated_data.get("job_title", instance.job_title)
-        instance.description = validated_data.get("description", instance.description)
-        instance.cover_image = validated_data.get("cover_image", instance.cover_image)
-        instance.experience = validated_data.get("experience", instance.experience)
-        instance.social_links = validated_data.get(
-            "social_links", instance.social_links
-        )
-        if "tags" in validated_data:
-            tag_names = validated_data.pop("tags", [])
-            instance.tags.clear()
-            for tag_name in tag_names:
-                tag, _ = Tag.objects.get_or_create(name=tag_name.strip())
-                instance.tags.add(tag)
-        instance.save()
         return instance

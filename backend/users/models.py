@@ -13,7 +13,8 @@ class Profile(models.Model):
     profile_picture = models.ImageField(
         upload_to="profile_pics/", default="profile_pics/default.jpg"
     )
-    about_me = models.CharField(max_length=250, blank=True)
+    # ✅ RENAMED: from about_me to headline
+    headline = models.CharField(max_length=250, blank=True)
     contact_email = models.EmailField(max_length=255, blank=True)
     username_last_changed = models.DateTimeField(null=True, blank=True)
 
@@ -49,28 +50,42 @@ class Tag(models.Model):
 
 
 # Model 3: The Studio model for teachers
+# --- ✅ REFACTORED STUDIO MODEL ---
 class Studio(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
-    job_title = models.CharField(
-        max_length=200, blank=True, help_text="e.g., Professor of Computer Science"
-    )
     cover_image = models.ImageField(
         upload_to="studio_covers/", default="studio_covers/default_cover.jpg"
     )
     description = models.TextField()
-
-    experience = models.JSONField(
-        default=list,
-        blank=True,
-        help_text='List of experiences, e.g., [{"title": "Software Engineer", "company": "Google"}]',
-    )
     tags = models.ManyToManyField(Tag, blank=True)
-    social_links = models.JSONField(blank=True, null=True)
+
+    # ✅ NEW: Subscribers Field
+    # We will use a ManyToManyField to link Users as subscribers.
+    subscribers = models.ManyToManyField(
+        User, related_name="subscribed_studios", blank=True
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
+
+
+# --- ✅ NEW: StudioRating MODEL ---
+# This new model will handle the ratings for each studio.
+class StudioRating(models.Model):
+    studio = models.ForeignKey(Studio, related_name="ratings", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    rating = models.IntegerField(default=0)  # e.g., 1 to 5 stars
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # Ensures a user can only rate a studio once
+        unique_together = ("studio", "user")
+
+    def __str__(self):
+        return f"{self.user.username} rated {self.studio.name} {self.rating} stars"
 
 
 # Model 4: The Lesson model for content inside a Studio

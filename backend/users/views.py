@@ -9,14 +9,13 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth.models import User, Group
 from .models import Studio, Lesson, Profile
 from .serializers import (
+    StudioSerializer,
     ProfileSerializer,
     ProfileUpdateSerializer,
-    StudioCardSerializer,
     LessonCardSerializer,
     TeacherCardSerializer,
     UserRegisterSerializer,
     CurrentUserSerializer,
-    StudioCreateSerializer,
 )
 
 
@@ -47,7 +46,7 @@ def explore_view(request):
             queryset = queryset.filter(name__icontains=query)
         if tags:
             queryset = queryset.filter(tags__name__in=tags).distinct()
-        serializer = StudioCardSerializer(queryset, many=True)
+        serializer = StudioSerializer(queryset, many=True)
 
     elif search_type == "course":
         queryset = Lesson.objects.all()
@@ -209,108 +208,3 @@ def profile_update_view(request):
             {"error": "A server error occurred during the profile update.", "detail": str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
-
-
-# @api_view(["GET", "POST", "PUT"])
-# @permission_classes([IsAuthenticated])
-# @parser_classes([MultiPartParser, FormParser])
-# def studio_manage_view(request):
-#     """
-#     A single, unified view to handle all studio-related actions
-#     for the authenticated user.
-#     """
-#     user = request.user
-
-#     # --- GET Request (No changes) ---
-#     if request.method == "GET":
-#         try:
-#             studio = Studio.objects.get(owner=user)
-#             serializer = StudioCardSerializer(studio)
-#             return Response(serializer.data, status=status.HTTP_200_OK)
-#         except Studio.DoesNotExist:
-#             return Response(
-#                 {"error": "Studio not found for this user."},
-#                 status=status.HTTP_404_NOT_FOUND,
-#             )
-
-#     # --- POST Request (Correction is here) ---
-#     elif request.method == "POST":
-#         if Studio.objects.filter(owner=user).exists():
-#             return Response(
-#                 {"error": "You have already created a studio."},
-#                 status=status.HTTP_400_BAD_REQUEST,
-#             )
-
-#         serializer = StudioCreateSerializer(data=request.data)
-#         if serializer.is_valid():
-#             try:
-#                 # All database operations are now inside a try block
-#                 studio = serializer.save(owner=user)
-#                 profile = request.user.profile
-#                 if "cv_file" in request.FILES:
-#                     profile.cv_file = request.FILES["cv_file"]
-#                     profile.save()
-
-#                 degree_names = request.data.getlist("degrees[name]")
-#                 degree_files = request.FILES.getlist("degrees[file]")
-#                 for name, file in zip(degree_names, degree_files):
-#                     if name and file:
-#                         Degree.objects.create(profile=profile, name=name, file=file)
-
-#                 teachers_group, _ = Group.objects.get_or_create(name="Teachers")
-#                 user.groups.add(teachers_group)
-
-#                 fresh_studio_instance = Studio.objects.get(pk=studio.pk)  # type: ignore
-#                 response_serializer = StudioCardSerializer(fresh_studio_instance)
-
-#                 return Response(
-#                     response_serializer.data, status=status.HTTP_201_CREATED
-#                 )
-
-#             except Exception as e:
-#                 # If ANY error occurs during creation or serialization, we catch it
-#                 print(f"---! SEVERE ERROR DURING STUDIO CREATION: {e} !---")
-#                 # And return a proper 500 error that includes CORS headers
-#                 return Response(
-#                     {
-#                         "error": "Studio created, but a server error occurred preparing the response.",
-#                         "detail": str(e),
-#                     },
-#                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-#                 )
-
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-#     # --- PUT Request (No changes) ---
-#     elif request.method == "PUT":
-#         # ... (The PUT logic remains the same as before) ...
-#         try:
-#             studio = Studio.objects.get(owner=user)
-#         except Studio.DoesNotExist:
-#             return Response(
-#                 {"error": "Studio not found. Cannot update."},
-#                 status=status.HTTP_404_NOT_FOUND,
-#             )
-
-#         serializer = StudioCreateSerializer(
-#             instance=studio, data=request.data, partial=True
-#         )
-#         if serializer.is_valid():
-#             serializer.save()
-#             profile = request.user.profile
-
-#             if "cv_file" in request.FILES:
-#                 profile.cv_file = request.FILES["cv_file"]
-#                 profile.save()
-
-#             new_degree_names = request.data.getlist("degrees[name]")
-#             new_degree_files = request.FILES.getlist("degrees[file]")
-#             for name, file in zip(new_degree_names, new_degree_files):
-#                 if name and file:
-#                     Degree.objects.get_or_create(
-#                         profile=profile, name=name, defaults={"file": file}
-#                     )
-
-#             studio_serializer = StudioCardSerializer(studio)
-#             return Response(studio_serializer.data, status=status.HTTP_200_OK)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -20,7 +20,4 @@ urlpatterns = [
     path("profile/update/", profile_update_view, name="profile-update"),
     # NEW: A dedicated URL for handling only the CV file upload.
     path("profile/upload-cv/", cv_upload_view, name="cv-upload"),
-    # --- UNIFIED STUDIO URL ---
-    # This single endpoint will handle GET, POST, and PUT for a user's studio.
-    # path("studio/", studio_manage_view, name="studio-manage"),
 ]
