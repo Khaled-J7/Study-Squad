@@ -64,7 +64,7 @@ const ProfilePage = () => {
     if (user) {
       setFormData({
         username: user.username || "",
-        about_me: user.profile.about_me || "",
+        headline: user.profile.headline || "",
         contact_email: user.profile.contact_email || "",
       });
       setDegrees(user.profile.degrees || []);
@@ -345,31 +345,31 @@ const ProfilePage = () => {
               <div className="detail-group">
                 <label className="detail-label">
                   <HiOutlinePencilAlt className="detail-label-icon" />
-                  About Me
+                  Headline
                 </label>
                 {isEditMode ? (
                   <>
                     <div className="detail-input-wrapper">
                       <HiOutlinePencilAlt className="detail-input-icon" />
                       <textarea
-                        name="about_me"
-                        value={formData.about_me}
+                        name="headline"
+                        value={formData.headline}
                         onChange={handleInputChange}
                         className="detail-textarea"
-                        rows="4"
-                        placeholder="Share a few words about yourself..."
+                        rows="2"
+                        placeholder="Summarize your professional or academic role"
                       />
                     </div>
                     {/* RESTORED: Helper text for About Me */}
                     <div className="detail-helper-text">
                       <HiInformationCircle className="icon" />
-                      This bio will be visible on your public profile.
+                      This headline will be visible on your public profile.
                     </div>
                   </>
                 ) : (
                   <div className="detail-value">
                     <HiOutlinePencilAlt className="detail-value-icon" />
-                    {user.profile.about_me || "No description provided yet."}
+                    {user.profile.headline || "No headline provided yet."}
                   </div>
                 )}
               </div>
