@@ -7,7 +7,6 @@ import HomePage from "./pages/HomePage";
 import ExplorePage from "./pages/ExplorePage";
 import SquadHubPage from "./pages/SquadHubPage";
 import AboutPage from "./pages/AboutPage";
-import MyStudioPage from "./pages/MyStudioPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -24,7 +23,6 @@ const App = () => {
             <Route path="/explore" element={<ExplorePage />} />
             <Route path="/squadhub" element={<SquadHubPage />} />
             <Route path="/about" element={<AboutPage />} />
-            <Route path="/my-studio" element={<MyStudioPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/profile" element={<ProfilePage />} />
