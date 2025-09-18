@@ -1,0 +1,513 @@
+/* frontend/src/pages/StudioOnboardingPage.css */
+.studio-onboarding {
+  min-height: 100vh;
+  background: linear-gradient(
+    135deg,
+    var(--color-bg-start) 0%,
+    var(--color-bg-mid) 50%,
+    var(--color-bg-end) 100%
+  );
+  position: relative;
+  overflow-x: hidden;
+  font-family: var(--font-body);
+}
+
+/* Hero Section */
+.studio-onboarding .hero-section {
+  padding: 1rem 1rem 1rem;
+  position: relative;
+}
+
+.studio-onboarding .hero-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.studio-onboarding .hero-text {
+  color: var(--color-text-primary);
+  text-align: center;
+}
+
+.studio-onboarding .welcome-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--color-surface);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--color-border);
+  padding: 0.7rem 1.5rem;
+  border-radius: 50px;
+  font-family: var(--font-nav);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  color: var(--color-text-secondary);
+  transition: transform 0.3s ease;
+}
+
+.studio-onboarding .welcome-badge:hover {
+  transform: translateY(-2px);
+}
+
+.studio-onboarding .badge-icon {
+  font-size: 1.2rem;
+  color: var(--color-primary);
+}
+
+.studio-onboarding .hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+  color: var(--color-text-primary);
+}
+
+.studio-onboarding .highlight {
+  background: linear-gradient(
+    120deg,
+    var(--color-primary) 0%,
+    var(--color-primary-hover) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.studio-onboarding .hero-subtitle {
+  font-family: var(--font-body);
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* Hero Image */
+.studio-onboarding .hero-image {
+  position: relative;
+}
+
+.studio-onboarding .image-container {
+  position: relative;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.studio-onboarding .image-container:hover {
+  transform: translateY(-5px);
+}
+
+.studio-onboarding .welcome-image {
+  width: 100%;
+  height: 420px;
+  object-fit: cover;
+  display: block;
+}
+
+.studio-onboarding .image-overlay {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+}
+
+.studio-onboarding .stat-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(15px);
+  padding: 1rem 1.5rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.studio-onboarding .stat-icon {
+  font-size: 1.5rem;
+  color: var(--color-accent-green);
+}
+
+.studio-onboarding .stat-number {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.studio-onboarding .stat-label {
+  font-family: var(--font-nav);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+/* Guidelines Section */
+.studio-onboarding .guidelines-section {
+  padding: 5rem 2rem;
+  background: var(--color-surface);
+  position: relative;
+}
+
+.studio-onboarding .container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.studio-onboarding .section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.studio-onboarding .section-icon {
+  font-size: 2.5rem;
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+}
+
+.studio-onboarding .section-header h2 {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 0.8rem;
+}
+
+.studio-onboarding .section-header p {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  color: var(--color-text-secondary);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Simplified Timeline - 2x2 Grid Layout */
+.studio-onboarding .guidelines-timeline {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.studio-onboarding .timeline-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+.studio-onboarding .timeline-marker {
+  width: 50px;
+  height: 50px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 15px rgba(217, 119, 6, 0.25);
+  margin-bottom: 1.5rem;
+}
+
+.studio-onboarding .step-number {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: white;
+}
+
+.studio-onboarding .timeline-content {
+  background: var(--color-card-bg);
+  padding: 1.8rem;
+  border-radius: 1.2rem;
+  width: 100%;
+  border: 1px solid var(--color-border);
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.studio-onboarding .timeline-content:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.studio-onboarding .timeline-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--color-accent-green);
+  border-radius: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  font-size: 1.2rem;
+  color: white;
+}
+
+.studio-onboarding .timeline-content h3 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 0.8rem;
+}
+
+.studio-onboarding .timeline-content p {
+  font-family: var(--font-body);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Pro Tip */
+.studio-onboarding .pro-tip {
+  margin-top: 3rem;
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-teal),
+    var(--color-accent-green)
+  );
+  padding: 1.5rem 2rem;
+  border-radius: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: white;
+  max-width: 550px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.studio-onboarding .tip-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.studio-onboarding .tip-content {
+  font-family: var(--font-nav);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.studio-onboarding .tip-content strong {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+/* CTA Section */
+.studio-onboarding .cta-section {
+  padding: 5rem 2rem;
+  background: var(--color-text-primary);
+  text-align: center;
+}
+
+.studio-onboarding .cta-content h2 {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--color-text-inverted);
+  margin-bottom: 1rem;
+}
+
+.studio-onboarding .cta-content p {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 2rem;
+  max-width: 450px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+}
+
+.studio-onboarding .cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-primary-hover) 50%,
+    #ea580c 100%
+  );
+  color: white;
+  padding: 1.4rem 3rem;
+  border-radius: 60px;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.4s ease;
+  box-shadow: 0 8px 30px rgba(217, 119, 6, 0.3);
+  position: relative;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.studio-onboarding .cta-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.6s ease;
+}
+
+.studio-onboarding .cta-icon {
+  font-size: 1.3rem;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+.studio-onboarding .cta-arrow {
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+}
+
+.studio-onboarding .cta-button:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(217, 119, 6, 0.4);
+  background: linear-gradient(
+    135deg,
+    #ea580c 0%,
+    var(--color-primary-hover) 50%,
+    var(--color-primary) 100%
+  );
+}
+
+.studio-onboarding .cta-button:hover::before {
+  left: 100%;
+}
+
+.studio-onboarding .cta-button:hover .cta-arrow {
+  transform: translateX(4px);
+}
+
+@keyframes sparkle {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
+    color: #fbbf24;
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+    color: #fde047;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  .studio-onboarding .hero-content {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .studio-onboarding .welcome-image {
+    height: 350px;
+  }
+
+  .studio-onboarding .guidelines-timeline {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .studio-onboarding .hero-section,
+  .studio-onboarding .guidelines-section,
+  .studio-onboarding .cta-section {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .studio-onboarding .hero-section {
+    padding-top: 4rem;
+    padding-bottom: 3rem;
+  }
+
+  .studio-onboarding .guidelines-section,
+  .studio-onboarding .cta-section {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+
+  .studio-onboarding .welcome-image {
+    height: 280px;
+  }
+
+  .studio-onboarding .section-header h2,
+  .studio-onboarding .cta-content h2 {
+    font-size: 1.8rem;
+  }
+
+  .studio-onboarding .timeline-content {
+    padding: 1.5rem;
+  }
+
+  .studio-onboarding .pro-tip {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+  }
+}
+
+/* Simple Animations */
+.studio-onboarding .hero-text,
+.studio-onboarding .hero-image,
+.studio-onboarding .timeline-item,
+.studio-onboarding .pro-tip {
+  animation: studioFadeIn 0.6s ease-out;
+}
+
+.studio-onboarding .hero-image {
+  animation-delay: 0.2s;
+  animation-fill-mode: both;
+}
+
+.studio-onboarding .timeline-item:nth-child(1) {
+  animation-delay: 0.1s;
+  animation-fill-mode: both;
+}
+.studio-onboarding .timeline-item:nth-child(2) {
+  animation-delay: 0.2s;
+  animation-fill-mode: both;
+}
+.studio-onboarding .timeline-item:nth-child(3) {
+  animation-delay: 0.3s;
+  animation-fill-mode: both;
+}
+.studio-onboarding .timeline-item:nth-child(4) {
+  animation-delay: 0.4s;
+  animation-fill-mode: both;
+}
+
+.studio-onboarding .pro-tip {
+  animation-delay: 0.5s;
+  animation-fill-mode: both;
+}
+
+@keyframes studioFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
