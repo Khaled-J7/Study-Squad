@@ -1,0 +1,36 @@
+/* frontend/src/components/common/InlineError/InlineError.css */
+
+.inline-error-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #dc2626; /* A strong red for errors */
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background-color: #fef2f2; /* A light red background */
+  border: 1px solid #fecaca; /* A soft red border */
+  border-radius: 8px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.inline-error-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0; /* Prevents the icon from shrinking */
+}
+
+.inline-error-message {
+  line-height: 1.4;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
