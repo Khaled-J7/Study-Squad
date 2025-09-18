@@ -10,6 +10,11 @@ import AboutPage from "./pages/AboutPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import ProfilePage from "./pages/ProfilePage";
+// MyStudioPage will be created soon
+// import MyStudioPage from "./pages/MyStudioPage";
+import StudioOnboardingPage from "./pages/StudioOnboardingPage";
+import CreateStudioPage from "./pages/CreateStudioPage";
+import TeacherRouteGuard from "./components/common/TeacherRouteGuard";
 import "./App.css";
 
 const App = () => {
@@ -26,6 +31,18 @@ const App = () => {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+
+            {/* --- Routes Guarded from Teachers --- */}
+            <Route element={<TeacherRouteGuard />}>
+              <Route
+                path="/studio/onboarding"
+                element={<StudioOnboardingPage />}
+              />
+              <Route path="/studio/create" element={<CreateStudioPage />} />
+            </Route>
+
+            {/* --- Routes for Teachers Only (we will build this next) --- */}
+            {/* <Route path="/my-studio" element={<MyStudioPage />} /> */}
           </Routes>
         </main>
       </div>
