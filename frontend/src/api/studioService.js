@@ -1,9 +1,10 @@
-// frontend/src/api/studioService.js
+// In frontend/src/api/studioService.js
+
 import axiosInstance from "./axiosInstance";
 
 /**
  * Creates a new studio by sending the form data to the backend.
- * @param {Object} studioData - The data collected from the multi-step form.
+ * @param {Object} studioData - The data collected from the creation form.
  * @returns {Object} An object with success status and data or error.
  */
 const createStudio = async (studioData) => {
@@ -11,9 +12,7 @@ const createStudio = async (studioData) => {
   const formData = new FormData();
 
   // We append each piece of data to the FormData object.
-  // The keys must match what our StudioCreateSerializer expects.
   formData.append("name", studioData.name);
-  formData.append("job_title", studioData.job_title);
   formData.append("description", studioData.description);
 
   // Only append the image if a new one was selected.
@@ -21,26 +20,7 @@ const createStudio = async (studioData) => {
     formData.append("cover_image", studioData.cover_image);
   }
 
-  // Append the new CV file if it exists
-  if (studioData.cv_file) {
-    formData.append("cv_file", studioData.cv_file);
-  }
-
-  // Append the new degrees. The backend expects two separate lists
-  // named 'degrees[name]' and 'degrees[file]'.
-  (studioData.degrees || []).forEach((degree) => {
-    formData.append("degrees[name]", degree.name);
-    formData.append("degrees[file]", degree.file);
-  });
-  
-  // For JSON fields (experience, social_links), we must stringify them.
-  formData.append("experience", JSON.stringify(studioData.experience || []));
-  formData.append(
-    "social_links",
-    JSON.stringify(studioData.social_links || {})
-  );
-
-  // For the tags (a list of strings), we append each tag individually.
+  // Append each tag individually.
   (studioData.tags || []).forEach((tag) => {
     formData.append("tags", tag);
   });
