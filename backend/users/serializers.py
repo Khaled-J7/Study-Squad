@@ -235,3 +235,36 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
 
         super().update(instance, validated_data)
         return instance
+
+
+# --- ✅ NEW: StudioCreateSerializer ---
+# This serializer will handle the creation of a new studio.
+class StudioCreateSerializer(serializers.ModelSerializer):
+    # The frontend will send a list of tag names (strings).
+    tags = serializers.ListField(
+        child=serializers.CharField(max_length=50), write_only=True, required=False
+    )
+
+    class Meta:
+        model = Studio
+        # These are the fields the user will fill out in the form.
+        fields = [
+            "name",
+            "description",
+            "cover_image",
+            "tags",
+        ]
+
+    def create(self, validated_data):
+        # Pop the tag_names from the validated data before creating the studio
+        tag_names = validated_data.pop("tags", [])
+
+        # Create the studio instance
+        studio = Studio.objects.create(**validated_data)
+
+        # Loop through the tag names, get or create the Tag object, and add it
+        for tag_name in tag_names:
+            tag, _ = Tag.objects.get_or_create(name=tag_name.strip())
+            studio.tags.add(tag)
+
+        return studio

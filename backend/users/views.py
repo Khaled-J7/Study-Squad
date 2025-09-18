@@ -10,6 +10,7 @@ from django.contrib.auth.models import User, Group
 from .models import Studio, Lesson, Profile
 from .serializers import (
     StudioSerializer,
+    StudioCreateSerializer,
     ProfileSerializer,
     ProfileUpdateSerializer,
     LessonCardSerializer,
@@ -205,6 +206,52 @@ def profile_update_view(request):
 
     except Exception as e:
         return Response(
-            {"error": "A server error occurred during the profile update.", "detail": str(e)},
+            {
+                "error": "A server error occurred during the profile update.",
+                "detail": str(e),
+            },
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
+
+# --- ✅ NEW: Studio Create View ---
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])  # To handle the cover image upload
+def studio_create_view(request):
+    """
+    Handles the creation of a new studio for a user.
+    """
+    user = request.user
+
+    # 1. Prevent users from creating more than one studio
+    if Studio.objects.filter(owner=user).exists():
+        return Response(
+            {"error": "You have already created a studio."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # 2. Validate the incoming form data
+    serializer = StudioCreateSerializer(data=request.data)
+    if serializer.is_valid():
+        # 3. Save the new studio, passing the logged-in user as the owner
+        studio = serializer.save(owner=user)
+
+        # 4. Elevate the user's role to "Teacher"
+        try:
+            teachers_group = Group.objects.get(name="Teachers")
+            user.groups.add(teachers_group)
+        except Group.DoesNotExist:
+            # This is a fallback in case the group was somehow deleted
+            return Response(
+                {"error": "Critical server error: 'Teachers' group not found."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        # 5. Return the full data of the newly created studio
+        # We use the main StudioSerializer here to include all calculated fields
+        response_serializer = StudioSerializer(studio)
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+
+    # If validation fails, return the errors
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

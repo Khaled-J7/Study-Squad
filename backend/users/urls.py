@@ -7,7 +7,7 @@ from .views import (
     current_user_view,
     profile_update_view,
     cv_upload_view,
-    # studio_manage_view,
+    studio_create_view,
 )
 
 urlpatterns = [
@@ -20,4 +20,7 @@ urlpatterns = [
     path("profile/update/", profile_update_view, name="profile-update"),
     # NEW: A dedicated URL for handling only the CV file upload.
     path("profile/upload-cv/", cv_upload_view, name="cv-upload"),
+    
+    # ✅ NEW: The URL for creating a studio
+    path("studios/create/", studio_create_view, name="studio-create"),
 ]
