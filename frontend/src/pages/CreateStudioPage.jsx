@@ -1,225 +1,326 @@
-// frontend/src/pages/CreateStudioPage.jsx
-import { useState,useEffect } from "react";
+// In frontend/src/pages/CreateStudioPage.jsx
+
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { HiChevronLeft, HiChevronRight, HiCheck } from "react-icons/hi";
 import studioService from "../api/studioService";
-import Step1_Essentials from "../components/studio/Step1_Essentials";
-import Step2_Visuals from "../components/studio/Step2_Visuals";
-import Step3_Expertise from "../components/studio/Step3_Expertise";
-import Step4_Connection from "../components/studio/Step4_Connection";
+import {
+  HiOutlineIdentification,
+  HiOutlinePencilAlt,
+  HiOutlinePhotograph,
+  HiOutlineTag,
+  HiX,
+  HiCheckCircle,
+  HiAcademicCap,
+} from "react-icons/hi";
 import SuccessModal from "../components/common/SuccessModal";
-import Spinner from "../components/common/Spinner";
+import InlineError from "../components/common/InlineError/InlineError";
 import "./CreateStudioPage.css";
 
-// This array defines the steps for our progress bar and logic.
-const steps = ["The Essentials", "Visuals", "Expertise", "Connection"];
-
 const CreateStudioPage = () => {
-  // --- STATE MANAGEMENT ---
   const navigate = useNavigate();
-  const { user, refreshUser } = useAuth();
+  const { refreshUser } = useAuth();
 
-  // This state tracks which step of the form the user is currently on.
-  const [currentStep, setCurrentStep] = useState(1);
-
-  // This state is a boolean to show a loading indicator on the "Finish" button.
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // This state will control the visibility of our new success modal.
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-
-  // This state holds all the data from all form steps combined.
   const [formData, setFormData] = useState({
     name: "",
-    job_title: "",
     description: "",
     cover_image: null,
     tags: [],
-    degrees: [],
-    cv_file: null,
-    experience: [],
-    social_links: { email: "", linkedin: "", twitter: "" },
   });
 
-  // --- NEW: THE REDIRECT GUARD ---
-  /**
-   * This useEffect hook runs whenever the 'user' object or 'navigate' function changes.
-   * Its job is to protect this page from being accessed by users who are already teachers.
-   */
-  useEffect(() => {
-    // We check if the user object exists and if it has a 'studio' property.
-    if (user && user.studio) {
-      console.log("User is already a teacher. Redirecting to dashboard...");
-      // If they are a teacher, we immediately redirect them to their studio dashboard.
-      navigate("/my-studio");
-    }
-  }, [user, navigate]); // Dependencies: This effect re-runs if the user logs in/out or if the navigate function changes.
+  const [currentTag, setCurrentTag] = useState("");
+  const [imagePreview, setImagePreview] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [errors, setErrors] = useState({});
+  const fileInputRef = useRef(null);
 
-  // --- HANDLER FUNCTIONS ---
+  const handleClearImage = () => {
+    setFormData((prev) => ({ ...prev, cover_image: null }));
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
-  // Moves the user to the next step in the form.
-  const nextStep = () => {
-    if (currentStep < steps.length) {
-      setCurrentStep((prevStep) => prevStep + 1);
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData((prev) => ({ ...prev, cover_image: file }));
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
-  // Moves the user to the previous step in the form.
-  const prevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep((prevStep) => prevStep - 1);
+  const handleUseDefaultToggle = (e) => {
+    const isChecked = e.target.checked;
+    if (isChecked) {
+      handleClearImage();
+      setImagePreview("/default_cover.jpg");
+      setFormData((prev) => ({ ...prev, cover_image: null }));
+    } else {
+      handleClearImage();
     }
   };
 
-  // Handles text input changes for Step 1.
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: null }));
+    }
   };
 
-  // The final submission function, called when the "Finish" button is clicked.
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
-    const response = await studioService.createStudio(formData);
+  const handleTagKeyDown = (e) => {
+    if (e.key === "Enter" && currentTag.trim() !== "") {
+      e.preventDefault();
+      if (!formData.tags.includes(currentTag.trim().toLowerCase())) {
+        setFormData((prev) => ({
+          ...prev,
+          tags: [...prev.tags, currentTag.trim().toLowerCase()],
+        }));
+      }
+      setCurrentTag("");
+    }
+  };
 
+  const removeTag = (tagToRemove) => {
+    setFormData((prev) => ({
+      ...prev,
+      tags: prev.tags.filter((tag) => tag !== tagToRemove),
+    }));
+  };
+
+  const addSuggestedTag = (tag) => {
+    if (!formData.tags.includes(tag.toLowerCase())) {
+      setFormData((prev) => ({
+        ...prev,
+        tags: [...prev.tags, tag.toLowerCase()],
+      }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setErrors({});
+    const finalFormData = { ...formData };
+    if (imagePreview === "/default_cover.jpg") {
+      finalFormData.cover_image = null;
+    }
+    const response = await studioService.createStudio(finalFormData);
     if (response.success) {
-      // After creating the studio, the user is now a teacher.
-      // We MUST refresh the user data to update their role across the app.
       await refreshUser();
-      // Instead of an alert, we now show our beautiful success modal.
       setShowSuccessModal(true);
     } else {
-      console.error("Submission failed:", response.details);
-      alert(response.error);
+      setErrors(
+        response.details || { general: "An unexpected error occurred." }
+      );
     }
-
     setIsSubmitting(false);
   };
 
-  // This function determines which form step component to render.
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 1:
-        return (
-          <Step1_Essentials
-            formData={formData}
-            handleInputChange={handleInputChange}
-          />
-        );
-      case 2:
-        return <Step2_Visuals formData={formData} setFormData={setFormData} />;
-      case 3:
-        return (
-          <Step3_Expertise formData={formData} setFormData={setFormData} />
-        );
-      case 4:
-        return (
-          <Step4_Connection formData={formData} setFormData={setFormData} />
-        );
-      default:
-        return null;
-    }
-  };
-
-  // --- RENDER LOGIC ---
-  // If the user is a teacher, this component will redirect before rendering anything meaningful.
-  // We can return null or a loading spinner to prevent a "flash" of the form content.
-  if (user && user.studio) {
-    return <Spinner />; // Or null
-  }
-
   return (
-    // We use a React Fragment <> to return multiple top-level elements.
-    <>
-      <div className="studio-creation-container">
-        {/* --- CHILD 1: THE HEADER (Spans full width) --- */}
-        <div className="studio-creation-header">
-          <h1>
-            Welcome, {user?.first_name}! Let's build your professional Studio.
-          </h1>
+    <div className="create-studio-page">
+      <div className="studio-hero">
+        <div className="hero-content">
+          <div className="hero-icon">
+            <HiAcademicCap />
+          </div>
+          <h1>Create Your Teaching Studio</h1>
           <p>
-            This is your space to shine. In just a few steps, you'll create a
-            professional hub to connect with learners, showcase your expertise,
-            and start sharing your knowledge. Let's lay the foundation for your
-            teaching journey on Study Squad.
+            Transform your expertise into an engaging learning experience and
+            connect with students worldwide.
           </p>
-        </div>
-
-        {/* --- CHILD 2: THE MAIN TWO-COLUMN CONTENT --- */}
-        <div className="studio-creation-main-content">
-          {/* Column 1: Progress Bar */}
-          <div className="progress-bar-container">
-            {steps.map((step, index) => {
-              // --- CHANGE START: Add a variable for clarity ---
-              const isCompleted = currentStep > index + 1;
-              const isActive = currentStep === index + 1;
-              // --- CHANGE END ---
-
-              return (
-                <div
-                  key={index}
-                  className={`progress-step ${isActive ? "step-active" : ""} ${
-                    isCompleted ? "step-completed" : ""
-                  }`}
-                >
-                  <div className="step-circle">
-                    {/* --- CHANGE START: Conditional rendering --- */}
-                    {isCompleted ? <HiCheck size={28} /> : index + 1}
-                    {/* --- CHANGE END --- */}
-                  </div>
-                  <div className="step-label">{step}</div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Column 2: Form Content */}
-          <div className="form-step-container">
-            {renderStepContent()}
-            <div className="step-navigation">
-              <button
-                onClick={prevStep}
-                className="step-btn step-btn-secondary"
-                disabled={currentStep === 1}
-              >
-                <HiChevronLeft />
-                Previous Step
-              </button>
-              {currentStep === steps.length ? (
-                <button
-                  onClick={handleSubmit}
-                  className="step-btn step-btn-primary"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting
-                    ? "Creating Studio..."
-                    : "Finish & Create Studio"}
-                </button>
-              ) : (
-                <button
-                  onClick={nextStep}
-                  className="step-btn step-btn-primary"
-                >
-                  Next Step
-                  <HiChevronRight />
-                </button>
-              )}
-            </div>
-          </div>
         </div>
       </div>
 
-      {/* --- SUCCESS MODAL (Correctly placed here) --- */}
+      <div className="form-container">
+        <form onSubmit={handleSubmit} className="studio-form">
+          {/* Studio Name */}
+          <div className="form-group">
+            <label htmlFor="name" className="form-label">
+              <HiOutlineIdentification className="label-icon" />
+              <div className="label-content">
+                <span className="label-title">Studio Name</span>
+                <span className="label-subtitle">
+                  🏷️ Choose a memorable name for your teaching space.
+                </span>
+              </div>
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              placeholder="e.g., The Creative Coding Academy"
+              value={formData.name}
+              onChange={handleInputChange}
+              required
+            />
+            <InlineError message={errors.name} />
+          </div>
+
+          {/* Description */}
+          <div className="form-group">
+            <label htmlFor="description" className="form-label">
+              <HiOutlinePencilAlt className="label-icon" />
+              <div className="label-content">
+                <span className="label-title">Description</span>
+                <span className="label-subtitle">
+                  🏷️ Tell students what makes your teaching special.
+                </span>
+              </div>
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              rows="5"
+              placeholder="Share your teaching philosophy, expertise, and what students can expect..."
+              value={formData.description}
+              onChange={handleInputChange}
+              required
+            />
+            <InlineError message={errors.description} />
+          </div>
+
+          {/* Cover Image */}
+          <div className="form-group">
+            <label className="form-label">
+              <HiOutlinePhotograph className="label-icon" />
+              <div className="label-content">
+                <span className="label-title">Cover Image</span>
+                <span className="label-subtitle">
+                  🏷️ Make a great first impression (16:9 recommended).
+                </span>
+              </div>
+            </label>
+            <div
+              className="file-uploader"
+              onClick={() => !imagePreview && fileInputRef.current.click()}
+            >
+              {imagePreview ? (
+                <div className="image-preview-wrapper">
+                  <img
+                    src={imagePreview}
+                    alt="Cover Preview"
+                    className="image-preview"
+                  />
+                  <button
+                    type="button"
+                    className="clear-image-btn"
+                    onClick={handleClearImage}
+                  >
+                    <HiX />
+                  </button>
+                </div>
+              ) : (
+                <div className="upload-prompt">
+                  <HiOutlinePhotograph className="upload-icon" />
+                  <span>Click to Upload Image</span>
+                </div>
+              )}
+            </div>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/png, image/jpeg"
+              style={{ display: "none" }}
+            />
+            <div className="default-image-toggle">
+              <input
+                type="checkbox"
+                id="useDefault"
+                checked={imagePreview === "/default_cover.jpg"}
+                onChange={handleUseDefaultToggle}
+              />
+              <label htmlFor="useDefault">
+                Use Study Squad's default cover image.
+              </label>
+            </div>
+          </div>
+
+          {/* Tags */}
+          <div className="form-group">
+            <label htmlFor="tags" className="form-label">
+              <HiOutlineTag className="label-icon" />
+              <div className="label-content">
+                <span className="label-title">Tags & Subjects</span>
+                <span className="label-subtitle">
+                  🏷️ Help students discover your studio by adding relevant tags.
+                </span>
+              </div>
+            </label>
+            <div className="tags-input-container">
+              {formData.tags.map((tag, index) => (
+                <div key={index} className="tag-item">
+                  {tag}
+                  <button type="button" onClick={() => removeTag(tag)}>
+                    <HiX />
+                  </button>
+                </div>
+              ))}
+              <input
+                type="text"
+                id="tags"
+                placeholder="Type and press Enter..."
+                value={currentTag}
+                onChange={(e) => setCurrentTag(e.target.value)}
+                onKeyDown={handleTagKeyDown}
+              />
+            </div>
+            {/* ✅ Feedback 4: More diverse tag suggestions */}
+            <div className="tags-suggestions">
+              <span className="suggestions-label">Popular:</span>
+              {[
+                "Python",
+                "History",
+                "Web Development",
+                "Art",
+                "Mathematics",
+                "Business",
+              ].map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  className="suggestion-chip"
+                  onClick={() => addSuggestedTag(tag)}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+            <InlineError message={errors.tags} />
+          </div>
+
+          <div className="form-actions">
+            <button
+              type="submit"
+              className="submit-btn"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="loading-spinner"></div>
+                  <span>Creating Studio...</span>
+                </>
+              ) : (
+                <>
+                  <HiCheckCircle />
+                  <span>Launch My Studio</span>
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+
       {showSuccessModal && (
         <SuccessModal
           title="Congratulations!"
-          message="Your studio is now live. You can now manage your content and engage with students."
+          message="Your studio is now live! You are officially a teacher on Study Squad."
           buttonText="Go to My Studio Dashboard"
           buttonLink="/my-studio"
         />
       )}
-    </>
+    </div>
   );
 };
 
