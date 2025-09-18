@@ -45,7 +45,7 @@ const Footer = () => {
               <Link to="/squadhub">SquadHUB</Link>
             </li>
             <li>
-              <Link to="/become-teacher">Become a Teacher</Link>
+              <Link to="/studio/onboarding">Become a Teacher</Link>
             </li>
           </ul>
         </div>

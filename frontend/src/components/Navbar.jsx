@@ -145,7 +145,7 @@ const Navbar = () => {
             <div className="logged-in-actions">
               {!isTeacher && (
                 <Link
-                  to="/my-studio"
+                  to="/studio/onboarding"
                   className="btn btn-cta-teal"
                   onClick={closeAllMenus}
                 >
