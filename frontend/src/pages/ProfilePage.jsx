@@ -283,7 +283,7 @@ const ProfilePage = () => {
                   </Link>
                 ) : (
                   <Link
-                    to="/my-studio"
+                    to="/studio/onboarding"
                     className="btn-profile btn-profile-secondary"
                   >
                     <HiSparkles /> Become a Teacher
