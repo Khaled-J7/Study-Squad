@@ -268,3 +268,45 @@ class StudioCreateSerializer(serializers.ModelSerializer):
             studio.tags.add(tag)
 
         return studio
+
+
+# --- ✅ NEW: STUDIO DASHBOARD SERIALIZER ---
+class StudioDashboardSerializer(serializers.ModelSerializer):
+    """
+    A dedicated serializer to gather all data needed for the teacher's dashboard.
+    """
+
+    subscribers_count = serializers.SerializerMethodField()
+    average_rating = serializers.SerializerMethodField()
+    lessons_count = serializers.SerializerMethodField()
+    owner = UserSerializer(read_only=True)
+    lessons = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Studio
+        fields = [
+            "id",
+            "name",
+            "cover_image",
+            "owner",
+            "subscribers_count",
+            "average_rating",
+            "lessons_count",
+            "lessons",
+        ]
+
+    def get_subscribers_count(self, obj):
+        return obj.subscribers.count()
+
+    def get_average_rating(self, obj):
+        # Using the same safe aggregation method as the main StudioSerializer
+        return obj.ratings.aggregate(Avg("rating")).get("rating__avg", 0) or 0
+
+    def get_lessons_count(self, obj):
+        return obj.lessons.count()
+
+    def get_lessons(self, obj):
+        # Fetch the 5 most recently created lessons for this studio.
+        recent_lessons = obj.lessons.order_by("-created_at")[:5]
+        # Use the existing LessonCardSerializer to format the data.
+        return LessonCardSerializer(recent_lessons, many=True).data

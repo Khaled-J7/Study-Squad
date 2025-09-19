@@ -11,6 +11,7 @@ from .models import Studio, Lesson, Profile
 from .serializers import (
     StudioSerializer,
     StudioCreateSerializer,
+    StudioDashboardSerializer,
     ProfileSerializer,
     ProfileUpdateSerializer,
     LessonCardSerializer,
@@ -255,3 +256,29 @@ def studio_create_view(request):
 
     # If validation fails, return the errors
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# ✅ --- NEW STUDIO DASHBOARD VIEW ---
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def studio_dashboard_view(request):
+    """
+    Provides all necessary data for the teacher's studio dashboard.
+    """
+    user = request.user
+    try:
+        # 2. We fetch the studio owned by the currently logged-in user.
+        #    Using .get() will raise an error if it doesn't exist.
+        studio = Studio.objects.get(owner=user)
+    except Studio.DoesNotExist:
+        # 3. This is a crucial security and error-handling step.
+        return Response(
+            {"error": "You do not have a studio. Access denied."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    # 4. We pass the fetched studio instance to our new serializer.
+    serializer = StudioDashboardSerializer(studio)
+
+    # 5. We return the serialized data with a success status.
+    return Response(serializer.data, status=status.HTTP_200_OK)
