@@ -89,27 +89,58 @@ class StudioRating(models.Model):
 
 
 # Model 4: The Lesson model for content inside a Studio
+# This is our main "container" model for any type of course content.
 class Lesson(models.Model):
-    studio = models.ForeignKey(Studio, on_delete=models.CASCADE, related_name="lessons")
-    title = models.CharField(max_length=200)
-    tags = models.ManyToManyField(Tag, blank=True)
-    description = models.TextField(
-        blank=True, help_text="A short description of the course."
+    """
+    Represents a single course or piece of content within a Studio.
+    This model is designed to be a flexible container for various types of educational content.
+    """
+
+    # We define the different types of content a Lesson can be.
+    # This is the core of the new architecture.
+    LESSON_CHOICES = (
+        ("markdown", "Markdown Text"),
+        ("file", "Downloadable File"),
+        ("video", "Single Video"),
     )
-    cover_image = models.ImageField(
-        upload_to="lesson_covers/",
+    # This field tells our application what kind of lesson this is.
+    lesson_type = models.CharField(
+        max_length=10, choices=LESSON_CHOICES, default="markdown"
+    )
+
+    # --- Standard Lesson Details (applies to all types) ---
+    # These are the fields for: the name, cover, and description of the overall lesson.
+    studio = models.ForeignKey(Studio, related_name="lessons", on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    cover_image = models.ImageField(upload_to="lesson_covers/", blank=True, null=True)
+    tags = models.ManyToManyField(Tag, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+
+    # --- Content-Specific Fields ---
+    # Only ONE of these will be used for any given lesson, depending on the 'lesson_type'.
+    # This keeps our data clean and explicit.
+
+    # For 'markdown' lessons
+    markdown_content = models.TextField(
+        blank=True, null=True, help_text="Content for markdown-based lessons."
+    )
+
+    # For 'file' lessons (PDF, Word, etc.)
+    lesson_file = models.FileField(
+        upload_to="lesson_files/",
         blank=True,
         null=True,
-        help_text="Upload a cover image for this course.",
+        help_text="A downloadable file for the lesson.",
     )
-    content = models.TextField(help_text="Use Markdown for formatting.")
-    video_upload = models.FileField(upload_to="lesson_videos/", blank=True, null=True)
-    video_url = models.URLField(blank=True, help_text="Or provide a YouTube/Vimeo URL.")
-    file_upload = models.FileField(upload_to="lesson_files/", blank=True, null=True)
-    order = models.PositiveIntegerField(
-        default=0, help_text="Order of the lesson in the course."
+
+    # For 'video' lessons (a single video upload)
+    lesson_video = models.FileField(
+        upload_to="lesson_videos/",
+        blank=True,
+        null=True,
+        help_text="A single video file for the lesson.",
     )
-    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
         return self.title

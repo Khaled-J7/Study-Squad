@@ -1,0 +1,178 @@
+/* frontend/src/components/dashboard/CourseManagementCard.css */
+.course-mgmt-card {
+  background-color: var(--color-white);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  transition: box-shadow 0.3s, transform 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+
+.course-mgmt-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+.course-mgmt-cover-link {
+  display: block;
+  height: 160px;
+}
+
+.course-mgmt-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.course-mgmt-info {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Allows the footer to stick to the bottom */
+}
+
+.course-mgmt-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.course-mgmt-desc {
+  font-size: 0.875rem;
+  color: #6b7280;
+  flex-grow: 1;
+  margin: 0 0 1rem 0;
+  /* Truncate long descriptions */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: inherit;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.course-mgmt-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: auto; /* Pushes actions to the bottom */
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.action-btn.edit {
+  background-color: #f0f9ff;
+  color: #0284c7;
+}
+.action-btn.edit:hover {
+  background-color: #e0f2fe;
+}
+
+.action-btn.view {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+.action-btn.view:hover {
+  background-color: #e2e8f0;
+}
+
+/* We add the 'flex-grow' property to push the delete button to the far right. */
+.course-mgmt-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: auto;
+  flex-grow: 1;
+  align-items: flex-end;
+}
+
+/* We add a spacer element to push the delete button to the right */
+.course-mgmt-actions .edit {
+  margin-right: auto; /* This is the magic property */
+}
+
+/* New style for the 'Play' button */
+.action-btn.play {
+  background-color: #ecfdf5;
+  color: #047857;
+}
+.action-btn.play:hover {
+  background-color: #d1fae5;
+}
+
+/* New style for the 'Delete' button */
+.action-btn.delete {
+  background-color: #fef2f2;
+  color: #b91c1c;
+  padding: 0.4rem; /* Make it a square-ish button */
+  width: 32px;
+  height: 32px;
+}
+.action-btn.delete:hover {
+  background-color: #fee2e2;
+}
+
+/* --- ✅ NEW: Styles for the Delete Confirmation Modal --- */
+.delete-confirmation-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(17, 24, 39, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+.delete-confirmation-modal {
+  background-color: var(--color-white);
+  padding: 2rem;
+  border-radius: 16px;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+}
+.confirmation-icon {
+  color: #f59e0b; /* Amber color for warning */
+  margin-bottom: 1rem;
+}
+.delete-confirmation-modal h3 {
+  font-size: 1.5rem;
+  margin: 0 0 0.5rem 0;
+}
+.delete-confirmation-modal p {
+  color: var(--color-text-medium);
+  margin-bottom: 1.5rem;
+}
+.confirmation-actions {
+  display: flex;
+  gap: 1rem;
+}
+.confirmation-actions button {
+  flex-grow: 1;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-cancel {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+.btn-confirm-delete {
+  background-color: #ef4444;
+  color: white;
+}

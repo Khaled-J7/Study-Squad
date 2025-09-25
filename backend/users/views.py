@@ -7,11 +7,18 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth.models import User, Group
+from django.db.models import Q  # Import Q objects for complex searches
 from .models import Studio, Lesson, Profile
 from .serializers import (
     StudioSerializer,
     StudioCreateSerializer,
     StudioDashboardSerializer,
+    StudioCoverSerializer,
+    StudioUpdateSerializer,
+    SubscriberSerializer,
+    LessonCreateSerializer,
+    LessonDetailSerializer,
+    LessonUpdateSerializer,
     ProfileSerializer,
     ProfileUpdateSerializer,
     LessonCardSerializer,
@@ -114,7 +121,7 @@ def current_user_view(request):
     return Response(serializer.data)
 
 
-# --- NEW, DEDICATED CV UPLOAD AND DELETE VIEW ---
+# --- , DEDICATED CV UPLOAD AND DELETE VIEW ---
 @api_view(["POST", "DELETE"])
 @permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])
@@ -215,7 +222,7 @@ def profile_update_view(request):
         )
 
 
-# --- ✅ NEW: Studio Create View ---
+# --- Studio Create View ---
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])  # To handle the cover image upload
@@ -258,7 +265,7 @@ def studio_create_view(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# ✅ --- NEW STUDIO DASHBOARD VIEW ---
+#  ---  STUDIO DASHBOARD VIEW ---
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def studio_dashboard_view(request):
@@ -282,3 +289,306 @@ def studio_dashboard_view(request):
 
     # 5. We return the serialized data with a success status.
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# ---  STUDIO COVER UPDATE VIEW ---
+@api_view(["PUT"])
+@permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])
+def studio_cover_update_view(request):
+    """
+    Handles updating the cover image for a user's studio.
+    """
+    try:
+        # Robustly get the studio associated with the requesting user
+        studio = Studio.objects.get(owner=request.user)
+    except Studio.DoesNotExist:
+        return Response(
+            {"error": "You do not have a studio to update."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    # Check if the cover_image is in the request files
+    if "cover_image" not in request.FILES:
+        return Response(
+            {"error": "No image file provided."}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # The data for the serializer is just the file itself
+    data = {"cover_image": request.FILES["cover_image"]}
+    serializer = StudioCoverSerializer(instance=studio, data=data, partial=True)
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# ---  STUDIO UPDATE VIEW ---
+@api_view(["GET", "PUT"])
+@permission_classes([IsAuthenticated])
+def studio_update_view(request):
+    """
+    Handles fetching (GET) and updating (PUT) a teacher's studio details.
+    """
+    try:
+        studio = Studio.objects.get(owner=request.user)
+    except Studio.DoesNotExist:
+        return Response(
+            {"error": "You do not have a studio to manage."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    if request.method == "GET":
+        # For a GET request, we serialize the existing studio data to pre-fill the form
+        serializer = StudioUpdateSerializer(studio)
+        return Response(serializer.data)
+
+    elif request.method == "PUT":
+        # For a PUT request, we validate and save the incoming data
+        serializer = StudioUpdateSerializer(
+            instance=studio, data=request.data, partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        # If the data is invalid, return the errors
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+#  --- STUDIO DELETE VIEW ---
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def studio_delete_view(request):
+    """
+    Handles the permanent deletion of a user's studio.
+    This is a critical, irreversible action.
+    """
+    user = request.user
+    try:
+        # Find the studio owned by the requesting user.
+        studio_to_delete = Studio.objects.get(owner=user)
+    except Studio.DoesNotExist:
+        # This is a security measure in case a non-teacher tries to access this.
+        return Response(
+            {"error": "You do not have a studio to delete."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    # Perform the deletion. Django's cascading delete will handle associated lessons, etc.
+    studio_to_delete.delete()
+
+    # Revert the user's role by removing them from the "Teachers" group.
+    try:
+        teachers_group = Group.objects.get(name="Teachers")
+        user.groups.remove(teachers_group)
+    except Group.DoesNotExist:
+        # This is a fallback for server integrity, should not normally happen.
+        # We can still return a success message as the studio was deleted.
+        pass
+
+    return Response(
+        {"message": "Studio has been successfully and permanently deleted."},
+        status=status.HTTP_204_NO_CONTENT,
+    )
+
+
+#  --- MY COURSES VIEW ---
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def my_courses_view(request):
+    """
+    Fetches all lessons (courses) associated with the authenticated teacher's studio.
+    """
+    try:
+        # Find the studio owned by the requesting user.
+        studio = Studio.objects.get(owner=request.user)
+    except Studio.DoesNotExist:
+        return Response(
+            {"error": "You do not have a studio."}, status=status.HTTP_403_FORBIDDEN
+        )
+
+    # Fetch all lessons for that studio, ordering by the most recently created.
+    courses = studio.lessons.all().order_by("-created_at")  # type: ignore
+
+    # We can reuse our existing LessonCardSerializer, as it has all the data we need for the cards.
+    serializer = LessonCardSerializer(courses, many=True)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# --- NEW SUBSCRIBERS LIST & SEARCH VIEW ---
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def studio_subscribers_view(request):
+    """
+    Fetches a list of all subscribers for the authenticated teacher's studio.
+    Also handles search functionality based on a query parameter.
+    """
+    try:
+        # First, we get the teacher's studio.
+        studio = Studio.objects.get(owner=request.user)
+    except Studio.DoesNotExist:
+        return Response(
+            {"error": "You do not have a studio."}, status=status.HTTP_403_FORBIDDEN
+        )
+
+    # We get all subscribers for that studio.
+    subscribers = studio.subscribers.all()
+
+    # We check if the frontend sent a search query.
+    # e.g., /api/studio/subscribers/?q=john
+    search_query = request.query_params.get("q", None)
+    if search_query:
+        # If a query exists, we filter the list.
+        # This Q object allows us to search across multiple fields at once (OR logic).
+        subscribers = subscribers.filter(
+            Q(username__icontains=search_query)
+            | Q(first_name__icontains=search_query)
+            | Q(last_name__icontains=search_query)
+        )
+
+    # We serialize the final list of subscribers (either all or the filtered results).
+    serializer = SubscriberSerializer(subscribers, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# --- NEW SUBSCRIBER VIEW ---
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def block_subscriber_view(request, user_id):
+    """
+    Removes (blocks) a specific subscriber from the teacher's studio.
+    """
+    try:
+        # Get the teacher's studio.
+        studio = Studio.objects.get(owner=request.user)
+    except Studio.DoesNotExist:
+        return Response(
+            {"error": "You do not have a studio."}, status=status.HTTP_403_FORBIDDEN
+        )
+
+    try:
+        # Find the specific subscriber we want to block by their ID.
+        subscriber_to_block = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response(
+            {"error": "Subscriber not found."}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    # This is the core logic: we remove the user from the many-to-many relationship.
+    studio.subscribers.remove(subscriber_to_block)
+
+    # We return a success response with no content, which is standard for DELETE operations.
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+#  --- NEW COURSE CREATE VIEW ---
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])  # We need this to handle file uploads
+def course_create_view(request):
+    """
+    Handles the creation of a new Lesson (course).
+    """
+    try:
+        # We ensure the user has a studio to add a course to.
+        studio = Studio.objects.get(owner=request.user)
+    except Studio.DoesNotExist:
+        return Response(
+            {"error": "You must have a studio to create a course."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    # We pass the incoming form data to our new serializer.
+    serializer = LessonCreateSerializer(data=request.data)
+    if serializer.is_valid():
+        # If the data is valid, we save the new lesson, associating it with the teacher's studio.
+        # We use a generic LessonCardSerializer for the response to keep it consistent.
+        lesson = serializer.save(studio=studio)
+        response_serializer = LessonCardSerializer(lesson)
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+
+    # If the data is invalid, we return the errors.
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# ---  COURSE DELETE VIEW ---
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def course_delete_view(request, lesson_id):
+    """
+    Handles the permanent deletion of a specific course (Lesson).
+    """
+    try:
+        # We query for a Lesson that has the given id AND belongs to a studio owned by the user making the request.
+        lesson_to_delete = Lesson.objects.get(id=lesson_id, studio__owner=request.user)
+    except Lesson.DoesNotExist:
+        # If the lesson doesn't exist or the user is not the owner
+        return Response(
+            {
+                "error": "Course not found or you don't have the permission to delete it."
+            },
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    # If the security check passes, we proceed with the deletion.
+    lesson_to_delete.delete()
+
+    # We return a 204 No Content response, which is the standard for a successful DELETE operation.
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# ---  COURSE DETAIL VIEW ---
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])  # Or IsAuthenticatedOrReadOnly if public
+def course_detail_view(request, lesson_id):
+    """
+    Fetches the full, detailed data for a single course.
+    """
+    try:
+        # We can add more complex permission checks here later for public viewing.
+        # For now, we just fetch the lesson by its ID.
+        lesson = Lesson.objects.get(id=lesson_id)
+    except Lesson.DoesNotExist:
+        return Response(
+            {"error": "Course not found."}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    # We use our new detailed serializer to return all the data.
+    serializer = LessonDetailSerializer(lesson)
+    return Response(serializer.data)
+
+
+# ✅ --- NEW COURSE UPDATE VIEW ---
+@api_view(["PUT"])
+@permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])  # To handle potential file re-uploads
+def course_update_view(request, lesson_id):
+    """
+    Handles updating an existing course (Lesson).
+    """
+    try:
+        # We ensure the lesson exists AND is owned by the user making the request.
+        lesson = Lesson.objects.get(id=lesson_id, studio__owner=request.user)
+    except Lesson.DoesNotExist:
+        return Response(
+            {"error": "Course not found or you do not have permission to edit it."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    # We pass the existing lesson instance and the new data to our serializer.
+    # partial=True allows the frontend to only send the fields that have changed.
+    serializer = LessonUpdateSerializer(
+        instance=lesson, data=request.data, partial=True
+    )
+    if serializer.is_valid():
+        # If the data is valid, we save the changes...
+        updated_lesson = serializer.save()
+        # ...and return the full, updated course data using the detail serializer.
+        response_serializer = LessonDetailSerializer(updated_lesson)
+        return Response(response_serializer.data, status=status.HTTP_200_OK)
+
+    # If the data is not valid, we return the errors.
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

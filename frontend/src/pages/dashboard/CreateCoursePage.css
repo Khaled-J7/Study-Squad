@@ -1,0 +1,32 @@
+/* frontend/src/pages/dashboard/CreateCoursePage.css */
+
+.create-course-page {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.progress-bar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.progress-step {
+  text-align: center;
+  font-weight: 600;
+  color: #9ca3af; /* Gray for inactive steps */
+  width: 33.33%;
+}
+
+.progress-step.active {
+  color: var(--color-primary); /* Primary color for active step */
+}
+
+.create-course-form-container {
+  background-color: var(--color-white);
+  padding: 2.5rem;
+  border-radius: 16px;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+}

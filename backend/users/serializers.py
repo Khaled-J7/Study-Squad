@@ -2,7 +2,15 @@
 import json
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Profile, Tag, Studio, Lesson, Post, Comment, StudioRating
+from .models import (
+    Profile,
+    Tag,
+    Studio,
+    Lesson,
+    Post,
+    Comment,
+    StudioRating,
+)
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Avg
@@ -101,6 +109,33 @@ class LessonCardSerializer(serializers.ModelSerializer):
             "cover_image",
             "description",
             "created_at",
+            "lesson_type",
+        ]
+
+
+# --- A detailed serializer for a single lesson ---
+class LessonDetailSerializer(serializers.ModelSerializer):
+    """
+    Serializes all fields for a single Lesson object, including all
+    possible content types, for the course viewer modal.
+    """
+
+    # Explicitly tell the serializer to include the many-to-many relationship for tags, using the TagSerializer
+    tags = TagSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Lesson
+        # We include every field needed to display the lesson content.
+        fields = [
+            "id",
+            "title",
+            "description",
+            "cover_image",
+            "lesson_type",
+            "markdown_content",
+            "lesson_file",
+            "lesson_video",
+            "tags",
         ]
 
 
@@ -287,6 +322,7 @@ class StudioDashboardSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
+            "description",
             "cover_image",
             "owner",
             "subscribers_count",
@@ -310,3 +346,161 @@ class StudioDashboardSerializer(serializers.ModelSerializer):
         recent_lessons = obj.lessons.order_by("-created_at")[:5]
         # Use the existing LessonCardSerializer to format the data.
         return LessonCardSerializer(recent_lessons, many=True).data
+
+
+# --- ✅ NEW: StudioCoverSerializer ---
+class StudioCoverSerializer(serializers.ModelSerializer):
+    """
+    A simple serializer for updating only the studio's cover image.
+    """
+
+    class Meta:
+        model = Studio
+        fields = ["cover_image"]
+
+
+class StudioUpdateSerializer(serializers.ModelSerializer):
+    """
+    A dedicated serializer for updating the core details of a studio.
+    """
+
+    # On GET, it will serialize the tag objects. On PUT, it accepts a list of strings.
+    tags = TagSerializer(many=True, read_only=True)
+    tag_names = serializers.ListField(
+        child=serializers.CharField(max_length=50), write_only=True, required=False
+    )
+
+    class Meta:
+        model = Studio
+        fields = ["name", "description", "tags", "tag_names"]
+
+    def update(self, instance, validated_data):
+        # Handle standard fields
+        instance.name = validated_data.get("name", instance.name)
+        instance.description = validated_data.get("description", instance.description)
+
+        # Handle the tags
+        if "tag_names" in validated_data:
+            tag_names = validated_data.pop("tag_names")
+            # First, clear the existing tags
+            instance.tags.clear()
+            # Then, add the new ones
+            for tag_name in tag_names:
+                tag, _ = Tag.objects.get_or_create(name=tag_name.strip())
+                instance.tags.add(tag)
+
+        instance.save()
+        return instance
+
+
+# --- ✅ NEW: SubscriberSerializer ---
+class SubscriberSerializer(serializers.ModelSerializer):
+    """
+    Serializes user data for the Subscribers page.
+    It includes the nested profile to get the user's avatar.
+    """
+
+    # We reuse the ProfileSerializer to include profile details like the profile picture.
+    profile = ProfileSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        # We specify the exact fields the frontend card will need.
+        fields = ["id", "username", "first_name", "last_name", "profile"]
+
+
+# --- Serializer for Creating a Course ---
+class LessonCreateSerializer(serializers.ModelSerializer):
+    """
+    Handles the creation of a new Lesson (course) of any type.
+    This serializer is designed to accept all possible content fields
+    and validates the main required information.
+    """
+
+    # We accept a list of tag names (strings) from the frontend.
+    tag_names = serializers.ListField(
+        child=serializers.CharField(max_length=50), write_only=True, required=False
+    )
+
+    class Meta:
+        model = Lesson
+        # These are all the fields the frontend can send when creating any type of lesson.
+        # The view logic will handle which content field is used based on 'lesson_type'.
+        fields = [
+            "title",
+            "description",
+            "cover_image",
+            "lesson_type",
+            "markdown_content",
+            "lesson_file",
+            "lesson_video",
+            "tag_names",
+        ]
+
+    def create(self, validated_data):
+        # We pop the tag_names so we can process them separately.
+        tag_names = validated_data.pop("tag_names", [])
+
+        # Create the main Lesson instance with the remaining data.
+        lesson = Lesson.objects.create(**validated_data)
+
+        # Loop through the provided tag names, get or create the Tag object, and associate it.
+        for tag_name in tag_names:
+            tag, _ = Tag.objects.get_or_create(name=tag_name.strip())
+            lesson.tags.add(tag)
+
+        return lesson
+
+
+# --- ✅ NEW: Serializer for Updating a Course ---
+class LessonUpdateSerializer(serializers.ModelSerializer):
+    """
+    Handles the update of an existing Lesson (course).
+    It is designed to accept partial data (PATCH) and handle tag updates.
+    """
+
+    # We expect the frontend to send a list of tag names (strings).
+    tags = TagSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Lesson
+        # These are all the fields a teacher can update on the edit page.
+        # We don't include 'lesson_type' as that should not be changed after creation.
+        fields = [
+            "title",
+            "description",
+            "cover_image",
+            "markdown_content",
+            "lesson_file",
+            "lesson_video",
+            "tags",
+        ]
+
+    def update(self, instance, validated_data):
+        # This is the core logic that runs when serializer.save() is called in the view.
+
+        # We handle the simple fields first.
+        instance.title = validated_data.get("title", instance.title)
+        instance.description = validated_data.get("description", instance.description)
+        instance.cover_image = validated_data.get("cover_image", instance.cover_image)
+        instance.markdown_content = validated_data.get(
+            "markdown_content", instance.markdown_content
+        )
+        instance.lesson_file = validated_data.get("lesson_file", instance.lesson_file)
+        instance.lesson_video = validated_data.get(
+            "lesson_video", instance.lesson_video
+        )
+
+        # If the frontend sent a new list of tags, we update them.
+        if "tag_names" in validated_data:
+            tag_names = validated_data.pop("tag_names")
+            # First, we remove all existing tags from the lesson.
+            instance.tags.clear()
+            # Then, we loop through the new list of tag names and add them.
+            for tag_name in tag_names:
+                tag, _ = Tag.objects.get_or_create(name=tag_name.strip())
+                instance.tags.add(tag)
+
+        # Finally, we save the updated lesson instance to the database.
+        instance.save()
+        return instance

@@ -14,3 +14,9 @@ db.sqlite3
 .idea/
 .DS_Store
 .hintrc
+
+# Ignore user-uploaded media files
+/backend/media/
+
+# Ignore log files
+backend/debug.log

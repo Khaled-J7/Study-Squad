@@ -1,0 +1,16 @@
+/* frontend/src/pages/MyStudioPage.css */
+body.dashboard-active {
+  background: #e7e7e7;
+}
+
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  font-family: var(--font-studio);
+}
+
+/* This new class is for the main content area */
+.dashboard-content-area {
+  padding: 2rem 4rem;
+  min-height: 100vh;
+}

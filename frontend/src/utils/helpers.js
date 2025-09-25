@@ -4,6 +4,7 @@
 
 const API_BASE_URL = "http://127.0.0.1:8000";
 const localDefaultAvatar = "/default.jpg"; // default.jpg in /frontend/public/
+const localDefaultCourseCover = "/course_card_default_cover_image.png";
 
 /**
  * A helper function to safely get the correct avatar URL for a user.
@@ -49,4 +50,14 @@ export const getDegrees = (user) => {
  */
 export const getContactEmail = (user) => {
   return user?.profile?.contact_email || null;
+};
+
+
+export const getCourseCoverUrl = (lesson) => {
+    if (lesson && lesson.cover_image) {
+        // If there's a real image, show it.
+        return `${API_BASE_URL}${lesson.cover_image}`;
+    }
+    // If the image is NULL, show our local default.
+    return "/course_card_default_cover_image.png"; 
 };

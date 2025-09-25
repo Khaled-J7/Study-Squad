@@ -1,0 +1,127 @@
+/* frontend/src/components/dashboard/CourseViewerModal.css */
+.course-viewer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(17, 24, 39, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+}
+.course-viewer-modal {
+  background-color: var(--color-white);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 800px;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+.close-modal-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: rgba(0, 0, 0, 0.4);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-header {
+  position: relative;
+  height: 250px;
+  flex-shrink: 0;
+  background-color: #e5e7eb;
+}
+.modal-cover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.modal-title-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+}
+.modal-title-overlay h2 {
+  color: white;
+  font-size: 2rem;
+  margin: 0;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+.modal-body {
+  padding: 2rem;
+  overflow-y: auto;
+  background-color: white;
+}
+/* ✅ NEW: A dedicated container for the markdown content with a clean background. */
+.markdown-content-wrapper {
+  padding: 2rem;
+  border-radius: 8px;
+}
+
+.markdown-body {
+  line-height: 1.8;
+}
+
+/* ✅ NEW: Styles for the new action buttons. */
+.markdown-actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.markdown-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #f1f5f9;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* ✅ --- NEW: Styles for Fullscreen Mode --- */
+/* This is a special CSS pseudo-class that targets an element when it's in fullscreen. */
+.markdown-content-wrapper:fullscreen {
+  /* This is the fix for the black background. We force it to be white. */
+  background-color: white;
+  /* This enables scrolling for long content. */
+  overflow-y: auto;
+  /* We add padding for better readability. */
+  padding: 2rem 3rem;
+}
+
+/* We also need to ensure the text color is correct in fullscreen. */
+.markdown-content-wrapper:fullscreen .markdown-body {
+  color: black;
+}
+
+.file-content,
+.video-content {
+  text-align: center;
+}
+
+.video-content video {
+  max-width: 100%;
+  border-radius: 8px;
+}

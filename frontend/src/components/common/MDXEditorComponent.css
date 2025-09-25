@@ -1,0 +1,98 @@
+/* frontend/src/components/common/MDXEditorComponent.css */
+
+/* --- The main container for the editor --- */
+.mdx-editor-wrapper {
+  width: 100%;
+  display: block;
+}
+
+/* --- The root element, including toolbar and content --- */
+.mdx-editor-root {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden; /* This prevents the toolbar from extending past the border */
+  background: #E5E4E2;
+  box-shadow: var(--shadow-sm);
+  font-family: var(--font-studio); /* Use our project's font */
+}
+
+/* --- ✅ NEW: Dark Theme for the Toolbar --- */
+.mdx-editor-toolbar {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  padding: 15px 15px;
+  background: #1f2937; /* A professional dark gray-blue, consistent with our sidebar */
+  flex-wrap: wrap;
+  z-index: 2;
+  position: relative;
+}
+
+/* --- ✅ NEW: White/light styles for toolbar controls --- */
+.mdx-editor-toolbar button,
+.mdx-editor-toolbar [role="button"],
+.mdx-editor-toolbar select,
+.mdx-editor-toolbar .mdx-editor-toolbar-item {
+  background: transparent;
+  border: none;
+  color: #d1d5db; /* A soft white for the text */
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.mdx-editor-toolbar button:hover,
+.mdx-editor-toolbar [role="button"]:hover {
+  background: #374151; /* A slightly lighter dark color for hover */
+  color: #ffffff;
+}
+
+/* Ensure SVG icons in the toolbar are also white */
+.mdx-editor-toolbar svg {
+  width: 18px;
+  height: 18px;
+  color: #d1d5db;
+}
+.mdx-editor-toolbar button:hover svg,
+.mdx-editor-toolbar [role="button"]:hover svg {
+  color: #ffffff;
+}
+
+/* --- A larger, more comfortable editing area --- */
+.mdx-editor-content {
+  min-height: 500px; /* A generous height for writing */
+  padding: 28px;
+  box-sizing: border-box;
+  font-size: 17px;
+  line-height: 1.8;
+  color: #111827;
+  outline: none;
+}
+
+/* --- Prose styles for better readability inside the editor --- */
+.mdx-editor-content p {
+  margin: 0 0 1rem 0;
+}
+.mdx-editor-content h1,
+.mdx-editor-content h2,
+.mdx-editor-content h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.5rem;
+}
+
+
+.mdx-editor-content blockquote {
+  margin: 1rem 0;
+  padding: 0.75rem 1.25rem; /* More spacious padding */
+  border-left: 4px solid var(--color-accent-green); /* Use our primary brand color */
+  color: #475569;
+  background-color: #f8fafc; /* A very light background to make it pop */
+  border-radius: 0 8px 8px 0; /* A subtle design touch */
+}

@@ -1,0 +1,113 @@
+/* frontend/src/pages/dashboard/DeleteStudioPage.css */
+
+/* Main container to center the content */
+.delete-studio-page {
+  max-width: 800px;
+  margin: 2rem auto;
+}
+
+/* The main box for the warning and form */
+.delete-warning-box {
+  background-color: var(--color-white);
+  border: 2px solid #ef4444; /* Red border to signify danger */
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+/* Header section with icon and title */
+.warning-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  color: #b91c1c; /* Dark red for text */
+}
+.warning-icon {
+  flex-shrink: 0;
+}
+.warning-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* The main explanatory text */
+.warning-content p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--color-text-medium);
+}
+.warning-content ul {
+  list-style-type: disc;
+  padding-left: 2rem;
+  margin: 1rem 0;
+}
+.warning-content li {
+  margin-bottom: 0.5rem;
+}
+
+/* The confirmation form */
+.delete-form {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.form-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #374151;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-family: var(--font-studio);
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* The final, dangerous delete button */
+.delete-button {
+  width: 100%;
+  background-color: #ef4444; /* Red background */
+  color: white;
+  padding: 0.8rem 1.75rem;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-studio);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  margin-top: 1rem;
+}
+
+.delete-button:hover {
+  background-color: #dc2626; /* Darker red on hover */
+}
+
+/* Style for when the button is disabled */
+.delete-button:disabled {
+  background-color: #fca5a5; /* Light, faded red */
+  cursor: not-allowed;
+}
+
+.delete-error-container {
+  margin-top: 1rem;
+  min-height: 24px; /* Prevents layout shift when error appears */
+}

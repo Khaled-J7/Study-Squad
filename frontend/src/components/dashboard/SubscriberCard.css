@@ -1,0 +1,98 @@
+/* frontend/src/components/dashboard/SubscriberCard.css */
+
+.subscriber-card {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.2s ease-in-out;
+}
+.subscriber-card:hover {
+  border-color: #d1d5db;
+  box-shadow: var(--shadow-sm);
+}
+.subscriber-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.subscriber-info {
+  flex-grow: 1;
+}
+.subscriber-name {
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+.subscriber-username {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin: 0.1rem 0 0 0;
+}
+.subscriber-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.meet-now-btn {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid var(--color-border);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-family: var(--font-studio);
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.action-menu-container {
+  position: relative;
+}
+.more-actions-btn {
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+}
+.more-actions-btn:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+.action-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: var(--color-white);
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  z-index: 10;
+  padding: 0.5rem;
+  width: 150px;
+}
+.action-menu button {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  border-radius: 6px;
+  color: #ef4444; /* Red for destructive action */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-studio);
+  font-weight: 500;
+}
+.action-menu button:hover {
+  background-color: #fee2e2;
+}

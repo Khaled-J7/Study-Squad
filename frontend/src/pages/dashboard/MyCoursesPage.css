@@ -1,0 +1,64 @@
+/* frontend/src/pages/dashboard/MyCoursesPage.css */
+
+.my-courses-page .page-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.my-courses-page .page-header h1 {
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  color: #111827;
+  margin: 0 0 0.5rem 0;
+}
+
+.my-courses-page .page-header p {
+  font-size: 1.1rem;
+  color: #6b7280;
+  max-width: 600px;
+}
+
+/* Styles for the grid when courses exist */
+.courses-grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Professional "Empty State" styling */
+.empty-state-container {
+  background-color: var(--color-white);
+  border-radius: 16px;
+  padding: 4rem;
+  text-align: center;
+  margin-top: 2rem;
+  border: 1px solid var(--color-border);
+}
+
+.empty-state-icon {
+  background-color: #f1f5f9;
+  color: #64748b;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.empty-state-title {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  color: #1e293b;
+  margin: 0 0 1rem 0;
+}
+
+.empty-state-text {
+  font-size: 1.1rem;
+  color: #475569;
+  max-width: 500px;
+  margin: 0 auto 2rem auto;
+  line-height: 1.6;
+}

@@ -1,0 +1,145 @@
+/* frontend/src/components/dashboard/DashboardSidebar.css */
+.dashboard-sidebar {
+  background-color: #111827;
+  color: #9ca3af;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* This is key to push footer down */
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  border-right: 1px solid #1f2937;
+}
+
+.sidebar-profile {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 1.5rem 0;
+}
+.sidebar-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 4px solid #374151;
+  margin-bottom: 1.25rem;
+  object-fit: cover;
+}
+.sidebar-username {
+  color: #f9fafb;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+.sidebar-headline {
+  font-size: 1rem;
+  font-weight: 400;
+  margin-top: 0.5rem;
+  color: #6b7280;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.create-course-btn {
+  background-color: var(--color-primary);
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+.create-course-btn:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.nav-menu-title {
+  font-size: 0.75rem;
+  color: #4b5563;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #d1d5db;
+  font-weight: 500;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.sidebar-link:hover {
+  background-color: #1f2937;
+  color: #ffffff;
+}
+
+.sidebar-link.active {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+.settings-dropdown .sidebar-link {
+  cursor: pointer;
+}
+
+/* Fix for settings text alignment */
+.settings-text {
+  flex-grow: 1; /* This makes it take up the available space */
+}
+
+.chevron-icon {
+  transition: transform 0.2s ease-in-out;
+}
+.chevron-icon.open {
+  transform: rotate(180deg);
+}
+.settings-submenu {
+  padding-left: 2.75rem; /* Indent submenu items */
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.submenu-link {
+  color: #d1d5db;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+.submenu-link:hover {
+  background-color: #1f2937;
+  color: #ffffff;
+}
+.submenu-link.delete {
+  color: #fca5a5;
+}
+
+.sidebar-footer {
+  padding-top: 1.5rem;
+  border-top: 1px solid #1f2937;
+}
+.sidebar-logo-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: #d1d5db;
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+.sidebar-logo-link img {
+  width: 35px;
+}
