@@ -4,6 +4,8 @@
 .mdx-editor-wrapper {
   width: 100%;
   display: block;
+  position: relative;
+  overflow: visible; 
 }
 
 /* --- The root element, including toolbar and content --- */

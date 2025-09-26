@@ -59,24 +59,17 @@ const updateCoverImage = async (coverImageFile) => {
   formData.append("cover_image", coverImageFile);
 
   try {
-    // We use PUT as defined in our backend view
+    // It calls the correct, dedicated endpoint
     const response = await axiosInstance.put(
       "/studio/cover/update/",
       formData,
       {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+        headers: { "Content-Type": "multipart/form-data" },
       }
     );
     return { success: true, data: response.data };
   } catch (error) {
-    console.error("Update cover image API error:", error.response);
-    return {
-      success: false,
-      error: "Failed to update cover image.",
-      details: error.response?.data,
-    };
+    return { success: false, error: error.response?.data };
   }
 };
 
@@ -90,17 +83,13 @@ const getStudioForUpdate = async () => {
   }
 };
 
-// Send updated studio details to the backend
 const updateStudio = async (studioData) => {
+  // This function now ONLY handles text data (name, description, tags)
   try {
     const response = await axiosInstance.put("/studio/update/", studioData);
     return { success: true, data: response.data };
   } catch (error) {
-    return {
-      success: false,
-      error: "Failed to update studio.",
-      details: error.response?.data,
-    };
+    return { success: false, error: error.response?.data };
   }
 };
 

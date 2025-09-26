@@ -3,7 +3,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-# NEW: We import the validator to check file extensions
+# We import the validator to check file extensions
 from django.core.validators import FileExtensionValidator
 
 
@@ -11,7 +11,10 @@ from django.core.validators import FileExtensionValidator
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     profile_picture = models.ImageField(
-        upload_to="profile_pics/", default="profile_pics/default.jpg"
+        upload_to="profile_pics/",
+        default="profile_pics/default.jpg",
+        null=True,
+        blank=True,
     )
     # ✅ RENAMED: from about_me to headline
     headline = models.CharField(max_length=250, blank=True)
@@ -54,9 +57,8 @@ class Tag(models.Model):
 class Studio(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
-    cover_image = models.ImageField(
-        upload_to="studio_covers/", default="studio_covers/default_cover.jpg"
-    )
+    
+    cover_image = models.ImageField(upload_to="studio_covers/", null=True, blank=True)
     description = models.TextField()
     tags = models.ManyToManyField(Tag, blank=True)
 
@@ -113,7 +115,7 @@ class Lesson(models.Model):
     studio = models.ForeignKey(Studio, related_name="lessons", on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    cover_image = models.ImageField(upload_to="lesson_covers/", blank=True, null=True)
+    cover_image = models.ImageField(upload_to="lesson_covers/", null=True, blank=True)
     tags = models.ManyToManyField(Tag, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 

@@ -72,7 +72,7 @@ const CourseManagementCard = ({ lesson, onDelete, onPreview }) => {
         <p className="course-mgmt-desc">{lesson.description}</p>
         <div className="course-mgmt-actions">
           <Link
-            to={`/my-studio/courses/edit/${lesson.id}`}
+            to={`/my-studio/courses/${lesson.id}/edit`} // CORRECTED URL STRUCTURE
             className="action-btn edit"
           >
             <Edit size={14} />

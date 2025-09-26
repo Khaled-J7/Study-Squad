@@ -35,8 +35,6 @@ INSTALLED_APPS = [
     "users.apps.UsersConfig",
     "rest_framework",
     "corsheaders",
-    "cloudinary_storage",
-    "cloudinary",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -99,16 +97,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# --- Add Cloudinary Configuration ---
-CLOUDINARY_STORAGE = {
-    "CLOUD_NAME": env("CLOUDINARY_CLOUD_NAME"),
-    "API_KEY": env("CLOUDINARY_API_KEY"),
-    "API_SECRET": env("CLOUDINARY_API_SECRET"),
-}
-
-# --- Set Cloudinary as the Default File Storage ---
-# This line tells Django to use Cloudinary for all file uploads.
-DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 # Internationalization
 LANGUAGE_CODE = "en-us"

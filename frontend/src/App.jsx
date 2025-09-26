@@ -67,7 +67,7 @@ const App = () => {
                 <Route path="courses/new" element={<CreateCoursePage />} />
                 {/* A dynamic route that captures the course ID */}
                 <Route
-                  path="courses/edit/:lessonId"
+                  path="courses/:lessonId/edit"
                   element={<EditCoursePage />}
                 />
               </Route>

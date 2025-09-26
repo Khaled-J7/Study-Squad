@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-// UPDATED: We now import the service object which contains our new functions
 import profileService from "../api/profileService";
 import { getAvatarUrl } from "../utils/helpers";
 import {
