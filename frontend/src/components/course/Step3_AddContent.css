@@ -2,95 +2,285 @@
 
 .step-add-content .step-header {
   text-align: center;
+  margin-bottom: 3rem;
+}
+
+.step-add-content .step-header h1 {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.step-add-content .step-header p {
+  font-size: 1.2rem;
+  color: #718096;
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Enhanced Form Styles */
+.update-studio-form {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.form-group {
   margin-bottom: 2rem;
 }
 
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: #1a202c;
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+}
+
+/* Enhanced File Uploader */
 .file-uploader {
-  border: 2px dashed var(--color-border);
-  border-radius: 12px;
-  padding: 2rem;
+  border: 2px dashed #cbd5e0;
+  border-radius: 16px;
+  padding: 3rem 2rem;
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: all 0.3s ease;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 250px;
-  background-color: #f9fafb;
+  min-height: 280px;
+  background: #f7fafc;
+  text-align: center;
 }
+
 .file-uploader:hover {
   border-color: var(--color-primary);
+  background: #f0f4f8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .upload-placeholder {
-  text-align: center;
-  color: #6b7280;
+  color: #64748b;
+  width: 100%;
 }
+
 .upload-placeholder svg {
-  margin-bottom: 1rem;
-  color: #9ca3af;
+  margin-bottom: 1.5rem;
+  color: #94a3b8;
+  opacity: 0.7;
 }
+
 .upload-placeholder p {
   font-weight: 600;
-  margin: 0;
+  margin: 0 0 0.5rem 0;
   font-size: 1.1rem;
 }
+
 .upload-placeholder span {
   font-size: 0.9rem;
-  color: #9ca3af;
-  display: block;
-  margin-top: 0.25rem;
+  color: #94a3b8;
 }
 
+/* Enhanced Success Message */
 .file-success-message {
-  text-align: center;
   color: #166534;
   cursor: default;
-}
-.success-icon {
-  color: #22c55e;
-  margin-bottom: 1rem;
+  width: 100%;
 }
 
-/* --- ✅ Final, Professional "Remove" Button Style --- */
+.success-icon {
+  color: #22c55e;
+  margin-bottom: 1.5rem;
+}
+
+.file-success-message p {
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+}
+
+.file-success-message strong {
+  color: #15803d;
+  font-weight: 700;
+}
+
 .remove-file-btn {
-  background-color: #f8fafc;
-  color: #64748b;
-  border: 1px solid var(--color-border);
-  border-radius: 99px;
-  padding: 0.4rem 1rem;
-  margin-top: 1rem;
+  background: none;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  margin: 1rem auto 0;
   cursor: pointer;
   display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-weight: 600;
-  font-family: var(--font-studio);
-  transition: all 0.2s ease-in-out;
+  align-items: center;   /* vertical centering */
+  justify-content: center; /* horizontal centering */
+  gap: 0.5rem;  /* equal space between icon and text */
+  color: #6b7280; /* neutral gray */
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1; /* ensures icon + text align better */
+  text-align: center;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.remove-file-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+  flex-shrink: 0; /* prevents squishing */
+  display: block; /* removes inline misalignment */
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  opacity: 0.8;
 }
 
 .remove-file-btn:hover {
-  background-color: #ef4444;
-  color: white;
-  border-color: #dc2626;
-  transform: scale(1.05);
-  box-shadow: var(--shadow-md);
+  color: #dc2626;
+  transform: translateY(-1px);
 }
 
-/* Make the editor wrapper fill available width and align visually with other inputs */
-.step-add-content .form-group .mdx-editor-wrapper,
-.form-group .mdx-editor-wrapper {
+.remove-file-btn:hover svg {
+  transform: scale(1.1);
+  opacity: 1;
+}
+
+.form-help-text {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-top: 0.75rem;
+  text-align: center;
+  font-style: italic;
+}
+
+/* Enhanced Step Navigation */
+.step-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.btn-secondary {
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  padding: 0.875rem 2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: #f1f5f9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.btn-primary-main {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-primary-hover) 100%
+  );
+  color: white;
+  border: none;
+  padding: 0.875rem 2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+}
+
+.btn-primary-main:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(217, 119, 6, 0.35);
+}
+
+.btn-primary-main:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* MDX Editor Styling to match the form */
+.step-add-content .form-group .mdx-editor-wrapper {
   width: 100%;
   margin-top: 0.5rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f8fafc;
+  transition: all 0.3s ease;
 }
 
-/* If the page has two-column layout or constrained parent, ensure editor gets enough room */
-.step-add-content .mdx-editor-wrapper {
-  min-width: 0; /* prevents flex children overflow issues */
-  flex: 1 1 100%;
-  margin-bottom: 1.25rem;
+.step-add-content .form-group .mdx-editor-wrapper:focus-within {
+  border-color: var(--color-primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
 }
 
-/* If you want the editor to look more like the file-uploader card (optional) */
 .mdx-editor-root {
   border-radius: 12px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .step-add-content .step-header h1 {
+    font-size: 2rem;
+  }
+
+  .step-add-content .step-header p {
+    font-size: 1.1rem;
+  }
+
+  .file-uploader {
+    padding: 2rem 1.5rem;
+    min-height: 240px;
+  }
+
+  .step-navigation {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .btn-secondary,
+  .btn-primary-main {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .step-add-content .step-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .file-uploader {
+    padding: 1.5rem 1rem;
+    min-height: 200px;
+  }
+
+  .upload-placeholder p {
+    font-size: 1rem;
+  }
+
+  .remove-file-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
 }

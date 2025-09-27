@@ -2,135 +2,348 @@
 .dashboard-sidebar {
   background-color: #111827;
   color: #9ca3af;
-  padding: 2rem;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* This is key to push footer down */
   height: 100vh;
   position: sticky;
   top: 0;
   border-right: 1px solid #1f2937;
+  font-family: var(--font-studio);
 }
 
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0; /* Crucial for flexbox scrolling */
+}
+
+/* Remove gradient background from profile to make it part of the same scrollable area */
 .sidebar-profile {
   text-align: center;
-  margin-bottom: 2rem;
-  padding: 1.5rem 0;
+  padding: 2rem 1.5rem 1rem; /* Adjusted padding */
+  border-bottom: 1px solid #1f2937;
+  flex-shrink: 0;
+  background-color: #111827; /* Solid color instead of gradient */
 }
+
 .sidebar-avatar {
-  width: 100px;
-  height: 100px;
+  width: 170px;
+  height: 170px;
   border-radius: 50%;
-  border: 4px solid #374151;
-  margin-bottom: 1.25rem;
+  border: 3px solid #374151;
+  margin-bottom: 1.5rem;
   object-fit: cover;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
+
+.sidebar-avatar:hover {
+  border-color: #4b5563;
+  transform: scale(1.05);
+}
+
 .sidebar-username {
   color: #f9fafb;
   font-size: 1.5rem;
   font-weight: 600;
   margin: 0;
+  line-height: 1.4;
 }
+
 .sidebar-headline {
   font-size: 1rem;
   font-weight: 400;
   margin-top: 0.5rem;
   color: #6b7280;
+  line-height: 1.4;
 }
 
+/* Navigation with independent scrolling - now includes profile */
 .sidebar-nav {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
 }
 
+.nav-scroll-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* Removed padding since profile is now inside */
+}
+
+/* Move profile inside the scroll container and add padding to the container */
+.nav-scroll-content {
+  padding: 0 1.5rem 2rem; /* Padding on sides and bottom */
+}
+
+/* Custom scrollbar for Webkit browsers (Chrome, Safari, Edge) */
+.nav-scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.nav-scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.nav-scroll-container::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 3px;
+  transition: background 0.3s ease;
+}
+
+.nav-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Fallback for Firefox */
+/* .nav-scroll-container {
+  scrollbar-width: thin;
+  scrollbar-color: #4b5563 transparent;
+} */
+
+/* Scroll shadow effect */
+.nav-scroll-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.1) 0%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.nav-scroll-container.scrolled::before {
+  opacity: 1;
+}
+
+/* Changed Create New Course to Pink */
 .create-course-btn {
-  background-color: var(--color-primary);
+  background: linear-gradient(
+    135deg,
+    #ec4899 0%,
+    #db2777 100%
+  ); /* Pink gradient */
   color: #ffffff !important;
   font-weight: 600 !important;
-  margin-bottom: 1.5rem;
+  margin: 1.5rem 0 2rem; /* Adjusted margin */
   justify-content: center;
+  border: none;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3); /* Pink shadow */
 }
+
+.create-course-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
 .create-course-btn:hover {
-  background-color: var(--color-primary-dark);
+  background: linear-gradient(
+    135deg,
+    #db2777 0%,
+    #be185d 100%
+  ); /* Darker pink on hover */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.4);
+}
+
+.create-course-btn:hover::before {
+  left: 100%;
 }
 
 .nav-menu-title {
   font-size: 0.75rem;
-  color: #4b5563;
+  color: #6b7280;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 0 0.5rem;
-  margin-bottom: 0.5rem;
+  letter-spacing: 0.1em;
+  padding: 1rem 0.5rem 0.75rem;
+  margin-bottom: 0.75rem;
+  border-top: 1px solid #1f2937;
 }
 
 .sidebar-link {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
   text-decoration: none;
   color: #d1d5db;
   font-weight: 500;
-  transition: background-color 0.2s, color 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem; /* Consistent font size */
+}
+
+.sidebar-link::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: #3b82f6;
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+  border-radius: 2px;
 }
 
 .sidebar-link:hover {
-  background-color: #1f2937;
+  background: linear-gradient(135deg, #1f2937 0%, #2d3748 100%);
   color: #ffffff;
+  border-color: #374151;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.sidebar-link:hover::before {
+  transform: scaleY(1);
 }
 
 .sidebar-link.active {
-  background-color: var(--color-primary);
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
   color: #ffffff;
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-.settings-dropdown .sidebar-link {
+.sidebar-link.active::before {
+  transform: scaleY(1);
+  background: #60a5fa;
+}
+
+/* Settings dropdown improvements - fixed font size and active state */
+.settings-dropdown {
+  position: relative;
+  margin-bottom: 0.5rem;
+}
+
+.settings-toggle {
+  width: 100%;
+  text-align: left;
   cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.95rem; /* Match other menu items */
 }
 
-/* Fix for settings text alignment */
-.settings-text {
-  flex-grow: 1; /* This makes it take up the available space */
+/* Fix for settings active state - ensure only settings gets active class */
+.settings-dropdown .sidebar-link.active {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
 }
 
-.chevron-icon {
-  transition: transform 0.2s ease-in-out;
-}
-.chevron-icon.open {
-  transform: rotate(180deg);
-}
 .settings-submenu {
-  padding-left: 2.75rem; /* Indent submenu items */
-  margin-top: 0.5rem;
+  padding-left: 0.5rem;
+  margin-top: 0.75rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+.settings-submenu.open {
+  max-height: 200px;
+  padding-left: 1rem;
+  margin-left: 0;
+}
+
 .submenu-link {
-  color: #d1d5db;
+  color: #9ca3af;
   text-decoration: none;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.5rem;
+  padding: 0.875rem 1rem;
   border-radius: 6px;
   font-size: 0.9rem;
-}
-.submenu-link:hover {
-  background-color: #1f2937;
-  color: #ffffff;
-}
-.submenu-link.delete {
-  color: #fca5a5;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  margin-left: 0;
+  width: calc(100% - 0.5rem);
 }
 
-.sidebar-footer {
-  padding-top: 1.5rem;
-  border-top: 1px solid #1f2937;
+.submenu-link:hover {
+  background: linear-gradient(135deg, #1f2937 0%, #2d3748 100%);
+  color: #ffffff;
+  border-color: #374151;
+  transform: translateX(4px);
+  padding-left: 1.25rem;
+  margin-left: 0;
 }
+
+.submenu-link.delete {
+  color: #fca5a5;
+  background: linear-gradient(
+    135deg,
+    rgba(220, 38, 38, 0.1) 0%,
+    rgba(185, 28, 28, 0.05) 100%
+  );
+}
+
+.submenu-link.delete:hover {
+  color: #fecaca;
+  background: linear-gradient(
+    135deg,
+    rgba(220, 38, 38, 0.2) 0%,
+    rgba(185, 28, 28, 0.15) 100%
+  );
+  border-color: rgba(220, 38, 38, 0.3);
+}
+
+.settings-text {
+  flex-grow: 1;
+}
+
+.chevron-icon {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chevron-icon.open {
+  transform: rotate(180deg);
+  color: #3b82f6;
+}
+
+/* Footer improvements */
+.sidebar-footer {
+  padding: 1rem;
+  border-top: 1px solid #1f2937;
+  background: linear-gradient(135deg, #111827 0%, #1a2332 100%);
+  flex-shrink: 0;
+}
+
 .sidebar-logo-link {
   display: flex;
   align-items: center;
@@ -138,8 +351,48 @@
   text-decoration: none;
   color: #d1d5db;
   font-weight: 600;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  padding: 0.5rem;
+  border-radius: 6px;
 }
+
+.sidebar-logo-link:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px);
+}
+
 .sidebar-logo-link img {
-  width: 35px;
+  width: 32px;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-logo-link:hover img {
+  transform: scale(1.1);
+}
+
+/* Responsive adjustments */
+@media (max-height: 700px) {
+  .sidebar-profile {
+    padding: 1.5rem 1rem 1rem;
+  }
+
+  .sidebar-avatar {
+    width: 120px;
+    height: 120px;
+  }
+
+  .sidebar-username {
+    font-size: 1.3rem;
+  }
+
+  .nav-scroll-content {
+    padding: 0 1rem 1.5rem;
+  }
+
+  .sidebar-link {
+    padding: 0.875rem 1rem;
+    margin-bottom: 0.375rem;
+  }
 }

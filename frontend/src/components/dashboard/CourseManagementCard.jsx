@@ -65,6 +65,13 @@ const CourseManagementCard = ({ lesson, onDelete, onPreview }) => {
           alt={lesson.title}
           className="course-mgmt-cover"
         />
+        <div className="course-type-badge">
+          {lesson.lesson_type === "video"
+            ? "Video"
+            : lesson.lesson_type === "file"
+            ? "File"
+            : "Article"}
+        </div>
       </div>
 
       <div className="course-mgmt-info">

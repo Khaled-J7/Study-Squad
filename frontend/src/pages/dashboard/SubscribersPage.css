@@ -1,53 +1,251 @@
 /* frontend/src/pages/dashboard/SubscribersPage.css */
 
-/* Using the same header style as MyCoursesPage for consistency */
-.subscribers-page .page-header {
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--color-border);
-}
-.subscribers-page .page-header h1 {
-  font-family: var(--font-display);
-  font-size: 2.25rem;
-  color: #111827;
-  margin: 0 0 0.5rem 0;
-}
-.subscribers-page .page-header p {
-  font-size: 1.1rem;
-  color: #6b7280;
-  max-width: 600px;
+.subscribers-page {
+  padding: 2rem;
+  background: white;
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* Search Bar Styles */
+/* Centered Page Header */
+.subscribers-page .page-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: center;
+  width: 100%;
+  max-width: 700px;
+}
+
+.subscribers-page .page-header h1 {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  /* margin: 0 0 0.5rem 0; */
+  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subscribers-page .page-header p {
+  font-size: 1.2rem;
+  color: #718096;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Centered Search Bar */
 .search-bar-container {
   position: relative;
-  margin-bottom: 2rem;
-  max-width: 900px;
+  margin-bottom: 1rem;
+  max-width: 500px;
+  width: 100%;
 }
+
 .search-icon {
   position: absolute;
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #9ca3af;
+  color: #94a3b8;
+  z-index: 2;
 }
+
 .search-input {
   width: 100%;
-  padding: 0.8rem 1rem 0.8rem 3rem; /* Left padding for icon */
-  border-radius: 8px;
-  border: 1px solid var(--color-border);
+  padding: 1rem 1rem 1rem 3rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
   font-family: var(--font-studio);
   font-size: 1rem;
+  background: #f8fafc;
+  transition: all 0.3s ease;
 }
+
 .search-input:focus {
   outline: none;
   border-color: var(--color-primary);
+  background: white;
   box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
 }
 
-/* Container for the list of cards */
+.search-input::placeholder {
+  color: #94a3b8;
+}
+
+/* Centered Subscribers List */
 .subscribers-list {
   display: grid;
-  grid-template-columns: 1fr; /* One column layout */
-  gap: 1rem;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 800px;
+}
+
+/* Enhanced Empty States */
+.empty-state-container {
+  text-align: center;
+  padding: 4rem 2rem;
+  max-width: 600px;
+  margin: 1rem auto;
+}
+
+.empty-state-icon {
+  background: linear-gradient(135deg, #e9d8fd 0%, #d6bcfa 100%);
+  color: #6b46c1;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.empty-state-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0 0 1rem 0;
+}
+
+.empty-state-text {
+  font-size: 1.1rem;
+  color: #718096;
+  max-width: 500px;
+  margin: 0 auto 2.5rem auto;
+  line-height: 1.6;
+}
+
+/* No Results State */
+.empty-state-container:has(
+    .empty-state-title:contains("No Subscribers Found")
+  ) {
+  background: #f7fafc;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+}
+
+/* Enhanced Button */
+.btn-primary-main {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-primary-hover) 100%
+  );
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+  border: none;
+  font-size: 1rem;
+}
+
+.btn-primary-main:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(217, 119, 6, 0.35);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-hover) 0%,
+    #e0781a 100%
+  );
+}
+
+/* Loading State Enhancement */
+.subscribers-page .spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  width: 100%;
+}
+
+/* Error State Enhancement */
+.subscribers-page .inline-error {
+  max-width: 600px;
+  margin: 2rem auto;
+  text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .subscribers-page {
+    padding: 1.5rem;
+  }
+
+  .subscribers-page .page-header h1 {
+    font-size: 2rem;
+  }
+
+  .subscribers-page .page-header p {
+    font-size: 1.1rem;
+  }
+
+  .search-bar-container {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+
+  .empty-state-container {
+    padding: 3rem 1.5rem;
+    margin: 1rem auto;
+  }
+
+  .empty-state-icon {
+    width: 80px;
+    height: 80px;
+  }
+
+  .empty-state-title {
+    font-size: 1.5rem;
+  }
+
+  .subscribers-list {
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .subscribers-page {
+    padding: 1rem;
+  }
+
+  .subscribers-page .page-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .empty-state-container {
+    padding: 2rem 1rem;
+  }
+
+  .btn-primary-main {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .search-input {
+    padding: 0.875rem 0.875rem 0.875rem 2.5rem;
+  }
+
+  .search-icon {
+    left: 1.5rem;
+  }
+
+  .subscribers-list {
+    padding: 0 0.5rem;
+  }
 }

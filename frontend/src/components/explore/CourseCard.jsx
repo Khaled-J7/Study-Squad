@@ -66,7 +66,7 @@ const CourseCard = ({ course }) => {
               <span className="meta-label">Studio</span>
               {/* ✅ Step 2.2: Replace Link with AuthLink */}
               <AuthLink
-                to={`/studios/${course.studio.id}`}
+                to={`/studio/${course.studio.id}`}
                 className="meta-link"
               >
                 {course.studio.name}

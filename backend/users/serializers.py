@@ -388,4 +388,5 @@ class LessonUpdateSerializer(serializers.ModelSerializer):
                 instance.tags.add(tag)
         return super().update(instance, validated_data)
 
+
 # The Post and Comment serializers can be added back when that feature is built.

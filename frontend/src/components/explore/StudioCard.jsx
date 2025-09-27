@@ -105,7 +105,7 @@ const StudioCard = ({ studio }) => {
             </div>
           )}
         </div>
-        <AuthLink to={`/studios/${studio.id}`} className="card-button">
+        <AuthLink to={`/studio/${studio.id}`} className="card-button">
           <span>View Studio</span>
           <HiArrowRight />
         </AuthLink>

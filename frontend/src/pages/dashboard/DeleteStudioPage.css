@@ -1,18 +1,38 @@
 /* frontend/src/pages/dashboard/DeleteStudioPage.css */
 
-/* Main container to center the content */
 .delete-studio-page {
   max-width: 800px;
-  margin: 2rem auto;
+  margin: 0 auto;
+  padding: 2rem;
+  background: white;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* The main box for the warning and form */
 .delete-warning-box {
-  background-color: var(--color-white);
-  border: 2px solid #ef4444; /* Red border to signify danger */
-  border-radius: 16px;
-  padding: 2.5rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  background: white;
+  border: 2px solid #fecaca;
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: 0 20px 40px rgba(239, 68, 68, 0.1);
+  width: 100%;
+  max-width: 600px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Red accent border at the top */
+.delete-warning-box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #ef4444, #dc2626, #b91c1c);
 }
 
 /* Header section with icon and title */
@@ -20,94 +40,260 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1.5rem;
-  color: #b91c1c; /* Dark red for text */
+  margin-bottom: 2rem;
+  color: #dc2626;
+  text-align: center;
+  justify-content: center;
+  flex-direction: column;
 }
+
 .warning-icon {
   flex-shrink: 0;
+  background: #fef2f2;
+  border-radius: 50%;
+  padding: 1rem;
+  border: 2px solid #fecaca;
 }
+
 .warning-title {
-  font-size: 2rem;
+  font-size: 2.25rem;
   font-weight: 700;
   margin: 0;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* The main explanatory text */
+.warning-content {
+  background: #fef2f2;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
 .warning-content p {
   font-size: 1.1rem;
   line-height: 1.7;
-  color: var(--color-text-medium);
+  color: #7f1d1d;
+  margin: 0 0 1.5rem 0;
+  text-align: center;
 }
+
+.warning-content p:last-child {
+  margin-bottom: 0;
+  font-weight: 600;
+}
+
 .warning-content ul {
-  list-style-type: disc;
-  padding-left: 2rem;
-  margin: 1rem 0;
+  list-style-type: none;
+  padding: 0;
+  margin: 1.5rem 0;
+  text-align: left;
 }
+
 .warning-content li {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding-left: 2rem;
+  position: relative;
+  color: #7f1d1d;
+}
+
+.warning-content li::before {
+  content: "•";
+  color: #ef4444;
+  font-weight: bold;
+  position: absolute;
+  left: 1rem;
 }
 
 /* The confirmation form */
 .delete-form {
   margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--color-border);
+  padding-top: 2rem;
+  border-top: 1px solid #fecaca;
 }
 
 .form-label {
   display: block;
   font-weight: 600;
-  margin-bottom: 0.75rem;
-  color: #374151;
+  margin-bottom: 1rem;
+  color: #7f1d1d;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.form-label strong {
+  color: #dc2626;
+  background: #fef2f2;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #fecaca;
 }
 
 .form-input {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  padding: 1rem;
+  border: 2px solid #fecaca;
+  border-radius: 12px;
   font-family: var(--font-studio);
   font-size: 1rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #fef2f2;
+  transition: all 0.3s ease;
+  text-align: center;
+  margin-bottom: 1.5rem;
 }
 
 .form-input:focus {
   outline: none;
   border-color: #ef4444;
+  background: white;
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-input::placeholder {
+  color: #fca5a5;
+  text-align: center;
 }
 
 /* The final, dangerous delete button */
 .delete-button {
   width: 100%;
-  background-color: #ef4444; /* Red background */
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   color: white;
-  padding: 0.8rem 1.75rem;
+  padding: 1.25rem 2rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-family: var(--font-studio);
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
   margin-top: 1rem;
 }
 
-.delete-button:hover {
-  background-color: #dc2626; /* Darker red on hover */
+.delete-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.35);
 }
 
 /* Style for when the button is disabled */
 .delete-button:disabled {
-  background-color: #fca5a5; /* Light, faded red */
+  background: #fca5a5;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  color: #fef2f2;
 }
 
 .delete-error-container {
-  margin-top: 1rem;
-  min-height: 24px; /* Prevents layout shift when error appears */
+  margin: 1.5rem 0;
+  min-height: 24px;
+  text-align: center;
+}
+
+/* Success state when typing matches */
+.form-input:not(:placeholder-shown) {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+.form-input:not(:placeholder-shown):focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .delete-studio-page {
+    padding: 1.5rem;
+    align-items: flex-start;
+    padding-top: 2rem;
+  }
+
+  .delete-warning-box {
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+  }
+
+  .warning-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+
+  .warning-title {
+    font-size: 1.75rem;
+  }
+
+  .warning-content {
+    padding: 1.5rem;
+  }
+
+  .warning-content p {
+    font-size: 1rem;
+  }
+
+  .delete-form {
+    padding-top: 1.5rem;
+  }
+
+  .delete-button {
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .delete-studio-page {
+    padding: 1rem;
+  }
+
+  .delete-warning-box {
+    padding: 1.5rem 1rem;
+  }
+
+  .warning-title {
+    font-size: 1.5rem;
+  }
+
+  .warning-content {
+    padding: 1rem;
+  }
+
+  .warning-content li {
+    padding-left: 1.5rem;
+  }
+
+  .warning-content li::before {
+    left: 0.5rem;
+  }
+
+  .form-input {
+    padding: 0.875rem;
+  }
+}
+
+/* Animation for critical warning */
+@keyframes pulseWarning {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.delete-warning-box {
+  animation: pulseWarning 2s ease-in-out;
 }

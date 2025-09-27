@@ -166,11 +166,18 @@ const CreateCoursePage = () => {
   return (
     <div className="create-course-page">
       <div className="progress-bar">
-        {/* We add a number to each step for clarity. */}
-        <div className={`progress-step ${currentStep >= 1 ? "active" : ""}`}>
+        <div
+          className={`progress-step ${currentStep >= 1 ? "active" : ""} ${
+            currentStep > 1 ? "completed" : ""
+          }`}
+        >
           <span>1</span>Choose Format
         </div>
-        <div className={`progress-step ${currentStep >= 2 ? "active" : ""}`}>
+        <div
+          className={`progress-step ${currentStep >= 2 ? "active" : ""} ${
+            currentStep > 2 ? "completed" : ""
+          }`}
+        >
           <span>2</span>Course Details
         </div>
         <div className={`progress-step ${currentStep >= 3 ? "active" : ""}`}>

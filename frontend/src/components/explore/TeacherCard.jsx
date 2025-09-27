@@ -103,7 +103,7 @@ const TeacherCard = ({ teacher }) => {
           <HiOutlineVideoCamera /> Meet Now
         </AuthLink>
         <AuthLink
-          to={`/studios/${teacher.studio_id}`}
+          to={`/studio/${teacher.studio_id}`}
           className="card-button-primary"
         >
           <span>View Studio</span>
