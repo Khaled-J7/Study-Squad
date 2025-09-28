@@ -5,24 +5,32 @@
 
 const API_BASE_URL = "http://127.0.0.1:8000";
 
-// Define constants for local default images for consistency and easy updates.
-const localDefaultAvatar = "/default.jpg"; // Located in /frontend/public/
-const localDefaultCourseCover = "/course_card_default_cover_image.png"; // Located in /frontend/public/
-const localDefaultStudioCover = "/default_cover.jpg"; // Located in /frontend/public/
+const localDefaultAvatar = "/default.jpg";
+const localDefaultCourseCover = "/course_card_default_cover_image.png";
+const localDefaultStudioCover = "/default_cover.jpg";
+
+/**
+ * Checks if a given URL is a full, absolute URL.
+ * @param {string} url - The URL to check.
+ * @returns {boolean}
+ */
+const isAbsoluteUrl = (url) => {
+  return url.startsWith("http://") || url.startsWith("https://");
+};
 
 /**
  * Safely gets the correct avatar URL for a user.
- * It handles the base URL, the default image, and missing profile data.
  * @param {object} user - The user object from our AuthContext.
  * @returns {string} The full URL for the avatar image.
  */
 export const getAvatarUrl = (user) => {
-  // Use optional chaining (?.) to prevent errors if user or profile is null.
-  if (user?.profile?.profile_picture) {
-    // If the backend provides a relative URL, we build the full path to it.
-    return `${API_BASE_URL}${user.profile.profile_picture}`;
+  const pictureUrl = user?.profile?.profile_picture;
+  if (pictureUrl) {
+    // If the URL is already absolute, return it. Otherwise, build it.
+    return isAbsoluteUrl(pictureUrl)
+      ? pictureUrl
+      : `${API_BASE_URL}${pictureUrl}`;
   }
-  // If there's no picture, we fall back to our local default avatar.
   return localDefaultAvatar;
 };
 
@@ -62,11 +70,10 @@ export const getContactEmail = (user) => {
  * @returns {string} The full URL for the course cover image.
  */
 export const getCourseCoverUrl = (lesson) => {
-  if (lesson?.cover_image) {
-    // If the lesson has a cover image, build the full URL.
-    return `${API_BASE_URL}${lesson.cover_image}`;
+  const coverUrl = lesson?.cover_image;
+  if (coverUrl) {
+    return isAbsoluteUrl(coverUrl) ? coverUrl : `${API_BASE_URL}${coverUrl}`;
   }
-  // Otherwise, fall back to our local default course cover.
   return localDefaultCourseCover;
 };
 
@@ -76,10 +83,9 @@ export const getCourseCoverUrl = (lesson) => {
  * @returns {string} The full URL for the studio cover image.
  */
 export const getStudioCoverUrl = (studio) => {
-  if (studio?.cover_image) {
-    // If the studio has a cover image, build the full URL.
-    return `${API_BASE_URL}${studio.cover_image}`;
+  const coverUrl = studio?.cover_image;
+  if (coverUrl) {
+    return isAbsoluteUrl(coverUrl) ? coverUrl : `${API_BASE_URL}${coverUrl}`;
   }
-  // Otherwise, fall back to our local default studio cover.
   return localDefaultStudioCover;
 };

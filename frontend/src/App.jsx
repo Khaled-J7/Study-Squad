@@ -21,6 +21,7 @@ import TeacherOnlyRouteGuard from "./components/common/TeacherOnlyRouteGuard";
 import StudioOnboardingPage from "./pages/StudioOnboardingPage";
 import CreateStudioPage from "./pages/CreateStudioPage";
 import TeacherRouteGuard from "./components/common/TeacherRouteGuard";
+import PublicStudioPage from "./pages/PublicStudioPage";
 import "./App.css";
 
 const App = () => {
@@ -39,6 +40,8 @@ const App = () => {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            {/* This is the new public route for viewing a studio. */}
+            <Route path="/studios/:studioId" element={<PublicStudioPage />} />
 
             {/* --- Routes Guarded from Teachers --- */}
             <Route element={<TeacherRouteGuard />}>

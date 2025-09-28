@@ -7,7 +7,6 @@ import Spinner from "../../components/common/Spinner";
 import TagInput from "../../components/common/TagInput";
 import InlineError from "../../components/common/InlineError/InlineError";
 import { Save } from "lucide-react";
-import { getStudioCoverUrl } from "../../utils/helpers";
 import "./UpdateStudioPage.css";
 
 const UpdateStudioPage = () => {

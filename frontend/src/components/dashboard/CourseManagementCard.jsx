@@ -12,7 +12,12 @@ import "./CourseManagementCard.css";
  * @param {Object} props.lesson - The course data.
  * @param {Function} props.onDelete - The handler function to delete the course.
  */
-const CourseManagementCard = ({ lesson, onDelete, onPreview }) => {
+const CourseManagementCard = ({
+  lesson,
+  onDelete,
+  onPreview,
+  isPublicView = false,
+}) => {
   // We add local state to this component to manage the delete confirmation dialog.
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const coverImageUrl = getCourseCoverUrl(lesson);
@@ -78,33 +83,43 @@ const CourseManagementCard = ({ lesson, onDelete, onPreview }) => {
         <h4 className="course-mgmt-title">{lesson.title}</h4>
         <p className="course-mgmt-desc">{lesson.description}</p>
         <div className="course-mgmt-actions">
-          <Link
-            to={`/my-studio/courses/${lesson.id}/edit`} // CORRECTED URL STRUCTURE
-            className="action-btn edit"
-          >
-            <Edit size={14} />
-            <span>Edit</span>
-          </Link>
+          {/* These actions are now conditional based on the isPublicView prop */}
+          {!isPublicView ? (
+            <>
+              <Link
+                to={`/my-studio/courses/${lesson.id}/edit`}
+                className="action-btn edit"
+              >
+                <Edit size={14} />
+                <span>Edit</span>
+              </Link>
+              {/* ✅ --- Conditional Rendering Logic --- */}
+              {/* We check the lesson_type to decide which button to show. */}
+              {/* ✅ The buttons now call the 'onPreview' function to open the modal. */}
+              {lesson.lesson_type === "video" ? (
+                <button onClick={onPreview} className="action-btn play">
+                  <PlayCircle size={14} />
+                  <span>Play</span>
+                </button>
+              ) : (
+                <button onClick={onPreview} className="action-btn view">
+                  <Eye size={14} />
+                  <span>Preview</span>
+                </button>
+              )}
 
-          {/* ✅ --- Conditional Rendering Logic --- */}
-          {/* We check the lesson_type to decide which button to show. */}
-          {/* ✅ The buttons now call the 'onPreview' function to open the modal. */}
-          {lesson.lesson_type === "video" ? (
-            <button onClick={onPreview} className="action-btn play">
-              <PlayCircle size={14} />
-              <span>Play</span>
-            </button>
+              <button className="action-btn delete" onClick={handleDeleteClick}>
+                <Trash2 size={14} />
+              </button>
+            </>
           ) : (
-            <button onClick={onPreview} className="action-btn view">
+            // Optionally, add a public-facing button like "View Course"
+            // For now, we'll just show a simple preview button
+            <button onClick={onPreview} className="action-btn view-public">
               <Eye size={14} />
-              <span>Preview</span>
+              <span>View Course</span>
             </button>
           )}
-
-          {/* ✅ --- The New Delete Button --- */}
-          <button className="action-btn delete" onClick={handleDeleteClick}>
-            <Trash2 size={14} />
-          </button>
         </div>
       </div>
     </div>

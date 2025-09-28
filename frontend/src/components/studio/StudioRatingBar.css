@@ -1,0 +1,36 @@
+/* frontend/src/components/studio/StudioRatingBar.css */
+.rating-bar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background-color: #f8f9fa; /* Lighter background */
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+}
+
+.rating-bar-prompt h4 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.2rem;
+  color: var(--text-color);
+}
+
+.rating-bar-prompt p {
+  margin: 0;
+  color: var(--secondary-color);
+}
+
+.rating-stars-wrapper input[type="radio"] {
+  display: none; /* Hide the actual radio buttons */
+}
+
+.rating-stars-wrapper .star-icon {
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+  width: 32px;
+  height: 32px;
+}
+
+.rating-stars-wrapper .star-icon:hover {
+  transform: scale(1.15);
+}

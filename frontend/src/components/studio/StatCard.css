@@ -1,0 +1,40 @@
+/* frontend/src/components/studio/StatCard.css */
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  background-color: #fff; /* White background */
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+  gap: 1.5rem;
+  flex-grow: 1;
+  border: 1px solid #e9ecef; /* Light border */
+}
+
+.stat-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: var(--primary-color-light);
+  color: var(--primary-color);
+}
+
+.stat-card-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-card-value {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.stat-card-label {
+  font-size: 0.9rem;
+  color: var(--secondary-color);
+}

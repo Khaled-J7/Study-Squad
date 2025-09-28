@@ -19,6 +19,10 @@ from .views import (
     course_delete_view,
     course_detail_view,
     course_update_view,
+    public_studio_detail,
+    subscribe_studio,
+    unsubscribe_studio,
+    rate_studio,
 )
 
 urlpatterns = [
@@ -67,4 +71,12 @@ urlpatterns = [
         course_update_view,
         name="course-update",
     ),
+    # Public Studio URLs
+    path("studios/<int:id>/", public_studio_detail, name="public-studio-detail"),
+    path("studios/<int:id>/subscribe/", subscribe_studio, name="subscribe-studio"),
+    path(
+        "studios/<int:id>/unsubscribe/", unsubscribe_studio, name="unsubscribe-studio"
+    ),
+    # Rating URL
+    path("studios/<int:id>/rate/", rate_studio, name="rate-studio"),
 ]

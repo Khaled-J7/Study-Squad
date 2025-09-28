@@ -242,6 +242,73 @@ const updateCourse = async (lessonId, courseData) => {
   }
 };
 
+/**
+ * Fetches the public data for a single studio.
+ * @param {string|number} studioId - The ID of the studio to fetch.
+ * @returns {Promise<Object>} The API response.
+ */
+const getPublicStudio = async (studioId) => {
+  try {
+    const response = await axiosInstance.get(`/studios/${studioId}/`);
+    return { success: true, data: response.data };
+  } catch (error) {
+    return { success: false, error: "Failed to fetch studio data." };
+  }
+};
+
+/**
+ * Subscribes the current user to a studio.
+ * @param {string|number} studioId - The ID of the studio to subscribe to.
+ * @returns {Promise<Object>} The API response.
+ */
+const subscribeToStudio = async (studioId) => {
+  try {
+    const response = await axiosInstance.post(
+      `/studios/${studioId}/subscribe/`
+    );
+    return { success: true, data: response.data };
+  } catch (error) {
+    return { success: false, error: "Failed to subscribe." };
+  }
+};
+
+/**
+ * Unsubscribes the current user from a studio.
+ * @param {string|number} studioId - The ID of the studio to unsubscribe from.
+ * @returns {Promise<Object>} The API response.
+ */
+const unsubscribeFromStudio = async (studioId) => {
+  try {
+    const response = await axiosInstance.post(
+      `/studios/${studioId}/unsubscribe/`
+    );
+    return { success: true, data: response.data };
+  } catch (error) {
+    return { success: false, error: "Failed to unsubscribe." };
+  }
+};
+
+/**
+ * Submits a star rating for a studio.
+ * @param {string|number} studioId - The ID of the studio to rate.
+ * @param {number} rating - The rating value (1-5).
+ * @returns {Promise<Object>} The API response.
+ */
+const rateStudio = async (studioId, rating) => {
+  try {
+    // We send the rating in the request body.
+    const response = await axiosInstance.post(`/studios/${studioId}/rate/`, {
+      rating,
+    });
+    return { success: true, data: response.data };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data?.error || "Failed to submit rating.",
+    };
+  }
+};
+
 const studioService = {
   createCourse,
   createStudio,
@@ -256,6 +323,10 @@ const studioService = {
   deleteCourse,
   getCourseDetail,
   updateCourse,
+  getPublicStudio,
+  subscribeToStudio,
+  unsubscribeFromStudio,
+  rateStudio,
 };
 
 export default studioService;

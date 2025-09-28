@@ -19,9 +19,10 @@ const Step2_CoreDetails = ({
 
   // This effect creates a preview URL when a new image file is selected.
   useEffect(() => {
-    if (courseData.cover_image && typeof courseData.cover_image !== "string") {
+    if (courseData.cover_image instanceof File) {
       const previewUrl = URL.createObjectURL(courseData.cover_image);
       setImagePreview(previewUrl);
+
       // This is a cleanup function to prevent memory leaks.
       return () => URL.revokeObjectURL(previewUrl);
     }
@@ -162,7 +163,6 @@ const Step2_CoreDetails = ({
             <ArrowLeft size={18} />
             <span>Back</span>
           </button>
-          {/* The button is now aware of the submission state for playlists. */}
           <button
             type="button"
             className="btn-primary-main"

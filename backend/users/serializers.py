@@ -45,6 +45,8 @@ class StudioSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
     subscribers_count = serializers.SerializerMethodField()
     average_rating = serializers.SerializerMethodField()
+    is_subscribed = serializers.SerializerMethodField()
+    lessons = lessons = serializers.SerializerMethodField()
 
     class Meta:
         model = Studio
@@ -58,6 +60,8 @@ class StudioSerializer(serializers.ModelSerializer):
             "created_at",
             "subscribers_count",
             "average_rating",
+            "is_subscribed",
+            "lessons",
         ]
 
     def get_subscribers_count(self, obj):
@@ -65,6 +69,16 @@ class StudioSerializer(serializers.ModelSerializer):
 
     def get_average_rating(self, obj):
         return obj.ratings.aggregate(Avg("rating")).get("rating__avg", 0) or 0
+
+    def get_is_subscribed(self, obj):
+        user = self.context.get("request").user # type: ignore
+        if user and user.is_authenticated:
+            # This checks if the user is in the set of subscribers for the studio
+            return obj.subscribers.filter(pk=user.pk).exists()
+        return False
+    
+    def get_lessons(self, obj):
+        return LessonCardSerializer(obj.lessons.all(), many=True).data
 
 
 class StudioCoverSerializer(serializers.ModelSerializer):

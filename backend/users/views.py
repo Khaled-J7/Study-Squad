@@ -2,13 +2,13 @@
 import json
 import traceback
 from rest_framework.decorators import api_view, permission_classes, parser_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth.models import User, Group
 from django.db.models import Q  # Import Q objects for complex searches
-from .models import Studio, Lesson, Profile
+from .models import Studio, Lesson, Profile, StudioRating
 from .serializers import (
     StudioSerializer,
     StudioCreateSerializer,
@@ -592,3 +592,89 @@ def course_update_view(request, lesson_id):
 
     # If the data is not valid, we return the errors.
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def public_studio_detail(request, id):
+    """
+    Provides a public view of a single studio, identified by its ID.
+    """
+    try:
+        studio = Studio.objects.get(pk=id)
+    except Studio.DoesNotExist:
+        return Response({"error": "Studio not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Pass the request context to the serializer so it knows who the user is
+    serializer = StudioSerializer(studio, context={"request": request})
+    return Response(serializer.data)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def subscribe_studio(request, id):
+    """
+    Subscribes the currently logged-in user to a studio.
+    """
+    try:
+        studio = Studio.objects.get(pk=id)
+    except Studio.DoesNotExist:
+        return Response({"error": "Studio not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Use the .add() method for ManyToManyFields
+    studio.subscribers.add(request.user)
+    return Response({"detail": "Successfully subscribed."}, status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def unsubscribe_studio(request, id):
+    """
+    Unsubscribes the currently logged-in user from a studio.
+    """
+    try:
+        studio = Studio.objects.get(pk=id)
+    except Studio.DoesNotExist:
+        return Response({"error": "Studio not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Use the .remove() method for ManyToManyFields
+    studio.subscribers.remove(request.user)
+    return Response({"detail": "Successfully unsubscribed."}, status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def rate_studio(request, id):
+    """
+    Allows a logged-in user to create or update their rating for a studio.
+    Expects a 'rating' value in the request body.
+    """
+    try:
+        studio = Studio.objects.get(pk=id)
+    except Studio.DoesNotExist:
+        return Response({"error": "Studio not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Get the rating from the request data.
+    rating_value = request.data.get("rating")
+
+    # Basic validation for the rating value.
+    if rating_value is None or not (1 <= int(rating_value) <= 5):
+        return Response(
+            {"error": "A rating between 1 and 5 is required."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Use update_or_create to handle both new and existing ratings.
+    # It finds a rating by the studio and user, and either updates it or creates a new one.
+    rating, created = StudioRating.objects.update_or_create(
+        studio=studio, user=request.user, defaults={"rating": int(rating_value)}
+    )
+
+    if created:
+        return Response(
+            {"detail": "Thank you for rating!"}, status=status.HTTP_201_CREATED
+        )
+    else:
+        return Response(
+            {"detail": "Your rating has been updated."}, status=status.HTTP_200_OK
+        )

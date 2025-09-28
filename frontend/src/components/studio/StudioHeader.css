@@ -1,0 +1,80 @@
+/* frontend/src/components/studio/StudioHeader.css */
+
+/* ... (keep existing styles like .studio-header, .studio-cover-image-container, etc.) ... */
+
+.studio-header {
+  width: 100%;
+  margin-bottom: 3rem;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background-color: #fff;
+}
+
+.studio-cover-image-container {
+  height: 250px;
+  background-color: #e9ecef;
+}
+
+.studio-cover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.studio-header-content {
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  background-color: #ffffff;
+}
+
+.studio-avatar-info-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.studio-avatar-container {
+  margin-top: -80px;
+  border: 4px solid #fff;
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  background-color: #fff;
+}
+
+.studio-avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.studio-name {
+  font-size: 2.5rem;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.studio-owner-name {
+  font-size: 1rem;
+  color: var(--secondary-color);
+  margin: 0.25rem 0 0.75rem 0;
+}
+
+/* REMOVED: .studio-stats, .stat-item, .stat-icon */
+
+/* NEW: Styles for the action buttons */
+.studio-actions {
+  display: flex;
+  gap: 1rem;
+}
+.studio-actions .btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

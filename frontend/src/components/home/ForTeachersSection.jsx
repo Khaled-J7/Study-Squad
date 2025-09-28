@@ -50,7 +50,7 @@ const ForTeachersSection = () => {
           {/* We check if the user is a teacher. */}
           {isTeacher() ? (
             // If they are a teacher, the button invites them to create content for their studio.
-            <AuthLink to="/my-studio" className="btn btn-cta-primary">
+            <AuthLink to="/my-studio/courses/new" className="btn btn-cta-primary">
               Craft a New Lesson <HiPlusCircle className="btn-icon" />
             </AuthLink>
           ) : (
