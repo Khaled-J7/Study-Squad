@@ -40,6 +40,33 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["id", "username", "first_name", "last_name", "profile"]
 
 
+# A new, lightweight serializer specifically for the studio cards on the explore page.
+class StudioCardSerializer(serializers.ModelSerializer):
+    owner = UserSerializer(read_only=True)
+    tags = TagSerializer(many=True, read_only=True)
+    subscribers_count = serializers.SerializerMethodField()
+    average_rating = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Studio
+        fields = [
+            "id",
+            "name",
+            "description",
+            "cover_image",
+            "owner",
+            "tags",
+            "subscribers_count",
+            "average_rating",
+        ]
+
+    def get_subscribers_count(self, obj):
+        return obj.subscribers.count()
+
+    def get_average_rating(self, obj):
+        return obj.ratings.aggregate(Avg("rating")).get("rating__avg", 0) or 0
+
+
 class StudioSerializer(serializers.ModelSerializer):
     owner = UserSerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
@@ -71,12 +98,12 @@ class StudioSerializer(serializers.ModelSerializer):
         return obj.ratings.aggregate(Avg("rating")).get("rating__avg", 0) or 0
 
     def get_is_subscribed(self, obj):
-        user = self.context.get("request").user # type: ignore
+        user = self.context.get("request").user  # type: ignore
         if user and user.is_authenticated:
             # This checks if the user is in the set of subscribers for the studio
             return obj.subscribers.filter(pk=user.pk).exists()
         return False
-    
+
     def get_lessons(self, obj):
         return LessonCardSerializer(obj.lessons.all(), many=True).data
 

@@ -13,6 +13,7 @@ import StudioRatingBar from "../components/studio/StudioRatingBar";
 import CourseViewerModal from "../components/dashboard/CourseViewerModal";
 import CredentialsSection from "../components/studio/CredentialsSection";
 import { Star, User, BookOpen } from "lucide-react";
+import AuthLink from "../components/common/AuthLink";
 import "./PublicStudioPage.css";
 
 const PublicStudioPage = () => {
@@ -28,6 +29,9 @@ const PublicStudioPage = () => {
 
   const [selectedCourseId, setSelectedCourseId] = useState(null); // State for the selected course id
   const [isCourseViewerOpen, setIsCourseViewerOpen] = useState(false); // State for the viewer modal
+
+  // A variable to check if the current user is the studio owner
+  const isOwner = user && user.id === studioData?.owner?.id;
 
   // This is our function to refresh the data on the page
   const fetchStudioData = async () => {
@@ -138,9 +142,17 @@ const PublicStudioPage = () => {
           studioData={studioData}
           onSubscribeClick={handleSubscribeClick}
           isSubmitting={isSubmitting}
+          isOwner={isOwner}
         />
 
         <div className="studio-content-body">
+          {studioData.description && (
+            <section className="studio-description-section">
+              <h2>About this Studio</h2>
+              <p>{studioData.description}</p>
+            </section>
+          )}
+          
           {/* NEW: Stats Section */}
           <section className="studio-stats-section">
             <StatCard
@@ -170,12 +182,6 @@ const PublicStudioPage = () => {
           />
 
           {/* FIX: Check for description before rendering */}
-          {studioData.description && (
-            <section className="studio-description-section">
-              <h2>About this Studio</h2>
-              <p>{studioData.description}</p>
-            </section>
-          )}
 
           <section className="studio-courses-section">
             <h2>Courses</h2>

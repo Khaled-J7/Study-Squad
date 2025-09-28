@@ -1,80 +1,233 @@
 /* frontend/src/components/studio/StudioHeader.css */
 
-/* ... (keep existing styles like .studio-header, .studio-cover-image-container, etc.) ... */
-
 .studio-header {
-  width: 100%;
-  margin-bottom: 3rem;
-  border-radius: 12px;
+  /* width: 100%; */
+  position: relative;
+  background: #fff;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  background-color: #fff;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+  margin: 1rem 0.5rem 2rem 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 2px solid #6366f1;
+  border-top: 2px solid #6366f1;
 }
 
 .studio-cover-image-container {
-  height: 250px;
-  background-color: #e9ecef;
+  height: 280px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  overflow: hidden;
 }
 
 .studio-cover-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.studio-cover-image:hover {
+  transform: scale(1.02);
 }
 
 .studio-header-content {
-  padding: 1.5rem 2rem;
+  padding: 2rem;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  position: relative;
-  background-color: #ffffff;
+  align-items: flex-start;
+  gap: 2rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
 }
 
 .studio-avatar-info-wrapper {
   display: flex;
-  align-items: center;
-  gap: 1.5rem;
+  align-items: flex-start;
+  gap: 2rem;
+  flex: 1;
 }
 
 .studio-avatar-container {
-  margin-top: -80px;
-  border: 4px solid #fff;
-  border-radius: 50%;
-  width: 120px;
-  height: 120px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  background-color: #fff;
+  margin-top: -70px;
+  position: relative;
+  z-index: 10;
 }
 
 .studio-avatar-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
+  object-fit: cover;
+  background: #fff;
+  border: 6px solid #fff;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.studio-avatar-image:hover {
+  transform: translateY(-4px);
+}
+
+.studio-info {
+  margin-top: 0.5rem;
 }
 
 .studio-name {
-  font-size: 2.5rem;
-  margin: 0;
-  color: var(--text-color);
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem 0;
+  color: #1e293b;
+  background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
 }
 
 .studio-owner-name {
-  font-size: 1rem;
-  color: var(--secondary-color);
-  margin: 0.25rem 0 0.75rem 0;
+  font-size: 1.1rem;
+  color: #64748b;
+  margin: 0;
+  font-weight: 500;
 }
 
-/* REMOVED: .studio-stats, .stat-item, .stat-icon */
-
-/* NEW: Styles for the action buttons */
 .studio-actions {
   display: flex;
   gap: 1rem;
+  align-items: flex-start;
+  margin-top: 1rem;
 }
+
 .studio-actions .btn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
+  padding: 1rem 1.75rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  min-width: 160px;
+  justify-content: center;
+}
+
+.studio-actions .btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.studio-actions .btn:hover::before {
+  left: 100%;
+}
+
+.studio-actions .btn-secondary {
+  background: rgba(100, 116, 139, 0.1);
+  color: #475569;
+  border: 1px solid rgba(100, 116, 139, 0.2);
+}
+
+.studio-actions .btn-secondary:hover {
+  background: rgba(100, 116, 139, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(100, 116, 139, 0.2);
+}
+
+.studio-actions .btn-primary {
+  background: linear-gradient(
+    135deg,
+    var(--primary-color, #3b82f6) 0%,
+    var(--primary-color-light, #60a5fa) 100%
+  );
+  color: white;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.studio-actions .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.4);
+}
+
+.studio-actions .btn-primary-outline {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.studio-actions .btn-primary-outline:hover {
+  background: rgba(34, 197, 94, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.2);
+}
+
+.studio-actions .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .studio-header-content {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1.5rem;
+    gap: 1.5rem;
+  }
+
+  .studio-avatar-info-wrapper {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .studio-avatar-container {
+    margin-top: -50px;
+  }
+
+  .studio-avatar-image {
+    width: 120px;
+    height: 120px;
+  }
+
+  .studio-name {
+    font-size: 1.875rem;
+  }
+
+  .studio-actions {
+    justify-content: center;
+    margin-top: 0;
+  }
+
+  .studio-actions .btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .studio-actions {
+    flex-direction: column;
+  }
+
+  .studio-cover-image-container {
+    height: 200px;
+  }
 }

@@ -9,15 +9,14 @@ import {
   HiArrowRight,
   HiInformationCircle,
 } from "react-icons/hi";
-import { getAvatarUrl } from "../../utils/helpers";
+import { getAvatarUrl, getStudioCoverUrl } from "../../utils/helpers";
 import "./StudioCard.css";
 
 const StudioCard = ({ studio }) => {
   const [isTeacherHovered, setIsTeacherHovered] = useState(false);
   const [isDescExpanded, setIsDescExpanded] = useState(false);
 
-  const API_BASE_URL = "http://1227.0.0.1:8000";
-  const coverImageUrl = `${API_BASE_URL}${studio.cover_image}`;
+  const studioCoverImage = getStudioCoverUrl(studio);
   const teacherAvatarUrl = getAvatarUrl(studio.owner);
 
   const creationDate = studio.created_at
@@ -40,7 +39,7 @@ const StudioCard = ({ studio }) => {
     <div className="card-wrapper">
       <div className="card-image-container">
         <img
-          src={coverImageUrl}
+          src={studioCoverImage}
           alt={`${studio.name} cover`}
           className="card-cover-image"
         />
@@ -105,7 +104,7 @@ const StudioCard = ({ studio }) => {
             </div>
           )}
         </div>
-        <AuthLink to={`/studio/${studio.id}`} className="card-button">
+        <AuthLink to={`/studios/${studio.id}`} className="card-button">
           <span>View Studio</span>
           <HiArrowRight />
         </AuthLink>

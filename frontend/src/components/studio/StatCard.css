@@ -1,40 +1,143 @@
 /* frontend/src/components/studio/StatCard.css */
 
 .stat-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  padding: 1.75rem;
   display: flex;
   align-items: center;
-  background-color: #fff; /* White background */
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
   gap: 1.5rem;
-  flex-grow: 1;
-  border: 1px solid #e9ecef; /* Light border */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--primary-color, #3b82f6),
+    var(--primary-color-light, #60a5fa)
+  );
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.stat-card:hover::before {
+  transform: scaleX(1);
 }
 
 .stat-card-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color, #3b82f6) 0%,
+    var(--primary-color-light, #60a5fa) 100%
+  );
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background-color: var(--primary-color-light);
-  color: var(--primary-color);
+  color: white;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.stat-card:hover .stat-card-icon {
+  transform: rotate(5deg) scale(1.05);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+}
+
+.stat-card-icon::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 70%
+  );
+  border-radius: 18px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.stat-card:hover .stat-card-icon::before {
+  opacity: 1;
+  animation: shine 1.5s ease-in-out;
 }
 
 .stat-card-info {
   display: flex;
   flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
 }
 
 .stat-card-value {
-  font-size: 1.75rem;
-  font-weight: 600;
-  color: var(--text-color);
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1e293b;
+  line-height: 1;
+  background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .stat-card-label {
-  font-size: 0.9rem;
-  color: var(--secondary-color);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .stat-card {
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+
+  .stat-card-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+  }
+
+  .stat-card-value {
+    font-size: 1.75rem;
+  }
+
+  .stat-card-label {
+    font-size: 0.8rem;
+  }
+}
+
+/* Animation Keyframes */
+@keyframes shine {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
 }

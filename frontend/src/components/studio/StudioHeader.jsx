@@ -5,7 +5,12 @@ import { getStudioCoverUrl, getAvatarUrl } from "../../utils/helpers";
 import { Calendar, Check } from "lucide-react";
 import "./StudioHeader.css";
 
-const StudioHeader = ({ studioData, onSubscribeClick, isSubmitting }) => {
+const StudioHeader = ({
+  studioData,
+  onSubscribeClick,
+  isSubmitting,
+  isOwner,
+}) => {
   const coverUrl = getStudioCoverUrl(studioData);
   // FIX: The owner data is nested inside the 'owner' object.
   const avatarUrl = getAvatarUrl(studioData.owner);
@@ -37,32 +42,41 @@ const StudioHeader = ({ studioData, onSubscribeClick, isSubmitting }) => {
           </div>
         </div>
         <div className="studio-actions">
-          {/* NEW: Schedule Meeting Button */}
-          <button
-            className="btn btn-secondary"
-            onClick={() => alert("Scheduling feature coming soon!")}
-          >
-            <Calendar size={18} />
-            <span>Schedule Meeting</span>
-          </button>
-          <button
-            className={`btn ${
-              studioData.is_subscribed ? "btn-primary-outline" : "btn-primary"
-            }`}
-            onClick={onSubscribeClick}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              "..."
-            ) : studioData.is_subscribed ? (
-              <>
-                <Check size={18} />
-                <span>Subscribed</span>
-              </>
-            ) : (
-              "Subscribe"
-            )}
-          </button>
+          
+          {/* We only show these buttons if the viewer is NOT the owner */}
+          {!isOwner && (
+            <>
+              {/*Schedule Meeting Button */}
+              <button
+                className="btn btn-secondary"
+                onClick={() => alert("Scheduling feature coming soon!")}
+              >
+                <Calendar size={18} />
+                <span>Schedule Meeting</span>
+              </button>
+              {/* Subscribe Button */}
+              <button
+                className={`btn ${
+                  studioData.is_subscribed
+                    ? "btn-primary-outline"
+                    : "btn-primary"
+                }`}
+                onClick={onSubscribeClick}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  "..."
+                ) : studioData.is_subscribed ? (
+                  <>
+                    <Check size={18} />
+                    <span>Subscribed</span>
+                  </>
+                ) : (
+                  "Subscribe"
+                )}
+              </button>
+            </>
+          )}
         </div>
       </div>
     </header>

@@ -16,6 +16,7 @@ from .serializers import (
     StudioCoverSerializer,
     StudioUpdateSerializer,
     SubscriberSerializer,
+    StudioCardSerializer,
     LessonCreateSerializer,
     LessonDetailSerializer,
     LessonUpdateSerializer,
@@ -52,17 +53,19 @@ def explore_view(request):
     if search_type == "studio":
         queryset = Studio.objects.all()
         if query:
-            queryset = queryset.filter(name__icontains=query)
-        if tags:
-            queryset = queryset.filter(tags__name__in=tags).distinct()
-        serializer = StudioSerializer(queryset, many=True)
+            queryset = queryset.filter(
+                Q(name__icontains=query) | Q(tags__name__icontains=query)
+            ).distinct()
+        serializer = StudioCardSerializer(
+            queryset, many=True, context={"request": request}
+        )
 
     elif search_type == "course":
         queryset = Lesson.objects.all()
         if query:
-            queryset = queryset.filter(title__icontains=query)
-        if tags:
-            queryset = queryset.filter(tags__name__in=tags).distinct()
+            queryset = queryset.filter(
+                Q(title__icontains=query) | Q(tags__name__icontains=query)
+            ).distinct()
         serializer = LessonCardSerializer(queryset, many=True)
 
     elif search_type == "teacher":

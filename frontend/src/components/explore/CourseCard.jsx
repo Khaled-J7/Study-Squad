@@ -1,16 +1,19 @@
 // In frontend/src/components/explore/CourseCard.jsx
 
-import { useState } from "react";
+import React, { useState } from "react";
 import AuthLink from "../common/AuthLink";
 import { HiTag, HiArrowRight, HiCalendar, HiViewGrid } from "react-icons/hi";
+import { getCourseCoverUrl, getAvatarUrl } from "../../utils/helpers";
+import CourseViewerModal from "../dashboard/CourseViewerModal";
 import "./CourseCard.css";
 
 const CourseCard = ({ course }) => {
   const [isDescExpanded, setIsDescExpanded] = useState(false);
+  // NEW: State for the course viewer modal
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
 
-  const API_BASE_URL = "http://127.0.0.1:8000";
-  const coverImageUrl = `${API_BASE_URL}${course.cover_image}`;
-  const teacherAvatarUrl = `${API_BASE_URL}${course.studio.owner.profile.profile_picture}`;
+  const courseCoverImage = getCourseCoverUrl(course);
+  const teacherAvatarImage = getAvatarUrl(course.studio.owner);
 
   const creationDate = course.created_at
     ? new Date(course.created_at).toLocaleDateString("en-US", {
@@ -26,84 +29,95 @@ const CourseCard = ({ course }) => {
       : course.description;
 
   return (
-    <div className="card-wrapper-course">
-      <div className="course-card-image-container">
-        <img
-          src={coverImageUrl}
-          alt={`${course.title} cover`}
-          className="course-card-cover-image"
+    <>
+      {/* Course Viewer Modal */}
+      {isViewerOpen && (
+        <CourseViewerModal
+          lessonId={course.id}
+          onClose={() => setIsViewerOpen(false)}
         />
-      </div>
-      <div className="course-card-info">
-        <h3 className="course-card-title">{course.title}</h3>
-        <p className="course-card-description">
-          {isDescExpanded ? course.description : shortDescription}
-          {course.description?.length > 100 && (
-            <button
-              onClick={() => setIsDescExpanded(!isDescExpanded)}
-              className="course-card-read-more"
-            >
-              {isDescExpanded ? "Show Less" : "Read More"}
-            </button>
-          )}
-        </p>
+      )}
 
-        <div className="course-card-meta">
-          <div className="meta-item">
-            <img
-              src={teacherAvatarUrl}
-              alt={course.studio.owner.username}
-              className="meta-avatar"
-            />
-            <div className="meta-text">
-              <span className="meta-label">Instructor</span>
-              <span className="meta-value">{course.studio.owner.username}</span>
-            </div>
-          </div>
-          <div className="meta-item">
-            <HiViewGrid className="meta-icon" />
-            <div className="meta-text">
-              <span className="meta-label">Studio</span>
-              {/* ✅ Step 2.2: Replace Link with AuthLink */}
-              <AuthLink
-                to={`/studio/${course.studio.id}`}
-                className="meta-link"
+      <div className="card-wrapper-course">
+        <div className="course-card-image-container">
+          <img
+            src={courseCoverImage}
+            alt={`${course.title} cover`}
+            className="course-card-cover-image"
+          />
+        </div>
+        <div className="course-card-info">
+          <h3 className="course-card-title">{course.title}</h3>
+          <p className="course-card-description">
+            {isDescExpanded ? course.description : shortDescription}
+            {course.description?.length > 100 && (
+              <button
+                onClick={() => setIsDescExpanded(!isDescExpanded)}
+                className="course-card-read-more"
               >
-                {course.studio.name}
-              </AuthLink>
+                {isDescExpanded ? "Show Less" : "Read More"}
+              </button>
+            )}
+          </p>
+
+          <div className="course-card-meta">
+            <div className="meta-item">
+              <img
+                src={teacherAvatarImage}
+                alt={course.studio.owner.username}
+                className="meta-avatar"
+              />
+              <div className="meta-text">
+                <span className="meta-label">Instructor</span>
+                <span className="meta-value">
+                  {course.studio.owner.first_name}{" "}
+                  {course.studio.owner.last_name}
+                </span>
+              </div>
+            </div>
+            <div className="meta-item">
+              <HiViewGrid className="meta-icon" />
+              <div className="meta-text">
+                <span className="meta-label">Studio</span>
+                {/* FIX: The link should go to /studios/:id now */}
+                <AuthLink
+                  to={`/studios/${course.studio.id}`}
+                  className="meta-link"
+                >
+                  {course.studio.name}
+                </AuthLink>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="card-tags">
-          {course.tags?.map((tag) => (
-            // ✅ Replace Link with AuthLink
-            <AuthLink
-              to={`/explore?tags=${tag.name}`}
-              key={tag.id}
-              className="card-tag"
-            >
-              <HiTag /> {tag.name}
-            </AuthLink>
-          ))}
+          <div className="card-tags">
+            {course.tags?.map((tag) => (
+              <AuthLink
+                to={`/explore?tags=${tag.name}`}
+                key={tag.id}
+                className="card-tag"
+              >
+                <HiTag /> {tag.name}
+              </AuthLink>
+            ))}
+          </div>
+        </div>
+        <div className="card-footer course">
+          <div className="card-stats">
+            {creationDate && (
+              <>
+                <HiCalendar />
+                <span>{creationDate}</span>
+              </>
+            )}
+          </div>
+          <button className="card-button" onClick={() => setIsViewerOpen(true)}>
+            <span>Explore Course</span>
+            <HiArrowRight />
+          </button>
         </div>
       </div>
-      <div className="card-footer course">
-        <div className="card-stats">
-          {creationDate && (
-            <>
-              <HiCalendar />
-              <span>{creationDate}</span>
-            </>
-          )}
-        </div>
-        // ✅ Step 2.2: Replace Link with AuthLink
-        <AuthLink to={`/courses/${course.id}`} className="card-button">
-          <span>Explore Course</span>
-          <HiArrowRight />
-        </AuthLink>
-      </div>
-    </div>
+    </>
   );
 };
 
