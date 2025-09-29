@@ -1,5 +1,6 @@
 # backend/users/views.py
 import json
+from tokenize import Comment
 import traceback
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -7,9 +8,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth.models import User, Group
-from django.db.models import Q  # Import Q objects for complex searches
-from .models import Studio, Lesson, Profile, StudioRating
+from django.db.models import Q  #  Q objects for complex searches
+from .models import Post, Studio, Lesson, Profile, StudioRating, Comment
 from .serializers import (
+    CommentSerializer,
     StudioSerializer,
     StudioCreateSerializer,
     StudioDashboardSerializer,
@@ -26,6 +28,8 @@ from .serializers import (
     TeacherCardSerializer,
     UserRegisterSerializer,
     CurrentUserSerializer,
+    PostCreateSerializer,
+    PostSerializer,
 )
 
 
@@ -681,3 +685,180 @@ def rate_studio(request, id):
         return Response(
             {"detail": "Your rating has been updated."}, status=status.HTTP_200_OK
         )
+
+
+# --- SquadHub API Views ---
+
+
+@api_view(["GET", "POST"])
+@parser_classes([MultiPartParser, FormParser])  # To handle file uploads
+def post_list_create_view(request):
+    """
+    A single view to handle both listing all posts and creating a new one.
+    - GET: Returns a list of all posts. (Publicly accessible)
+    - POST: Creates a new post. (Requires authentication)
+    """
+    if request.method == "GET":
+        posts = Post.objects.all().order_by("-timestamp")  # Show newest first
+        # Use the detailed PostSerializer to include comments and likes
+        serializer = PostSerializer(posts, many=True, context={"request": request})
+        return Response(serializer.data)
+
+    elif request.method == "POST":
+        # Manually check for authentication for the POST method
+        if not request.user.is_authenticated:
+            return Response(
+                {"error": "Authentication required to create a post."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        # Use the PostCreateSerializer for incoming data
+        serializer = PostCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            # Pass the authenticated user as the author when saving
+            serializer.save(author=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def post_detail_view(request, pk):
+    """
+    Fetches a single post by its ID, including all its comments.
+    """
+    try:
+        post = Post.objects.get(pk=pk)
+    except Post.DoesNotExist:
+        return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = PostSerializer(post, context={"request": request})
+    return Response(serializer.data)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def comment_create_view(request, post_pk):
+    """
+    Creates a new comment on a specific post.
+    """
+    try:
+        post = Post.objects.get(pk=post_pk)
+    except Post.DoesNotExist:
+        return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # We only need the 'content' from the request for a new comment.
+    content = request.data.get("content")
+    if not content:
+        return Response(
+            {"error": "Comment content cannot be empty."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    comment = Comment.objects.create(post=post, author=request.user, content=content)
+
+    serializer = CommentSerializer(comment, context={"request": request})
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def post_like_toggle_view(request, pk):
+    """
+    Toggles a 'like' on a post for the current user.
+    """
+    try:
+        post = Post.objects.get(pk=pk)
+    except Post.DoesNotExist:
+        return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    user = request.user
+    if user in post.likes.all():
+        # If the user has already liked the post, remove the like.
+        post.likes.remove(user)
+        liked = False
+    else:
+        # If the user has not liked the post, add the like.
+        post.likes.add(user)
+        liked = True
+
+    return Response({"liked": liked, "likes_count": post.likes.count()})
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def my_posts_view(request):
+    """
+    Fetches all posts created by the currently logged-in user.
+    """
+    posts = Post.objects.filter(author=request.user).order_by("-timestamp")
+    serializer = PostSerializer(posts, many=True, context={"request": request})
+    return Response(serializer.data)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def comment_like_toggle_view(request, pk):
+    """
+    Toggles a 'like' on a comment for the current user.
+    """
+    try:
+        comment = Comment.objects.get(pk=pk)  # type: ignore
+    except Comment.DoesNotExist:  # type: ignore
+        return Response(
+            {"error": "Comment not found"}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    user = request.user
+    if user in comment.likes.all():
+        comment.likes.remove(user)
+        liked = False
+    else:
+        comment.likes.add(user)
+        liked = True
+
+    return Response({"liked": liked, "likes_count": comment.likes.count()})
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def post_delete_view(request, pk):
+    """
+    Deletes a post. A user can only delete their own post.
+    """
+    try:
+        post = Post.objects.get(pk=pk)
+    except Post.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    # SECURITY CHECK: Ensure the user requesting the delete is the post's author.
+    if request.user != post.author:
+        return Response(
+            {"error": "You do not have permission to delete this post."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    post.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def comment_delete_view(request, pk):
+    """
+    Deletes a comment. A user can only delete their own comment.
+    """
+    try:
+        comment = Comment.objects.get(pk=pk)
+    except Comment.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    # SECURITY CHECK: Ensure the user requesting the delete is the comment's author.
+    if request.user != comment.author:
+        return Response(
+            {"error": "You do not have permission to delete this comment."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    comment.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)

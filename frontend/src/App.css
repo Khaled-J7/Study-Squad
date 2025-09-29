@@ -17,3 +17,7 @@
 .main-content-area {
   padding-top: 100px;
 }
+
+.main-content-area.squadhub-page-content {
+  padding-top: 0;
+}

@@ -57,7 +57,7 @@ class Tag(models.Model):
 class Studio(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
-    
+
     cover_image = models.ImageField(upload_to="studio_covers/", null=True, blank=True)
     description = models.TextField()
     tags = models.ManyToManyField(Tag, blank=True)
@@ -151,14 +151,22 @@ class Lesson(models.Model):
 # Model 5 & 6: Post and Comment for the Squad Hub
 class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255, default="Untitled Post")
+    # This will store the main body of the post, written in Markdown.
     content = models.TextField()
+    # Reusing the existing Tag model to categorize posts.
+    tags = models.ManyToManyField(Tag, blank=True)
+    # Allows users to attach a single, relevant file to their post.
+    file_attachment = models.FileField(
+        upload_to="post_attachments/",
+        blank=True,
+        null=True,
+    )
     timestamp = models.DateTimeField(auto_now_add=True)
     likes = models.ManyToManyField(User, related_name="liked_posts", blank=True)
 
     def __str__(self):
-        return (
-            f'Post by {self.author.username} at {self.timestamp.strftime("%Y-%m-%d")}'
-        )
+        return f'"{self.title}" by {self.author.username}'
 
 
 class Comment(models.Model):

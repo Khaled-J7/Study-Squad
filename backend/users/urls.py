@@ -1,8 +1,14 @@
 # backend/users/urls.py
 from django.urls import path
 from .views import (
+    comment_create_view,
+    comment_like_toggle_view,
     explore_view,
     logout_view,
+    my_posts_view,
+    post_detail_view,
+    post_like_toggle_view,
+    post_list_create_view,
     register_view,
     current_user_view,
     profile_update_view,
@@ -23,6 +29,8 @@ from .views import (
     subscribe_studio,
     unsubscribe_studio,
     rate_studio,
+    post_delete_view,
+    comment_delete_view,
 )
 
 urlpatterns = [
@@ -79,4 +87,21 @@ urlpatterns = [
     ),
     # Rating URL
     path("studios/<int:id>/rate/", rate_studio, name="rate-studio"),
+    # 🔽🔽 NEW: SquadHub URLs 🔽🔽
+    # A single endpoint for listing all posts (GET) and creating a new post (POST)
+    path("posts/", post_list_create_view, name="post-list-create"),
+    # An endpoint to get only the posts for the logged-in user
+    path("posts/mine/", my_posts_view, name="my-posts"),
+    # An endpoint for a single post's details (GET)
+    path("posts/<int:pk>/", post_detail_view, name="post-detail"),
+    # An endpoint to toggle a like on a post (POST)
+    path("posts/<int:pk>/like/", post_like_toggle_view, name="post-like-toggle"),
+    # An endpoint to create a comment on a specific post (POST)
+    path("posts/<int:post_pk>/comments/", comment_create_view, name="comment-create"),
+    # An endpoint to toggle a like on a comment (POST)
+    path(
+        "comments/<int:pk>/like/", comment_like_toggle_view, name="comment-like-toggle"
+    ),
+    path("posts/<int:pk>/delete/", post_delete_view, name="post-delete"),
+    path("comments/<int:pk>/delete/", comment_delete_view, name="comment-delete"),
 ]

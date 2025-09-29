@@ -32,12 +32,39 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ["id", "name"]
 
 
+class UserStudioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Studio
+        fields = ["id", "name"]
+
+
 class UserSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(read_only=True)
+    is_teacher = serializers.SerializerMethodField()
+    studio = UserStudioSerializer(source="studio_set", many=True, read_only=True)
 
     class Meta:
         model = User
-        fields = ["id", "username", "first_name", "last_name", "profile"]
+        fields = [
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "profile",
+            "is_teacher",
+            "studio",
+        ]
+
+    # Check if the user belongs to the "Teachers" group.
+    def get_is_teacher(self, obj):
+        return obj.groups.filter(name="Teachers").exists()
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        # Take the first studio from the list, or null if there are none.
+        studios = representation.get("studio")
+        representation["studio"] = studios[0] if studios else None
+        return representation
 
 
 # A new, lightweight serializer specifically for the studio cards on the explore page.
@@ -116,12 +143,6 @@ class StudioCoverSerializer(serializers.ModelSerializer):
     class Meta:
         model = Studio
         fields = ["cover_image"]
-
-
-class UserStudioSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Studio
-        fields = ["id", "name"]
 
 
 class CourseStudioSerializer(serializers.ModelSerializer):
@@ -430,4 +451,105 @@ class LessonUpdateSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
-# The Post and Comment serializers can be added back when that feature is built.
+# --- 🚩 SquadHub Serializers 🚩 ---
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Comment model. Includes the author's details.
+    """
+
+    author = UserSerializer(read_only=True)
+    likes_count = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Comment
+        fields = [
+            "id",
+            "post",
+            "author",
+            "content",
+            "timestamp",
+            "likes_count",
+            "is_liked",
+        ]
+
+    def get_likes_count(self, obj):
+        return obj.likes.count()
+
+    def get_is_liked(self, obj):
+        user = self.context.get("request").user  # type: ignore
+        if user and user.is_authenticated:
+            return obj.likes.filter(pk=user.pk).exists()
+        return False
+
+
+class PostSerializer(serializers.ModelSerializer):
+    """
+    A detailed serializer for reading a single post.
+    It includes the author's details, tags, and all associated comments.
+    """
+
+    author = UserSerializer(read_only=True)
+    tags = TagSerializer(many=True, read_only=True)
+    # We nest the CommentSerializer to include all comments directly in the post data.
+    comments = CommentSerializer(many=True, read_only=True)
+    likes_count = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Post
+        fields = [
+            "id",
+            "author",
+            "title",
+            "tags",
+            "file_attachment",
+            "content",
+            "timestamp",
+            "likes_count",
+            "comments",
+            "is_liked",
+        ]
+
+    def get_likes_count(self, obj):
+        return obj.likes.count()
+
+    def get_is_liked(self, obj):
+        user = self.context.get("request").user  # type: ignore
+        if user and user.is_authenticated:
+            return obj.likes.filter(pk=user.pk).exists()
+        return False
+
+
+class PostCreateSerializer(serializers.ModelSerializer):
+    """
+    A simpler serializer specifically for CREATING a new post.
+    It handles the incoming tag names and file attachment.
+    """
+
+    # This field will accept a list of strings (tag names) from the frontend.
+    tag_names = serializers.ListField(
+        child=serializers.CharField(max_length=50), write_only=True, required=False
+    )
+
+    class Meta:
+        model = Post
+        fields = ["title", "content", "file_attachment", "tag_names"]
+
+    def create(self, validated_data):
+        # We pop the 'tag_names' key off validated_data dictionary because the Post model doesn't have this field directly, otherwise return an empty list ([]) instead of raising a KeyError
+        tag_names = validated_data.pop("tag_names", [])
+
+        # Create the Post instance with the remaining data.
+        post = Post.objects.create(**validated_data)
+
+        # Loop through the tag names, find or create the Tag objects, and add them to the post.
+        for tag_name in tag_names:
+            # _ is used to discard the created boolean as it is not needed for this specific logic.
+            tag, _ = Tag.objects.get_or_create(name=tag_name.strip().lower())
+            # Associates the retrieved or created tag object with the post object
+            post.tags.add(tag)
+
+        return post

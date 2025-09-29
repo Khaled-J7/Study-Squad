@@ -1,0 +1,195 @@
+/* SquadHubPage.css - Professional Design */
+
+.squadhub-page {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #35374b;
+  color: #f0f0f0;
+  font-family: var(
+    --font-studio,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif
+  );
+  position: relative;
+  top: 0;
+}
+
+.squadhub-nav-header {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem 3rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.squadhub-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #a0a0b8;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.squadhub-back-link:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.05);
+  transform: translateX(-4px);
+}
+
+.squadhub-my-posts-link {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 1rem 1.5rem;
+  margin-left: 350px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #4b4d63 0%, #5a5c7a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.95rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.squadhub-my-posts-link:hover {
+  background: linear-gradient(135deg, #5a5c7a 0%, #6a6c8a 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.squadhub-header {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 3rem 3rem 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+  position: relative;
+}
+
+.squadhub-header::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 3rem;
+  right: 3rem;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1) 20%,
+    rgba(255, 255, 255, 0.1) 80%,
+    transparent
+  );
+}
+
+.squadhub-header-content {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.squadhub-logo {
+  height: 120px;
+  width: auto;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+}
+
+.squadhub-header-text h1 {
+  font-size: 2.75rem;
+  margin: 0;
+  color: #fff;
+  font-family: var(--font-display, "Georgia", serif);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.squadhub-header-text p {
+  font-size: 1.1rem;
+  margin: 0.5rem 0 0 0;
+  color: #b0b0c8;
+  font-weight: 400;
+}
+
+.squadhub-main-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 3rem 4rem;
+}
+
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 2rem;
+}
+
+.no-posts-message {
+  text-align: center;
+  font-size: 1.15rem;
+  color: #a0a0b8;
+  padding: 6rem 2rem;
+  background: linear-gradient(
+    135deg,
+    rgba(75, 77, 99, 0.3) 0%,
+    rgba(90, 92, 122, 0.2) 100%
+  );
+  border-radius: 16px;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.create-post-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1rem;
+  padding: 0.85rem 1.75rem;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(0, 123, 255, 0.25);
+}
+
+.create-post-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 24px rgba(0, 123, 255, 0.35);
+}
+
+@media (max-width: 768px) {
+  .squadhub-nav-header,
+  .squadhub-header,
+  .squadhub-main-content {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  .squadhub-header::after {
+    left: 1.5rem;
+    right: 1.5rem;
+  }
+
+  .squadhub-header-text h1 {
+    font-size: 2rem;
+  }
+
+  .squadhub-logo {
+    height: 70px;
+  }
+
+  .posts-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}

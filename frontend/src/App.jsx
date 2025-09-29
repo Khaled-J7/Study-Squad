@@ -22,20 +22,35 @@ import StudioOnboardingPage from "./pages/StudioOnboardingPage";
 import CreateStudioPage from "./pages/CreateStudioPage";
 import TeacherRouteGuard from "./components/common/TeacherRouteGuard";
 import PublicStudioPage from "./pages/PublicStudioPage";
+import CreatePostPage from "./pages/CreatePostPage";
+import PostDetailPage from "./pages/PostDetailPage";
+import MyPostsPage from "./pages/MyPostsPage";
 import "./App.css";
 
 const App = () => {
-  const location = useLocation(); // Get the current location
-  const isDashboardRoute = location.pathname.startsWith("/my-studio"); // 3. Check if it's a dashboard route
+  // Get the current location
+  const location = useLocation();
+  // Check if it's a dashboard route
+  const isDashboardRoute = location.pathname.startsWith("/my-studio");
+  const isSquadHubRoute = location.pathname.startsWith("/squadhub");
+
   return (
     <>
-      <Navbar />
+     <Navbar />
       <div className="app-content-wrapper">
         <main className="main-content-area">
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/explore" element={<ExplorePage />} />
+            {/* SQUADHUB ROUTES */}
             <Route path="/squadhub" element={<SquadHubPage />} />
+            <Route path="/squadhub/create-post" element={<CreatePostPage />} />
+            <Route
+              path="/squadhub/posts/:postId"
+              element={<PostDetailPage />}
+            />
+            <Route path="/squadhub/my-posts" element={<MyPostsPage />} />
+            {/* END SQUADHUB ROUTES */}
             <Route path="/about" element={<AboutPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
