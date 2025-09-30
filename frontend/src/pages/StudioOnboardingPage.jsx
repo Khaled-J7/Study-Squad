@@ -39,13 +39,6 @@ const StudioOnboardingPage = () => {
                 alt="Teacher presenting online"
                 className="welcome-image"
               />
-              <div className="image-overlay">
-                <div className="stat-card">
-                  <HiUsers className="stat-icon" />
-                  <span className="stat-number">10K+</span>
-                  <span className="stat-label">Students</span>
-                </div>
-              </div>
             </div>
           </div>
         </div>
