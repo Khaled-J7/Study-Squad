@@ -3,6 +3,8 @@ import json
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import (
+    Invitation,
+    Meeting,
     Profile,
     Tag,
     Studio,
@@ -553,3 +555,42 @@ class PostCreateSerializer(serializers.ModelSerializer):
             post.tags.add(tag)
 
         return post
+
+
+# --- Jitsi Meet Serializers ---
+
+
+class MeetingSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Meeting model. Includes the host's details.
+    """
+
+    host = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Meeting
+        fields = ["id", "title", "description", "room_name", "host", "created_at"]
+
+
+class InvitationSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Invitation model. Includes details about the meeting.
+    """
+
+    meeting = MeetingSerializer(read_only=True)
+
+    class Meta:
+        model = Invitation
+        fields = ["id", "meeting", "invitee", "status", "is_read", "created_at"]
+
+
+class UserSearchSerializer(serializers.ModelSerializer):
+    """
+    A lightweight serializer for returning user search results.
+    """
+
+    profile = ProfileSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ["id", "username", "first_name", "last_name", "profile"]

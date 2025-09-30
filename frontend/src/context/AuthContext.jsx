@@ -9,7 +9,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import authService from "../api/authService";
 import axiosInstance from "../api/axiosInstance";
-import Spinner from "../components/common/Spinner"; 
+import Spinner from "../components/common/Spinner";
 
 // This is the "box" that will hold all our global auth data.
 export const AuthContext = createContext();
@@ -30,6 +30,9 @@ export const AuthProvider = ({ children }) => {
 
   // State for the full user object.
   const [user, setUser] = useState(null);
+
+  // NEW STATE FOR INVITATIONS
+  const [invitations, setInvitations] = useState([]);
 
   // 'loading' is for the initial check when the app first loads.
   const [loading, setLoading] = useState(true);
@@ -171,6 +174,12 @@ export const AuthProvider = ({ children }) => {
     };
   }, [logout]);
 
+  // NEW FUNCTION TO UPDATE INVITATIONS
+  // This will be called by our polling hook later to keep the context up-to-date.
+  const updateInvitations = useCallback((newInvitations) => {
+    setInvitations(newInvitations);
+  }, []);
+
   // This is the data and functions that we provide to the whole app.
   const contextData = {
     user,
@@ -182,6 +191,8 @@ export const AuthProvider = ({ children }) => {
     logout,
     isTeacher,
     refreshUser,
+    invitations,
+    updateInvitations,
   };
 
   return (

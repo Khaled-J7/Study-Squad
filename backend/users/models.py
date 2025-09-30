@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 
 # We import the validator to check file extensions
 from django.core.validators import FileExtensionValidator
+import uuid
 
 
 # Model 1: The Unified Profile for all users
@@ -53,7 +54,7 @@ class Tag(models.Model):
 
 
 # Model 3: The Studio model for teachers
-# --- ✅ REFACTORED STUDIO MODEL ---
+#
 class Studio(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
@@ -62,7 +63,7 @@ class Studio(models.Model):
     description = models.TextField()
     tags = models.ManyToManyField(Tag, blank=True)
 
-    # ✅ NEW: Subscribers Field
+    # Subscribers Field
     # We will use a ManyToManyField to link Users as subscribers.
     subscribers = models.ManyToManyField(
         User, related_name="subscribed_studios", blank=True
@@ -74,7 +75,7 @@ class Studio(models.Model):
         return self.name
 
 
-# --- ✅ NEW: StudioRating MODEL ---
+# --- StudioRating MODEL ---
 # This new model will handle the ratings for each studio.
 class StudioRating(models.Model):
     studio = models.ForeignKey(Studio, related_name="ratings", on_delete=models.CASCADE)
@@ -178,3 +179,54 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.author.username} on {self.post}"
+
+
+# --- Jitsi Meet Feature Models ---
+
+
+class Meeting(models.Model):
+    """
+    Represents a single video meeting session.
+    """
+
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    # The unique, random name for the Jitsi room. We use a UUID to make it impossible to guess.
+    room_name = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    host = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="hosted_meetings"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'"{self.title}" hosted by {self.host.username}'
+
+
+class Invitation(models.Model):
+    """
+    Represents an invitation sent to a user for a specific meeting.
+    """
+
+    STATUS_CHOICES = (
+        ("pending", "Pending"),
+        ("accepted", "Accepted"),
+        ("declined", "Declined"),
+    )
+
+    meeting = models.ForeignKey(
+        Meeting, on_delete=models.CASCADE, related_name="invitations"
+    )
+    invitee = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="meeting_invitations"
+    )
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
+    # This flag will help us show a notification count.
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # A user can only be invited to the same meeting once.
+        unique_together = ("meeting", "invitee")
+
+    def __str__(self):
+        return f'Invitation for {self.invitee.username} to "{self.meeting.title}"'

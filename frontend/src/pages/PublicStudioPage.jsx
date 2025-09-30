@@ -102,6 +102,14 @@ const PublicStudioPage = () => {
     setIsSubmitting(false);
   };
 
+  // This handler will navigate to the create page with the studio owner's data.
+  const handleScheduleMeeting = () => {
+    // We only proceed if we have the studio owner's data
+    if (studioData?.owner) {
+      navigate('/create-meeting', { state: { initialInvitee: studioData.owner } });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="page-container">
@@ -143,6 +151,7 @@ const PublicStudioPage = () => {
           onSubscribeClick={handleSubscribeClick}
           isSubmitting={isSubmitting}
           isOwner={isOwner}
+          onScheduleMeeting={handleScheduleMeeting}
         />
 
         <div className="studio-content-body">

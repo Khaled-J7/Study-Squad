@@ -414,6 +414,31 @@
     line-height: 1;
   }
 
+  .notification-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #d9534f;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    border: 2px solid var(--color-accent-green);
+  }
+  .notification-badge-menu {
+    margin-left: 100px;
+    background-color: var(--color-primary);
+    color: white;
+    border-radius: 10px;
+    padding: 2px 6px;
+    font-size: 12px;
+  }
+
   /* Mobile Hamburger Menu
    ========================================================================== */
   .hamburger-menu {

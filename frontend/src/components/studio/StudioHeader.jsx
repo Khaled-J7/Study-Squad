@@ -10,6 +10,7 @@ const StudioHeader = ({
   onSubscribeClick,
   isSubmitting,
   isOwner,
+  onScheduleMeeting,
 }) => {
   const coverUrl = getStudioCoverUrl(studioData);
   // FIX: The owner data is nested inside the 'owner' object.
@@ -42,15 +43,11 @@ const StudioHeader = ({
           </div>
         </div>
         <div className="studio-actions">
-          
           {/* We only show these buttons if the viewer is NOT the owner */}
           {!isOwner && (
             <>
               {/*Schedule Meeting Button */}
-              <button
-                className="btn btn-secondary"
-                onClick={() => alert("Scheduling feature coming soon!")}
-              >
+              <button className="btn btn-secondary" onClick={onScheduleMeeting}>
                 <Calendar size={18} />
                 <span>Schedule Meeting</span>
               </button>

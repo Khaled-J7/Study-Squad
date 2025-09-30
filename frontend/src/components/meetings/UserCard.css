@@ -1,0 +1,147 @@
+/* frontend/src/components/meetings/UserCard.css */
+.user-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.9rem;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  background: white;
+  margin-bottom: 0.5rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.user-card:hover {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border-color: var(--color-primary);
+  transform: translateX(5px);
+  box-shadow: var(--shadow-md);
+}
+
+.user-card-info {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.user-card-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--color-surface);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.user-card:hover .user-card-avatar {
+  border-color: var(--color-primary);
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+}
+
+.user-card-info > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-card-name {
+  margin: 0 0 0.2rem 0;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-family: var(--font-studio);
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-card-username {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+  font-family: var(--font-studio);
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-add {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-hover)
+  );
+  color: var(--color-text-inverted);
+  border: none;
+  padding: 0.6rem 1.1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  font-family: var(--font-studio);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.2);
+  white-space: nowrap;
+}
+
+.btn-add:hover {
+  background: linear-gradient(135deg, var(--color-primary-hover), #fbbf24);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
+}
+
+.btn-add:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.25);
+}
+
+/* Success animation when user is added */
+@keyframes addSuccess {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+    background: var(--color-accent-green);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.btn-add:active {
+  animation: addSuccess 0.4s ease;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .user-card {
+    padding: 0.75rem;
+  }
+
+  .user-card-avatar {
+    width: 42px;
+    height: 42px;
+  }
+
+  .user-card-name {
+    font-size: 0.95rem;
+  }
+
+  .user-card-username {
+    font-size: 0.8rem;
+  }
+
+  .btn-add {
+    padding: 0.55rem 0.9rem;
+    font-size: 0.85rem;
+  }
+}

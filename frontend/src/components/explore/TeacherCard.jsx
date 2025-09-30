@@ -1,7 +1,9 @@
 // In frontend/src/components/explore/TeacherCard.jsx
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AuthLink from "../common/AuthLink";
+import { useAuth } from "../../context/AuthContext";
 import {
   HiArrowRight,
   HiBriefcase,
@@ -20,11 +22,21 @@ import "./TeacherCard.css";
 
 const TeacherCard = ({ teacher }) => {
   const [isNameHovered, setIsNameHovered] = useState(false);
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   const teacherAvatarUrl = getAvatarUrl(teacher);
   const cvFileUrl = getCvFileUrl(teacher);
   const degrees = getDegrees(teacher);
   const contactEmail = getContactEmail(teacher);
+
+  // Check if the teacher on this card is the currently logged-in user.
+  const isSelf = user && user.id === teacher.id;
+
+  // NEW: This handler will navigate to the create page and pass the teacher's data.
+  const handleMeetNow = () => {
+    navigate("/create-meeting", { state: { initialInvitee: teacher } });
+  };
 
   return (
     <div className="card-wrapper-teacher">
@@ -85,8 +97,8 @@ const TeacherCard = ({ teacher }) => {
             </div>
           )}
         </div>
-
-        {contactEmail && (
+        {/* Contact Instructor Section */}
+        {!isSelf && contactEmail && (
           <div className="teacher-card-socials">
             <p className="teacher-socials-heading">Contact Instructor</p>
             <div className="teacher-social-icons">
@@ -98,10 +110,11 @@ const TeacherCard = ({ teacher }) => {
         )}
       </div>
       <div className="card-footer teacher">
-        {/* ✅ Using AuthLink for protected actions */}
-        <AuthLink to="/meet" className="card-button-secondary">
-          <HiOutlineVideoCamera /> Meet Now
-        </AuthLink>
+        {!isSelf && (
+          <button onClick={handleMeetNow} className="card-button-secondary">
+            <HiOutlineVideoCamera /> Meet Now
+          </button>
+        )}
         <AuthLink
           to={`/studios/${teacher.studio_id}`}
           className="card-button-primary"

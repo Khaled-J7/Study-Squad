@@ -31,6 +31,10 @@ from .views import (
     rate_studio,
     post_delete_view,
     comment_delete_view,
+    meeting_create_view,
+    get_my_invitations_view,
+    update_invitation_status_view,
+    user_search_view,
 )
 
 urlpatterns = [
@@ -104,4 +108,17 @@ urlpatterns = [
     ),
     path("posts/<int:pk>/delete/", post_delete_view, name="post-delete"),
     path("comments/<int:pk>/delete/", comment_delete_view, name="comment-delete"),
+    # --- Jitsi Meet URLs ---
+    # A single endpoint for creating a new meeting (POST)
+    path("meetings/create/", meeting_create_view, name="meeting-create"),
+    # An endpoint to get all pending invitations for the logged-in user (GET)
+    path("invitations/", get_my_invitations_view, name="my-invitations"),
+    # An endpoint to update an invitation's status (accept/decline) (POST)
+    path(
+        "invitations/<int:pk>/update/",
+        update_invitation_status_view,
+        name="invitation-update",
+    ),
+    # NEW URL for searching users
+    path("users/search/", user_search_view, name="user-search"),
 ]

@@ -1,0 +1,112 @@
+/* frontend/src/components/meetings/UserSearch.css */
+.user-search-container {
+  margin-top: 0.5rem;
+}
+
+.user-search-container .search-input-wrapper {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.user-search-container .search-input-wrapper:focus-within .search-icon {
+  color: var(--color-primary);
+}
+
+.user-search-container .search-input {
+  width: 100%;
+  padding: 0.9rem 1.1rem 0.9rem 3.2rem;
+  background-color: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: 12px;
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  font-family: var(--font-studio);
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.user-search-container .search-input:focus {
+  outline: none;
+  padding-right: 25px;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.1), var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.user-search-container .search-input::placeholder {
+  color: #9ca3af;
+  font-style: italic;
+  /* padding-left: 30px; */
+}
+
+.search-results {
+  margin-top: 1rem;
+  max-height: 280px;
+  overflow-y: auto;
+  background: linear-gradient(135deg, #fafafa, #f5f5f5);
+  border-radius: 12px;
+  border: 2px solid var(--color-border);
+  padding: 0.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.search-results:empty {
+  display: none;
+}
+
+.search-results > p {
+  text-align: center;
+  color: #9ca3af;
+  padding: 2rem 1rem;
+  font-family: var(--font-studio);
+  font-style: italic;
+  margin: 0;
+}
+
+/* Custom scrollbar */
+.search-results::-webkit-scrollbar {
+  width: 8px;
+}
+
+.search-results::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.search-results::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    var(--color-primary),
+    var(--color-accent-green)
+  );
+  border-radius: 10px;
+}
+
+.search-results::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    var(--color-primary-hover),
+    var(--color-accent-green)
+  );
+}
+
+/* Loading state animation */
+.search-results > p {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Empty state styling */
+.search-results:has(p) {
+  background: linear-gradient(135deg, #ffffff, #fafafa);
+  border-style: dashed;
+}

@@ -1,0 +1,66 @@
+/* frontend/src/components/common/InvitationToast.css */
+.invitation-toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #2b2d3e;
+  color: #f0f0f0;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  z-index: 2000;
+  border: 1px solid #4b4d63;
+  animation: slideInUp 0.5s ease-out;
+}
+
+.toast-icon {
+  color: var(--primary-color);
+}
+
+.toast-content {
+  flex-grow: 1;
+}
+
+.toast-title {
+  font-weight: bold;
+  margin: 0 0 0.25rem 0;
+}
+
+.toast-body {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #a0a0b8;
+}
+
+.toast-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.toast-actions button {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.btn-decline {
+  background-color: #5a5c7a;
+  color: #f0f0f0;
+}
+.btn-decline:hover {
+  background-color: #7a7c9d;
+}
+
+.btn-accept {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+.btn-accept:hover {
+  opacity: 0.9;
+}

@@ -9,9 +9,20 @@ from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth.models import User, Group
 from django.db.models import Q  #  Q objects for complex searches
-from .models import Post, Studio, Lesson, Profile, StudioRating, Comment
+from .models import (
+    Invitation,
+    Meeting,
+    Post,
+    Studio,
+    Lesson,
+    Profile,
+    StudioRating,
+    Comment,
+)
 from .serializers import (
     CommentSerializer,
+    InvitationSerializer,
+    MeetingSerializer,
     StudioSerializer,
     StudioCreateSerializer,
     StudioDashboardSerializer,
@@ -30,6 +41,7 @@ from .serializers import (
     CurrentUserSerializer,
     PostCreateSerializer,
     PostSerializer,
+    UserSearchSerializer,
 )
 
 
@@ -862,3 +874,104 @@ def comment_delete_view(request, pk):
 
     comment.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# --- Jitsi Meet Views ---
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def meeting_create_view(request):
+    """
+    Creates a new meeting and sends invitations.
+    Now allows ANY authenticated user to create a meeting.
+    """
+    title = request.data.get("title")
+    description = request.data.get("description", "")
+    invitee_usernames = request.data.get("invitees", [])
+
+    if not title or not invitee_usernames:
+        return Response(
+            {"error": "Title and at least one invitee are required."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Create the meeting instance
+    meeting = Meeting.objects.create(
+        host=request.user, title=title, description=description
+    )
+
+    # Find the users to invite and create the invitation objects
+    invited_users = User.objects.filter(username__in=invitee_usernames)
+    for user in invited_users:
+        # We prevent users from inviting themselves.
+        if user != request.user:
+            Invitation.objects.create(meeting=meeting, invitee=user)
+
+    serializer = MeetingSerializer(meeting)
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_my_invitations_view(request):
+    """
+    Fetches all unread, pending invitations for the logged-in user.
+    This is the endpoint our frontend will poll.
+    """
+    invitations = Invitation.objects.filter(
+        invitee=request.user, status="pending", is_read=False
+    ).order_by("-created_at")
+
+    serializer = InvitationSerializer(invitations, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def update_invitation_status_view(request, pk):
+    """
+    Allows a user to accept or decline an invitation.
+    Expects a 'status' in the request body ('accepted' or 'declined').
+    """
+    try:
+        invitation = Invitation.objects.get(pk=pk, invitee=request.user)
+    except Invitation.DoesNotExist:
+        return Response(
+            {"error": "Invitation not found."}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    new_status = request.data.get("status")
+    if new_status not in ["accepted", "declined"]:
+        return Response(
+            {"error": "Invalid status. Must be 'accepted' or 'declined'."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    invitation.status = new_status
+    invitation.is_read = True  # Mark the invitation as read
+    invitation.save()
+
+    serializer = InvitationSerializer(invitation)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def user_search_view(request):
+    """
+    Searches for users by username.
+    Accepts a query parameter 'q'. Ex: /api/users/search/?q=jane
+    """
+    query = request.query_params.get("q", "")
+
+    if not query:
+        return Response([], status=status.HTTP_200_OK)
+
+    # Find users whose username contains the query, and exclude the user making the request.
+    users = User.objects.filter(username__icontains=query).exclude(pk=request.user.pk)[
+        :10
+    ]  # Limit to 10 results for performance
+
+    serializer = UserSearchSerializer(users, many=True)
+    return Response(serializer.data)

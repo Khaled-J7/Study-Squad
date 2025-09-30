@@ -1,6 +1,6 @@
 // frontend/src/components/Navbar.jsx
 import { useState, useEffect, useRef } from "react";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import {
   HiHome,
   HiSearch,
@@ -15,8 +15,7 @@ import {
   HiChevronRight,
   HiLogout,
   HiTrash,
-  HiOutlineDotsVertical,
-  HiChatAlt2,
+  HiBell,
 } from "react-icons/hi";
 import { useScroll } from "../hooks/useScroll";
 import { useClickOutside } from "../hooks/useClickOutside";
@@ -31,25 +30,12 @@ import { getAvatarUrl } from "../utils/helpers";
  */
 const Navbar = () => {
   // --- STATE & GLOBAL CONTEXT ---
-  const { user, logout } = useAuth();
+  const { user, logout, invitations } = useAuth();
   const scrolled = useScroll();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
-
-  // --- ⚠️ OUR DIAGNOSTIC TOOL ---
-  // This will run every single time the 'user' object from the context changes.
-  // useEffect(() => {
-  //   console.log("--- NAVBAR DIAGNOSTIC ---");
-  //   if (user) {
-  //     console.log("User object in Navbar has changed:", user);
-  //     console.log("Does the user have a studio? ->", user.studio);
-  //   } else {
-  //     console.log("User object in Navbar is now null.");
-  //   }
-  //   console.log("-------------------------");
-  // }, [user]); // The dependency array ensures this runs only when 'user' changes.
-  // --- END OF DIAGNOSTIC TOOL ⚠️  ---
+  const navigate = useNavigate();
 
   // 2. We derive ALL state directly from the user object right here.
   // This is the most direct and reliable way.
@@ -63,7 +49,6 @@ const Navbar = () => {
     setIsLanguageMenuOpen(false);
   });
 
-  // NOTE: All the old avatar logic is now replaced by this one clean function call.
   const navAvatarUrl = getAvatarUrl(user);
 
   const closeAllMenus = () => {
@@ -86,235 +71,266 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={`navbar ${scrolled ? "navbar-scrolled" : ""}`}>
-      <div className="navbar-container">
-        {/* === BRAND LOGO === */}
-        <NavLink className="navbar-brand" to="/" onClick={closeAllMenus}>
-          <img src="/StudySquadMainLogo.png" alt="Study Squad Logo" />
-          <span className="brand-text">Study Squad</span>
-        </NavLink>
+    <>
+      <nav className={`navbar ${scrolled ? "navbar-scrolled" : ""}`}>
+        <div className="navbar-container">
+          {/* === BRAND LOGO === */}
+          <NavLink className="navbar-brand" to="/" onClick={closeAllMenus}>
+            <img src="/StudySquadMainLogo.png" alt="Study Squad Logo" />
+            <span className="brand-text">Study Squad</span>
+          </NavLink>
 
-        {/* === MAIN NAVIGATION LINKS (Desktop & Mobile) === */}
-        <div className={`nav-links ${isMenuOpen ? "active" : ""}`}>
-          <NavLink className="nav-link" to="/" onClick={closeAllMenus}>
-            <HiHome className="nav-icon" /> Home
-          </NavLink>
-          <NavLink className="nav-link" to="/explore" onClick={closeAllMenus}>
-            <HiSearch className="nav-icon" /> Explore
-          </NavLink>
-          <NavLink className="nav-link" to="/squadhub" onClick={closeAllMenus}>
-            <img src={SquadHubLogo} alt="SquadHUB" className="nav-icon-img" />{" "}
-            SquadHUB
-          </NavLink>
-          {isTeacher && (
+          {/* === MAIN NAVIGATION LINKS (Desktop & Mobile) === */}
+          <div className={`nav-links ${isMenuOpen ? "active" : ""}`}>
+            <NavLink className="nav-link" to="/" onClick={closeAllMenus}>
+              <HiHome className="nav-icon" /> Home
+            </NavLink>
+            <NavLink className="nav-link" to="/explore" onClick={closeAllMenus}>
+              <HiSearch className="nav-icon" /> Explore
+            </NavLink>
             <NavLink
               className="nav-link"
-              to="/my-studio"
+              to="/squadhub"
               onClick={closeAllMenus}
             >
-              <HiViewGrid className="nav-icon" /> My Studio
+              <img src={SquadHubLogo} alt="SquadHUB" className="nav-icon-img" />{" "}
+              SquadHUB
             </NavLink>
-          )}
-        </div>
-
-        {/* === USER ACTIONS (Right Side) === */}
-        <div className="nav-actions">
-          {!isLoggedIn ? (
-            // --- GUEST VIEW ---
-            <div className="guest-actions">
-              <NavLink className="nav-link" to="/about" onClick={closeAllMenus}>
-                <HiInformationCircle className="nav-icon" /> About
+            {isTeacher && (
+              <NavLink
+                className="nav-link"
+                to="/my-studio"
+                onClick={closeAllMenus}
+              >
+                <HiViewGrid className="nav-icon" /> My Studio
               </NavLink>
-              <Link
-                to="/login"
-                className="btn btn-login"
-                onClick={closeAllMenus}
-              >
-                Login
-              </Link>
-              <Link
-                to="/signup"
-                className="btn btn-signup"
-                onClick={closeAllMenus}
-              >
-                Sign Up
-              </Link>
-            </div>
-          ) : (
-            // --- LOGGED-IN VIEW ---
-            <div className="logged-in-actions">
-              {!isTeacher && (
-                <Link
-                  to="/studio/onboarding"
-                  className="btn btn-cta-teal"
+            )}
+          </div>
+
+          {/* === USER ACTIONS (Right Side) === */}
+          <div className="nav-actions">
+            {!isLoggedIn ? (
+              // --- GUEST VIEW ---
+              <div className="guest-actions">
+                <NavLink
+                  className="nav-link"
+                  to="/about"
                   onClick={closeAllMenus}
                 >
-                  <HiAcademicCap className="nav-icon" /> Become a Teacher
-                </Link>
-              )}
-              <Link
-                to="/meet"
-                className="btn btn-cta-green"
-                onClick={closeAllMenus}
-              >
-                <HiOutlineVideoCamera className="nav-icon" /> Meet Now
-              </Link>
-
-              <div className="dropdown" ref={dropdownRef}>
-                <button
-                  className="dropdown-toggle-avatar"
-                  onClick={() => setIsDropdownOpen((v) => !v)}
-                  aria-haspopup="true"
-                  aria-expanded={isDropdownOpen}
+                  <HiInformationCircle className="nav-icon" /> About
+                </NavLink>
+                <Link
+                  to="/login"
+                  className="btn btn-login"
+                  onClick={closeAllMenus}
                 >
-                  <img
-                    src={navAvatarUrl}
-                    alt="User Avatar"
-                    className="navbar-avatar"
-                  />
+                  Login
+                </Link>
+                <Link
+                  to="/signup"
+                  className="btn btn-signup"
+                  onClick={closeAllMenus}
+                >
+                  Sign Up
+                </Link>
+              </div>
+            ) : (
+              // --- LOGGED-IN VIEW ---
+              <div className="logged-in-actions">
+                {!isTeacher && (
+                  <Link
+                    to="/studio/onboarding"
+                    className="btn btn-cta-teal"
+                    onClick={closeAllMenus}
+                  >
+                    <HiAcademicCap className="nav-icon" /> Become a Teacher
+                  </Link>
+                )}
+                <button
+                  className="btn btn-cta-green"
+                  onClick={() => navigate("/create-meeting")}
+                >
+                  <HiOutlineVideoCamera className="nav-icon" /> Create Meeting
                 </button>
 
-                <div
-                  className={`dropdown-menu ${isDropdownOpen ? "active" : ""}`}
-                >
-                  <NavLink
-                    className="dropdown-item"
-                    to="/profile"
-                    onClick={closeAllMenus}
+                <div className="dropdown" ref={dropdownRef}>
+                  <button
+                    className="dropdown-toggle-avatar"
+                    onClick={() => setIsDropdownOpen((v) => !v)}
                   >
                     <img
                       src={navAvatarUrl}
                       alt="User Avatar"
-                      className="dropdown-avatar"
+                      className="navbar-avatar"
                     />
-                    <span>My Profile</span>
-                  </NavLink>
-
-                  <NavLink
-                    className="dropdown-item"
-                    to="/about"
-                    onClick={closeAllMenus}
-                  >
-                    <HiInformationCircle className="dropdown-icon" /> About
-                  </NavLink>
-
-                  <NavLink
-                    className="dropdown-item"
-                    to="/contact"
-                    onClick={closeAllMenus}
-                  >
-                    <HiChat className="dropdown-icon" /> Contact Team
-                  </NavLink>
-
-                  <button
-                    className="dropdown-item"
-                    onClick={() =>
-                      alert("Theme customization will be available soon!")
-                    }
-                    type="button"
-                  >
-                    <HiColorSwatch className="dropdown-icon" /> Theme
-                    Preferences
+                    {/* NEW: Notification badge */}
+                    {invitations.length > 0 && (
+                      <span className="notification-badge">
+                        {invitations.length}
+                      </span>
+                    )}
                   </button>
 
-                  {/* LANGUAGE SUBMENU */}
                   <div
-                    className={`dropdown-item dropdown-submenu ${
-                      isLanguageMenuOpen ? "open" : ""
+                    className={`dropdown-menu ${
+                      isDropdownOpen ? "active" : ""
                     }`}
-                    onMouseEnter={() => setIsLanguageMenuOpen(true)}
-                    onMouseLeave={() => setIsLanguageMenuOpen(false)}
                   >
-                    <button
-                      className="submenu-trigger"
-                      onClick={toggleLanguageMenu}
-                      type="button"
-                      aria-haspopup="true"
-                      aria-expanded={isLanguageMenuOpen}
+                    <NavLink
+                      className="dropdown-item"
+                      to="/profile"
+                      onClick={closeAllMenus}
                     >
-                      <span className="submenu-trigger-left">
-                        <HiTranslate className="dropdown-icon" />
-                        <span>Language</span>
-                      </span>
-                      <HiChevronRight
-                        className={`submenu-arrow ${
-                          isLanguageMenuOpen ? "rotated" : ""
-                        }`}
+                      <img
+                        src={navAvatarUrl}
+                        alt="User Avatar"
+                        className="dropdown-avatar"
                       />
+                      <span>My Profile</span>
+                    </NavLink>
+
+                    {/* Notifications Link */}
+                    <NavLink
+                      className="dropdown-item"
+                      to="/notifications"
+                      onClick={closeAllMenus}
+                    >
+                      <HiBell className="dropdown-icon" /> Notifications
+                      {invitations.length > 0 && (
+                        <span className="notification-badge-menu">
+                          {invitations.length}
+                        </span>
+                      )}
+                    </NavLink>
+
+                    <NavLink
+                      className="dropdown-item"
+                      to="/about"
+                      onClick={closeAllMenus}
+                    >
+                      <HiInformationCircle className="dropdown-icon" /> About
+                    </NavLink>
+
+                    <NavLink
+                      className="dropdown-item"
+                      to="/contact"
+                      onClick={closeAllMenus}
+                    >
+                      <HiChat className="dropdown-icon" /> Contact Team
+                    </NavLink>
+
+                    <button
+                      className="dropdown-item"
+                      onClick={() =>
+                        alert("Theme customization will be available soon!")
+                      }
+                      type="button"
+                    >
+                      <HiColorSwatch className="dropdown-icon" /> Theme
+                      Preferences
                     </button>
 
+                    {/* LANGUAGE SUBMENU */}
                     <div
-                      className={`submenu ${isLanguageMenuOpen ? "open" : ""}`}
+                      className={`dropdown-item dropdown-submenu ${
+                        isLanguageMenuOpen ? "open" : ""
+                      }`}
+                      onMouseEnter={() => setIsLanguageMenuOpen(true)}
+                      onMouseLeave={() => setIsLanguageMenuOpen(false)}
                     >
                       <button
-                        className="submenu-item"
+                        className="submenu-trigger"
+                        onClick={toggleLanguageMenu}
                         type="button"
-                        onClick={() =>
-                          alert("Multi-language support coming soon!")
-                        }
+                        aria-haspopup="true"
+                        aria-expanded={isLanguageMenuOpen}
                       >
-                        <span className="flag-icon">🇺🇸</span>
-                        English
+                        <span className="submenu-trigger-left">
+                          <HiTranslate className="dropdown-icon" />
+                          <span>Language</span>
+                        </span>
+                        <HiChevronRight
+                          className={`submenu-arrow ${
+                            isLanguageMenuOpen ? "rotated" : ""
+                          }`}
+                        />
                       </button>
-                      <button
-                        className="submenu-item"
-                        type="button"
-                        onClick={() =>
-                          alert("Multi-language support coming soon!")
-                        }
+
+                      <div
+                        className={`submenu ${
+                          isLanguageMenuOpen ? "open" : ""
+                        }`}
                       >
-                        <span className="flag-icon">🇫🇷</span>
-                        Français
-                      </button>
-                      <button
-                        className="submenu-item"
-                        type="button"
-                        onClick={() =>
-                          alert("Multi-language support coming soon!")
-                        }
-                      >
-                        <span className="flag-icon">🇹🇳</span>
-                        العربية
-                      </button>
+                        <button
+                          className="submenu-item"
+                          type="button"
+                          onClick={() =>
+                            alert("Multi-language support coming soon!")
+                          }
+                        >
+                          <span className="flag-icon">🇺🇸</span>
+                          English
+                        </button>
+                        <button
+                          className="submenu-item"
+                          type="button"
+                          onClick={() =>
+                            alert("Multi-language support coming soon!")
+                          }
+                        >
+                          <span className="flag-icon">🇫🇷</span>
+                          Français
+                        </button>
+                        <button
+                          className="submenu-item"
+                          type="button"
+                          onClick={() =>
+                            alert("Multi-language support coming soon!")
+                          }
+                        >
+                          <span className="flag-icon">🇹🇳</span>
+                          العربية
+                        </button>
+                      </div>
                     </div>
+
+                    <hr className="dropdown-divider" />
+
+                    <button
+                      className="dropdown-item"
+                      onClick={handleLogout}
+                      type="button"
+                    >
+                      <HiLogout className="dropdown-icon" /> Logout
+                    </button>
+
+                    <button
+                      className="dropdown-item dropdown-item-danger"
+                      type="button"
+                    >
+                      <HiTrash className="dropdown-icon dropdown-icon-danger" />{" "}
+                      Delete Account
+                    </button>
                   </div>
-
-                  <hr className="dropdown-divider" />
-
-                  <button
-                    className="dropdown-item"
-                    onClick={handleLogout}
-                    type="button"
-                  >
-                    <HiLogout className="dropdown-icon" /> Logout
-                  </button>
-
-                  <button
-                    className="dropdown-item dropdown-item-danger"
-                    type="button"
-                  >
-                    <HiTrash className="dropdown-icon dropdown-icon-danger" />{" "}
-                    Delete Account
-                  </button>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        {/* === HAMBURGER MENU (Mobile) === */}
-        <button
-          className="hamburger-menu"
-          onClick={() => setIsMenuOpen((v) => !v)}
-          aria-label="Toggle navigation"
-          aria-expanded={isMenuOpen}
-        >
-          <span />
-          <span />
-          <span />
-        </button>
-      </div>
-    </nav>
+          {/* === HAMBURGER MENU (Mobile) === */}
+          <button
+            className="hamburger-menu"
+            onClick={() => setIsMenuOpen((v) => !v)}
+            aria-label="Toggle navigation"
+            aria-expanded={isMenuOpen}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        </div>
+      </nav>
+    </>
   );
 };
 

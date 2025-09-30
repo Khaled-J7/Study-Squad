@@ -1,5 +1,8 @@
 // frontend/src/App.jsx
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
+import { useInvitations } from "./hooks/useInvitations";
+import meetingService from "./api/meetingService";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import HomePage from "./pages/HomePage";
@@ -25,18 +28,51 @@ import PublicStudioPage from "./pages/PublicStudioPage";
 import CreatePostPage from "./pages/CreatePostPage";
 import PostDetailPage from "./pages/PostDetailPage";
 import MyPostsPage from "./pages/MyPostsPage";
+import InvitationToast from "./components/common/InvitationToast";
+import NotificationsPage from "./pages/NotificationsPage";
+import MeetingPage from "./pages/MeetingPage";
+import CreateMeetingPage from './pages/CreateMeetingPage';
 import "./App.css";
 
 const App = () => {
   // Get the current location
   const location = useLocation();
+
+  const navigate = useNavigate();
+
   // Check if it's a dashboard route
   const isDashboardRoute = location.pathname.startsWith("/my-studio");
-  const isSquadHubRoute = location.pathname.startsWith("/squadhub");
+
+  const { invitations, updateInvitations } = useAuth(); // Get invitations from context
+  useInvitations(); // Activate our polling hook globally!
+
+  const handleAccept = async (invitationId, roomName) => {
+    await meetingService.updateInvitationStatus(invitationId, "accepted");
+    updateInvitations(invitations.filter((inv) => inv.id !== invitationId));
+    // Now this will work correctly
+    navigate(`/meeting/${roomName}`);
+  };
+
+  const handleDecline = async (invitationId) => {
+    await meetingService.updateInvitationStatus(invitationId, "declined");
+    // Remove the invitation from the list
+    updateInvitations(invitations.filter((inv) => inv.id !== invitationId));
+  };
 
   return (
     <>
-     <Navbar />
+      <Navbar />
+      {/* Display a toast for each pending invitation */}
+      <div className="toast-container">
+        {invitations.map((inv) => (
+          <InvitationToast
+            key={inv.id}
+            invitation={inv}
+            onAccept={handleAccept}
+            onDecline={handleDecline}
+          />
+        ))}
+      </div>
       <div className="app-content-wrapper">
         <main className="main-content-area">
           <Routes>
@@ -54,10 +90,12 @@ const App = () => {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
+            <Route path="/notifications" element={<NotificationsPage />} />{" "}
+            <Route path="/meeting/:roomName" element={<MeetingPage />} />
+            <Route path="/create-meeting" element={<CreateMeetingPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             {/* This is the new public route for viewing a studio. */}
             <Route path="/studios/:studioId" element={<PublicStudioPage />} />
-
             {/* --- Routes Guarded from Teachers --- */}
             <Route element={<TeacherRouteGuard />}>
               <Route
@@ -66,7 +104,6 @@ const App = () => {
               />
               <Route path="/studio/create" element={<CreateStudioPage />} />
             </Route>
-
             {/* NESTED DASHBOARD ROUTES */}
             {/* 1. The guard now wraps the parent Route, protecting all children */}
             <Route element={<TeacherOnlyRouteGuard />}>
