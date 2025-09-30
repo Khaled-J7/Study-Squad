@@ -975,3 +975,16 @@ def user_search_view(request):
 
     serializer = UserSearchSerializer(users, many=True)
     return Response(serializer.data)
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def account_delete_view(request):
+    """
+    Permanently deletes the authenticated user's account.
+    """
+    user = request.user
+    user.delete()
+    return Response(
+        {"detail": "Account successfully deleted."}, status=status.HTTP_204_NO_CONTENT
+    )

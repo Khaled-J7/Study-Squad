@@ -304,13 +304,14 @@ const Navbar = () => {
                       <HiLogout className="dropdown-icon" /> Logout
                     </button>
 
-                    <button
+                    <NavLink
                       className="dropdown-item dropdown-item-danger"
-                      type="button"
+                      to="/delete-account"
+                      onClick={closeAllMenus}
                     >
                       <HiTrash className="dropdown-icon dropdown-icon-danger" />{" "}
                       Delete Account
-                    </button>
+                    </NavLink>
                   </div>
                 </div>
               </div>

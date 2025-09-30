@@ -58,9 +58,19 @@ const login = (username, password) => {
   });
 };
 
+const deleteAccount = async () => {
+  try {
+    await axiosInstance.delete("/users/delete/");
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: "Failed to delete account." };
+  }
+};
+
 const authService = {
   register,
   login,
+  deleteAccount,
 };
 
 export default authService;

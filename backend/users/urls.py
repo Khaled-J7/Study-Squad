@@ -35,6 +35,7 @@ from .views import (
     get_my_invitations_view,
     update_invitation_status_view,
     user_search_view,
+    account_delete_view,
 )
 
 urlpatterns = [
@@ -121,4 +122,7 @@ urlpatterns = [
     ),
     # NEW URL for searching users
     path("users/search/", user_search_view, name="user-search"),
+    
+    # 🗑️ URL for deleting a user account
+    path("users/delete/", account_delete_view, name="user-delete"),
 ]

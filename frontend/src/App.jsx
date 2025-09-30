@@ -32,6 +32,7 @@ import InvitationToast from "./components/common/InvitationToast";
 import NotificationsPage from "./pages/NotificationsPage";
 import MeetingPage from "./pages/MeetingPage";
 import CreateMeetingPage from './pages/CreateMeetingPage';
+import DeleteAccountPage from './pages/DeleteAccountPage';
 import "./App.css";
 
 const App = () => {
@@ -94,6 +95,7 @@ const App = () => {
             <Route path="/meeting/:roomName" element={<MeetingPage />} />
             <Route path="/create-meeting" element={<CreateMeetingPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/delete-account" element={<DeleteAccountPage />} /> 
             {/* This is the new public route for viewing a studio. */}
             <Route path="/studios/:studioId" element={<PublicStudioPage />} />
             {/* --- Routes Guarded from Teachers --- */}
