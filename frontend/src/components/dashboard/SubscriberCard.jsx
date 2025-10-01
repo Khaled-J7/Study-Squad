@@ -25,11 +25,6 @@ const SubscriberCard = ({ subscriber, onBlock }) => {
       </div>
 
       <div className="subscriber-actions">
-        {/* The "Meet Now" button is a placeholder for a future feature. */}
-        <button className="meet-now-btn">
-          <MessageSquare size={16} />
-          <span>Meet Now</span>
-        </button>
 
         {/* This is the three-dot menu for more actions. */}
         <div className="action-menu-container">
