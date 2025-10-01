@@ -4,6 +4,8 @@
 [![Django Badge](https://img.shields.io/badge/-Django-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
 [![Jitsi Badge](https://img.shields.io/badge/-Jitsi%20Meet-1D76E5?style=for-the-badge&logo=jitsi&logoColor=white)](https://jitsi.org/)
 
+![Study_Squad_Logo](https://github.com/Khaled-J7/Study-Squad/blob/main/frontend/public/StudySquadMainLogo.png)
+
 An innovative online learning platform connecting teachers and students through personalized studios, collaborative courses, a vibrant community hub, and real-time video meetings.
 
 ---
