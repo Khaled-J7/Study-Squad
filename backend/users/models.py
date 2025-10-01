@@ -56,7 +56,7 @@ class Tag(models.Model):
 # Model 3: The Studio model for teachers
 #
 class Studio(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
 
     cover_image = models.ImageField(upload_to="studio_covers/", null=True, blank=True)

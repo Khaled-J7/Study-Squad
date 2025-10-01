@@ -43,7 +43,7 @@ class UserStudioSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(read_only=True)
     is_teacher = serializers.SerializerMethodField()
-    studio = UserStudioSerializer(source="studio_set", many=True, read_only=True)
+    studio = UserStudioSerializer(read_only=True)
 
     class Meta:
         model = User
@@ -57,16 +57,16 @@ class UserSerializer(serializers.ModelSerializer):
             "studio",
         ]
 
-    # Check if the user belongs to the "Teachers" group.
+    
     def get_is_teacher(self, obj):
-        return obj.groups.filter(name="Teachers").exists()
+        return hasattr(obj, 'studio')
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        # Take the first studio from the list, or null if there are none.
-        studios = representation.get("studio")
-        representation["studio"] = studios[0] if studios else None
-        return representation
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #     # Take the first studio from the list, or null if there are none.
+    #     studios = representation.get("studio")
+    #     representation["studio"] = studios[0] if studios else None
+    #     return representation
 
 
 # A new, lightweight serializer specifically for the studio cards on the explore page.
